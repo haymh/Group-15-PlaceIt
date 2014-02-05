@@ -6,6 +6,14 @@ import android.text.format.Time;
 
 
 public class PlaceIt {
+	public static final int MON = 1000000;
+	public static final int TUE = 100000;
+	public static final int WED = 10000;
+	public static final int THURS = 1000;
+	public static final int FRI = 100;
+	public static final int SAT = 10;
+	public static final int SUN = 1;
+	
 	public enum NumOfWeekRepeat{
 		ONE(1),TWO(2),THREE(3),FOUR(4);
 		private int value;
@@ -15,32 +23,73 @@ public class PlaceIt {
 		public int getValue(){
 			return value;
 		}
+		public static NumOfWeekRepeat genNumOfWeekRepeat(int value){
+			switch(value){
+			case 1:
+				return ONE;
+			case 2:
+				return TWO;
+			case 3:
+				return THREE;
+			case 4:
+				return FOUR;
+			default:
+				return null;
+			}
+		}
 	}
 	
+	public enum Status{
+		ON_MAP(1), ACTIVE(2), PULL_DOWN(3), EXPIRED(4);
+		private int value;
+		private Status(int value){
+			this.value = value;
+		}
+		public int getValue(){
+			return value;
+		}
+		public static Status genStatus(int value){
+			switch(value){
+			case 1:
+				return ON_MAP;
+			case 2:
+				return ACTIVE;
+			case 3:
+				return PULL_DOWN;
+			case 4:
+				return EXPIRED;
+			default:
+				return null;	
+			}
+		}
+	}
 	
+	private long id;
 	private String title;
 	private String description;
 	private boolean isRepeated;
-	private boolean repeatedDayInWeek[];
+	private int repeatedDayInWeek;
+	private boolean repeatedDay[];
 	private NumOfWeekRepeat numOfWeekRepeat;
 	private Date createDate;
 	private Date postDate;
 	private Date expiration;	
 	private double latitude;
 	private double longitude;
-	private int status;
+	private Status status;
 	
 	
 	
-	public PlaceIt(String title, String description, boolean isRepeated,
-			boolean[] repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
-			Date createDate, Date postDate, Date expiration, double latitude,
-			double longitude, int status) {
+	public PlaceIt(long id, String title, String description, boolean isRepeated,
+			int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
+			Date createDate, Date postDate, Date expiration, Status status, double latitude,
+			double longitude) {
 		super();
+		this.id = id;
 		this.title = title;
 		this.description = description;
 		this.isRepeated = isRepeated;
-		this.repeatedDayInWeek = repeatedDayInWeek;
+		this.setRepeatedDayInWeek(repeatedDayInWeek);
 		this.numOfWeekRepeat = numOfWeekRepeat;
 		this.createDate = createDate;
 		this.postDate = postDate;
@@ -48,6 +97,29 @@ public class PlaceIt {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.status = status;
+	}
+	public PlaceIt(String title, String description, boolean isRepeated,
+			int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
+			Date createDate, Date postDate, Date expiration, Status status, double latitude,
+			double longitude) {
+		super();
+		this.title = title;
+		this.description = description;
+		this.isRepeated = isRepeated;
+		this.setRepeatedDayInWeek(repeatedDayInWeek);
+		this.numOfWeekRepeat = numOfWeekRepeat;
+		this.createDate = createDate;
+		this.postDate = postDate;
+		this.expiration = expiration;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.status = status;
+	}
+	public long getId(){
+		return id;
+	}
+	public void setId(long id){
+		this.id = id;
 	}
 	public String getTitle() {
 		return title;
@@ -67,15 +139,31 @@ public class PlaceIt {
 	public void setRepeated(boolean isRepeated) {
 		this.isRepeated = isRepeated;
 	}
-	public boolean[] getRepeatedDayInWeek() {
+	public int getRepeatedDayInWeek() {
 		return repeatedDayInWeek;
 	}
 	
-	//parameter must be a array of size of 7
-	public void setRepeatedDayInWeek(boolean[] repeatedDayInWeek) { 
-		if(repeatedDayInWeek.length != 7)
-			throw new IllegalArgumentException("repeatedDayInWeek needs to be 7 in length");
-		this.repeatedDayInWeek = repeatedDayInWeek;
+	//parameter must be a integer of length of 7, e.g 1010001 Monday, Wednesday, Sunday 
+	//the way to pass valid parameters is setRepeatedDayInWeek(PlaceIt.MON + PlaceIt.WED + PlaceIt.SUN)
+	public void setRepeatedDayInWeek(int repeatedDayInWeek) { 
+		if(isRepeated){
+			this.repeatedDayInWeek = repeatedDayInWeek;
+			int n = 1000000;
+			int r = repeatedDayInWeek / n;
+			for(int i = 0; i < 7; i++){
+				if(r == 1)
+					repeatedDay[i] = true;
+				else
+					repeatedDay[i] = false;
+				repeatedDayInWeek = repeatedDayInWeek % n;
+				n = n / 10;
+				r = repeatedDayInWeek / n;
+			}
+		}else{
+			this.repeatedDayInWeek = 0;
+			for(int i = 0; i < 7; i++)
+				repeatedDay[i] = false;
+		}
 	}
 	public NumOfWeekRepeat getNumOfWeekRepeat() {
 		return numOfWeekRepeat;
@@ -114,10 +202,10 @@ public class PlaceIt {
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
-	public int getStatus() {
+	public Status getStatus() {
 		return status;
 	}
-	public void setStatus(int status) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 	
@@ -137,7 +225,7 @@ public class PlaceIt {
 			int earliest = 0;
 			// find earliest post day in a week
 			for(; earliest < 7; earliest++){
-				if(found = repeatedDayInWeek[earliest])
+				if(found = repeatedDay[earliest])
 					break;
 			}
 			if(!found)
@@ -179,7 +267,7 @@ public class PlaceIt {
 			int i = d;
 			//find any post day after current day
 			for(; i < 7; i++ ){
-				if(found = repeatedDayInWeek[i])
+				if(found = repeatedDay[i])
 					break;
 			}
 			if(found){
