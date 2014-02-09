@@ -38,9 +38,9 @@
         </activity>
                 <meta-data
               android:name="com.google.android.maps.v2.API_KEY"
-              android:value="AIzaSyDwuAxvGkLECwiRCoBiuRxsAAmAId_Zs-A"/>
+              android:value="AIzaSyCqm29UP6ST8cyQizyCfuAG4fDDC7PGWXg"/>
         <meta-data
-              android:name="com.google.android.gms.version"
+              android:name="com.google.android.gms.version" 
               android:value="@integer/google_play_services_version" />
     </application>
 
