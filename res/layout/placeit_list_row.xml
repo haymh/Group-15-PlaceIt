@@ -7,20 +7,24 @@
 	android:paddingBottom="5dp"
 	android:paddingLeft="5dp"
 	android:paddingRight="15dp"
-	android:onClick="editResult"
 	android:background="@android:drawable/list_selector_background"
 	>
     
 	<TextView
-	    android:id="@+id/title"
+	    android:id="@+id/inListTitle"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentLeft="true"
 	    android:layout_alignParentTop="true"
-	    android:text="Title"
-	    android:textSize="30sp" 
+	    android:textSize="25sp" 
 	   	/>
 
-	
+	<TextView
+	    android:id="@+id/inListDetail"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignLeft="@+id/inListTitle"
+	    android:layout_below="@+id/inListTitle"
+	    />
 
 </RelativeLayout>

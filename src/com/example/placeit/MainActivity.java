@@ -4,17 +4,27 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.android.gms.maps.*;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -28,7 +38,11 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
 	private List mMarkers = new ArrayList();
 	private Iterator marker = mMarkers.iterator();
 	
-
+	// Location client, used to get location
+	private LocationClient mLocationClient;
+	
+	private double latitude;
+	private double longitude;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +52,13 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
 		mMap.setMyLocationEnabled(true);
 		mMap.setOnMapClickListener(this);
 		
+		// Sends user to current location
+		gotoCurrentLocation();
+		
+		// Turns off compass
+		mMap.getUiSettings().setCompassEnabled(false);
+	    
+		/*
 		 Button btnReTrack = (Button) findViewById(R.id.retrack);
 		 btnReTrack.setOnClickListener(new View.OnClickListener() 
 		 { 
@@ -53,6 +74,7 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
 				 }
 			 }
 		 }								);
+		 */
 		 
 		 Button btnUpdate = (Button) findViewById(R.id.sendLocationBtn);
 		 btnUpdate.setOnClickListener(new View.OnClickListener() 
@@ -63,13 +85,43 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
 				 EditText editText = (EditText) findViewById(R.id.sendLocation);
 				 String geoData = editText.getText().toString();
 				 String[] coordinate = geoData.split(",");
-				 double latitude = Double.valueOf(coordinate[0]).doubleValue();
-				 double longitude = Double.valueOf(coordinate[1]).doubleValue();
+				 latitude = Double.valueOf(coordinate[0]).doubleValue();
+				 longitude = Double.valueOf(coordinate[1]).doubleValue();
 				 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12),2000,null);
 			 }
 		 }								);
 
 		 
+	}
+	
+	// This sends the camera to the user current location
+	// Called during onCreate()
+	private void gotoCurrentLocation()
+	{
+	    LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	    List<String> providers = lm.getProviders(true);
+
+	    Location l = null;
+	    for (int i = 0; i < providers.size(); i++) {
+	        l = lm.getLastKnownLocation(providers.get(i));
+	        if (l != null)
+	            break;
+	    }
+
+	    if (l != null) {
+	        latitude = l.getLatitude();
+	        longitude = l.getLongitude();
+	    }
+	    
+	    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12),2000,null);
+	}
+	
+	// List button handler
+	// Sends user to list of place-it activity
+	public void gotoListPage(View view)
+	{
+		Intent i = new Intent(this, PlaceItListActivity.class);
+		startActivity(i);
 	}
 
 	@Override

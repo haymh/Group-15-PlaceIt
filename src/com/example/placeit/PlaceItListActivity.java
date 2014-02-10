@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 public class PlaceItListActivity extends ListActivity 
 {
@@ -23,6 +24,20 @@ public class PlaceItListActivity extends ListActivity
 		super.onCreate(savedInstanceState);
 
 		list = new ArrayList<String>();
+		
+		list.add("We must A");
+		list.add("Everyone owes me lunch");
+		list.add("This");
+		list.add("is");
+		list.add("a");
+		list.add("test");
+		list.add("Scroll bar should");
+		list.add("be here by now");
+		list.add("Never mind");
+		list.add("My phone is big");
+		list.add("So I've got to");
+		list.add("Keep typing this");
+		list.add("This shit");
 		
 		setListAdapter(new Adapter(PlaceItListActivity.this, R.layout.placeit_list_row, list));
 	}
@@ -57,29 +72,15 @@ public class PlaceItListActivity extends ListActivity
 
 			if(item != null)
 			{
-				/*
-				TextView subject = (TextView) row.findViewById(R.id.RESULTsubject);
-				if(subject != null)
-					subject.setText(item.getSubject());
-
-				TextView isCreator = (TextView) row.findViewById(R.id.RESULTisCreator);
-				if(isCreator != null)
-				{
-					if(item.getIsCreator() == true)
-						isCreator.setText("Creator");
-					else
-						isCreator.setText("Member");
-				}
-
-				TextView dateTime = (TextView) row.findViewById(R.id.RESULTdateTime);
-				dateTime.setText(item.getDate() + "       " + item.getTime());
-
-				TextView count = (TextView) row.findViewById(R.id.RESULTcount);
-				count.setText(Integer.toString(item.getCount()));
-
-				TextView data = (TextView) row.findViewById(R.id.RESULTdata);
-				data.setText(Integer.toString(number));
-				*/
+				
+				TextView title = (TextView) row.findViewById(R.id.inListTitle);
+				if(title != null)
+					title.setText(item);
+	
+				TextView detail = (TextView) row.findViewById(R.id.inListDetail);
+				if(detail != null)
+					detail.setText("Some very specific detail goes in here, I think");
+				
 			}
 
 			return row;
