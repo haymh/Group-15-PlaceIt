@@ -1,90 +1,72 @@
 package com.example.placeit;
 
-import java.util.ArrayList;
-
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.app.ListActivity;
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+ 
+public class PlaceItListActivity extends Activity {
+ 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+ 
+        ActionBar actionBar = getActionBar();
+ 
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+ 
+        String activeLabel = "Active", pulledDownLabel = "Pulled Down";
+        
+        Tab tab = actionBar.newTab();
+        tab.setText(activeLabel);
+        TabListener<TabActive> tl = new TabListener<TabActive>(this, activeLabel, TabActive.class);
+        tab.setTabListener(tl);
+        actionBar.addTab(tab);
+        
+        tab = actionBar.newTab();
+        tab.setText(pulledDownLabel);
+        TabListener<TabPulledDown> t2 = new TabListener<TabPulledDown>(this, pulledDownLabel, TabPulledDown.class);
+        tab.setTabListener(t2);
+        actionBar.addTab(tab);
+ 
+    }
+ 
+    private class TabListener<T extends Fragment> implements ActionBar.TabListener {
+        private Fragment mFragment;
+        private final Activity mActivity;
+        private final String mTag;
+        private final Class<T> mClass;
+ 
+        public TabListener(Activity activity, String tag, Class<T> clz) {
+            mActivity = activity;
+            mTag = tag;
+            mClass = clz;
+        }
+ 
+		public void onTabSelected(Tab tab, FragmentTransaction ft) {
+            // Check if the fragment is already initialized
+            if (mFragment == null) {
+                // If not, instantiate and add it to the activity
+                mFragment = Fragment.instantiate(mActivity, mClass.getName());
+                ft.add(android.R.id.content, mFragment, mTag);
+            } else {
+                // If it exists, simply attach it in order to show it
+                ft.attach(mFragment);
+            }
+        }
 
-public class PlaceItListActivity extends ListActivity 
-{
-	// Array list of place-its objects
-	// String place holder
-	private ArrayList<String> list;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) 
-	{
-		super.onCreate(savedInstanceState);
-
-		list = new ArrayList<String>();
-		
-		list.add("We must A");
-		list.add("Everyone owes me lunch");
-		list.add("This");
-		list.add("is");
-		list.add("a");
-		list.add("test");
-		list.add("Scroll bar should");
-		list.add("be here by now");
-		list.add("Never mind");
-		list.add("My phone is big");
-		list.add("So I've got to");
-		list.add("Keep typing this");
-		list.add("This shit");
-		
-		setListAdapter(new Adapter(PlaceItListActivity.this, R.layout.placeit_list_row, list));
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) 
-	{
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.list, menu);
-		return true;
-	}
-	
-	public class Adapter extends ArrayAdapter<String>
-	{
-		public Adapter(Context context, int textResource, ArrayList<String> objects)
-		{
-			super(context, textResource, objects);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) 
-		{			
-			View row = convertView;
-
-			if(row == null)
-			{	
-				LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				row = inflater.inflate(R.layout.placeit_list_row, null);
-			}
-
-			String item = getItem(position);
-
-			if(item != null)
-			{
-				
-				TextView title = (TextView) row.findViewById(R.id.inListTitle);
-				if(title != null)
-					title.setText(item);
-	
-				TextView detail = (TextView) row.findViewById(R.id.inListDetail);
-				if(detail != null)
-					detail.setText("Some very specific detail goes in here, I think");
-				
-			}
-
-			return row;
-		}
-	}
-
+		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+            if (mFragment != null) {
+                // Detach the fragment, because another one is being attached
+                ft.detach(mFragment);
+            }
+        }
+ 
+        public void onTabReselected(Tab tab, FragmentTransaction ft) {
+            // User selected the already selected tab. Usually do nothing.
+        }
+    }
+ 
 }
