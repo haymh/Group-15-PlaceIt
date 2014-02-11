@@ -5,14 +5,41 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
  
 public class PlaceItListActivity extends Activity {
  
+	private MyService service;
+	
+	private ServiceConnection connection = new ServiceConnection(){
+
+		@Override
+		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
+			// TODO Auto-generated method stub
+			service = ((MyService.LocalBinder)arg1).getService();
+			Toast.makeText(PlaceItListActivity.this, "connnected to service", Toast.LENGTH_SHORT).show();
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName arg0) {
+			// TODO Auto-generated method stub
+			service = null;
+			Toast.makeText(PlaceItListActivity.this, "disconnnected from service", Toast.LENGTH_SHORT).show();
+		}
+		
+	};
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
- 
+        
         ActionBar actionBar = getActionBar();
  
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -31,6 +58,13 @@ public class PlaceItListActivity extends Activity {
         tab.setTabListener(t2);
         actionBar.addTab(tab);
  
+    }
+    
+    public void onStart(){
+    	super.onStart();
+    	Log.v("PlaceItListActivity onStart","trying to connect to service");
+		bindService(new Intent(this, MyService.class), connection, Context.BIND_AUTO_CREATE);
+		Log.v("PlaceItListActivity onStart","connectted to service");
     }
  
     private class TabListener<T extends Fragment> implements ActionBar.TabListener {
@@ -66,6 +100,10 @@ public class PlaceItListActivity extends Activity {
  
         public void onTabReselected(Tab tab, FragmentTransaction ft) {
             // User selected the already selected tab. Usually do nothing.
+        }
+        
+        public MyService getService(){
+        	return service;
         }
     }
  

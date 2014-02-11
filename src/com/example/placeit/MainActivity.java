@@ -122,6 +122,9 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
 	{
 		Intent i = new Intent(this, PlaceItListActivity.class);
 		startActivity(i);
+		
+		//Intent i = new Intent(this, TestActivity.class);
+		//startActivity(i);
 	}
 
 	@Override

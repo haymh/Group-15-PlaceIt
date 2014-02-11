@@ -7,21 +7,23 @@
     <permission
         android:name="com.example.placeit.maps.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
-    
+
     <uses-sdk
         android:minSdkVersion="13"
         android:targetSdkVersion="18" />
- 	<uses-feature
+
+    <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-     <!-- The following two permissions are required for location -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!-- The following two permissions are required for location -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -40,12 +42,28 @@
             android:name="com.example.placeit.PlaceItListActivity"
             android:label="@string/title_activity_list" >
         </activity>
+
         <meta-data
-              android:name="com.google.android.maps.v2.API_KEY"
-              android:value="AIzaSyCl7CsGIk0T9ghVv4c9rDLEYs40YKJ8fVc" />
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyCCqloye59-Ts0Ra9vmzCP26cq5BItNtZ0" />
         <meta-data
-              android:name="com.google.android.gms.version" 
-              android:value="@integer/google_play_services_version" />
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <service
+            android:name="com.example.placeit.MyService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <activity
+            android:name="com.example.placeit.TestActivity"
+            android:label="@string/title_activity_test" >
+        </activity>
+        <activity
+            android:name="com.example.placeit.TestListActivity"
+            android:label="@string/title_activity_test_list" >
+        </activity>
     </application>
 
 </manifest>

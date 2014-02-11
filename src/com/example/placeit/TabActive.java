@@ -1,10 +1,17 @@
 package com.example.placeit;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import android.app.ListFragment;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -12,8 +19,15 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
  
 public class TabActive extends ListFragment {
+	
+	private MyService service;
+	private Collection<PlaceIt> placeIts;
+	
+
+	
  
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -26,28 +40,31 @@ public class TabActive extends ListFragment {
 	private ArrayList<String> list;
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) 
+	public void onActivityCreated(Bundle savedInstanceState) 
 	{
-		super.onCreate(savedInstanceState);
-
+		super.onActivityCreated(savedInstanceState);
+		//service = ((PlaceItListActivity)getActivity()).getService();
 		list = new ArrayList<String>();
+		if(service == null)
+			Log.v("activeTab oncreate","service is null");
+		else
+			Log.v("activeTab oncreate","service is not null");
+		placeIts = service.getActiveList();
+		Log.v("activeTab oncreate","got active list");
+		if(!placeIts.isEmpty()){
+			Iterator<PlaceIt> nextPlaceIt = placeIts.iterator();
+			while(nextPlaceIt.hasNext()){
+				list.add(nextPlaceIt.next().getTitle());
+			}
+		}
 		
-		list.add("We must A");
-		list.add("Everyone owes me lunch");
-		list.add("This");
-		list.add("is");
-		list.add("a");
-		list.add("test");
-		list.add("Scroll bar should");
-		list.add("be here by now");
-		list.add("Never mind");
-		list.add("My phone is big");
-		list.add("So I've got to");
-		list.add("Keep typing this");
-		list.add("This shit");
+		
+		list.add("first");
+		Log.v("activetab","active tab is built");
 		
 		setListAdapter(new Adapter(this.getActivity(), R.layout.placeit_list_row, list));
 	}
+	
 
 	public class Adapter extends ArrayAdapter<String>
 	{
