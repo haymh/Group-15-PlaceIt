@@ -50,20 +50,29 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <activity
+            android:name="com.example.placeit.CreatePlaceItActivity"
+            android:label="@string/title_activity_create_place_it" >
+        </activity>
+        <activity
+            android:name="com.example.placeit.PlaceItDetailActivity"
+            android:label="@string/title_activity_place_it_detail" >
+        </activity>
+        <activity
+            android:name="com.example.placeit.TestActivity"
+            android:label="Test Activity" >
+        </activity>
+        <activity
+            android:name="com.example.placeit.TestListActivity"
+            android:label="Test List Activity" >
+        </activity>
+        
         <service
             android:name="com.example.placeit.MyService"
             android:enabled="true"
             android:exported="true" >
         </service>
-
-        <activity
-            android:name="com.example.placeit.TestActivity"
-            android:label="@string/title_activity_test" >
-        </activity>
-        <activity
-            android:name="com.example.placeit.TestListActivity"
-            android:label="@string/title_activity_test_list" >
-        </activity>
+        
     </application>
 
 </manifest>
