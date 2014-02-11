@@ -12,12 +12,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 	public static final String COLUMN_ID = "id";
 	public static final String COLUMN_TITLE = "title";
 	public static final String COLUMN_DESCRIPTION = "description";
-	public static final String COLUMN_IS_REPEATED = "isRepeated";
+	public static final String COLUMN_REPEAT_BY_WEEK = "repeatByWeek";
+	public static final String COLUMN_REPEAT_BY_MIN = "repeatByMinute";
+	public static final String COLUMN_REPEATED_MIN = "repeatedMinute";
 	public static final String COLUMN_REPEATED_DAY_IN_WEEK = "repeatedDayInWeek";
 	public static final String COLUMN_NUM_OF_WEEK_REPEAT = "numOfWeekRepeat";
 	public static final String COLUMN_CREATE_DATE = "createDate";
 	public static final String COLUMN_POST_DATE = "postDate";
-	public static final String COLUMN_EXPIRATION = "expiration";
 	public static final String COLUMN_STATUS = "status";
 	public static final String COLUMN_LATITUDE = "latitude";
 	public static final String COLUMN_LONGITUDE = "longitude";
@@ -25,17 +26,18 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 	private static final String DATABASE_NAME = "placeIts";
 	private static final int DATABASE_VERSION = 1;
 	
-	private static final String DATABASE_CREATE = "create table"
+	private static final String DATABASE_CREATE = "create table "
 			+ TABLE_PLACE_IT + "(" + COLUMN_ID
 			+ " integer primary key autoincrement, "
 			+ COLUMN_TITLE + " text not null, "
 			+ COLUMN_DESCRIPTION + " text, "
-			+ COLUMN_IS_REPEATED + " boolean not null, "
+			+ COLUMN_REPEAT_BY_MIN + " boolean not null, "
+			+ COLUMN_REPEATED_MIN + " integer, "
+			+ COLUMN_REPEAT_BY_WEEK + " boolean not null, "
 			+ COLUMN_REPEATED_DAY_IN_WEEK + " integer, "
 			+ COLUMN_NUM_OF_WEEK_REPEAT + " integer, "
 			+ COLUMN_CREATE_DATE + " datetime not null, "
 			+ COLUMN_POST_DATE + " datetime, "
-			+ COLUMN_EXPIRATION + " datetime, "
 			+ COLUMN_STATUS + " integer not null, "
 			+ COLUMN_LATITUDE + " double not null, "
 			+ COLUMN_LONGITUDE + " double not null);";

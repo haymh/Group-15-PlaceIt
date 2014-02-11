@@ -1,6 +1,8 @@
 package com.example.placeit;
 import java.util.*;
 
+import com.google.android.gms.maps.model.LatLng;
+
 
 import android.text.format.Time;
 
@@ -40,7 +42,7 @@ public class PlaceIt {
 	}
 	
 	public enum Status{
-		ON_MAP(1), ACTIVE(2), PULL_DOWN(3), EXPIRED(4);
+		ON_MAP(1), ACTIVE(2), PULL_DOWN(3);
 		private int value;
 		private Status(int value){
 			this.value = value;
@@ -56,8 +58,6 @@ public class PlaceIt {
 				return ACTIVE;
 			case 3:
 				return PULL_DOWN;
-			case 4:
-				return EXPIRED;
 			default:
 				return null;	
 			}
@@ -67,54 +67,59 @@ public class PlaceIt {
 	private long id;
 	private String title;
 	private String description;
-	private boolean isRepeated;
+	private boolean repeatByWeek;
+	private boolean repeatByMinute;
 	private int repeatedDayInWeek;
+	private int repeatedMinute;
 	private boolean repeatedDay[];
 	private NumOfWeekRepeat numOfWeekRepeat;
 	private Date createDate;
-	private Date postDate;
-	private Date expiration;	
-	private double latitude;
-	private double longitude;
+	private Date postDate;	
+	private LatLng coordinate;
 	private Status status;
 	
-	
-	
-	public PlaceIt(long id, String title, String description, boolean isRepeated,
-			int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
-			Date createDate, Date postDate, Date expiration, Status status, double latitude,
-			double longitude) {
+	public PlaceIt(long id, String title, String description,
+			boolean repeatByMinute, int repeatedMinute,
+			boolean repeatByWeek, int repeatedDayInWeek,
+			NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate,
+			LatLng coordinate, Status status) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.description = description;
-		this.isRepeated = isRepeated;
+		this.repeatByWeek = repeatByWeek;
+		this.repeatByMinute = repeatByMinute;
 		this.setRepeatedDayInWeek(repeatedDayInWeek);
+		this.repeatedMinute = repeatedMinute;
 		this.numOfWeekRepeat = numOfWeekRepeat;
 		this.createDate = createDate;
 		this.postDate = postDate;
-		this.expiration = expiration;
-		this.latitude = latitude;
-		this.longitude = longitude;
+		this.coordinate = coordinate;
 		this.status = status;
 	}
-	public PlaceIt(String title, String description, boolean isRepeated,
-			int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
-			Date createDate, Date postDate, Date expiration, Status status, double latitude,
-			double longitude) {
+	
+	public PlaceIt(long id, String title, String description,
+			boolean repeatByMinute, int repeatedMinute,
+			boolean repeatByWeek, int repeatedDayInWeek,
+			NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate,
+			double latitude, double longitude, Status status) {
 		super();
+		this.id = id;
 		this.title = title;
 		this.description = description;
-		this.isRepeated = isRepeated;
+		this.repeatByWeek = repeatByWeek;
+		this.repeatByMinute = repeatByMinute;
 		this.setRepeatedDayInWeek(repeatedDayInWeek);
+		this.repeatedMinute = repeatedMinute;
 		this.numOfWeekRepeat = numOfWeekRepeat;
 		this.createDate = createDate;
 		this.postDate = postDate;
-		this.expiration = expiration;
-		this.latitude = latitude;
-		this.longitude = longitude;
+		this.coordinate = new LatLng(latitude,longitude);
 		this.status = status;
 	}
+	
+	
+	
 	public long getId(){
 		return id;
 	}
@@ -133,12 +138,43 @@ public class PlaceIt {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public boolean isRepeated() {
-		return isRepeated;
+	
+	public boolean isRepeatByWeek() {
+		return repeatByWeek;
 	}
-	public void setRepeated(boolean isRepeated) {
-		this.isRepeated = isRepeated;
+
+
+
+	public void setRepeatByWeek(boolean repeatByWeek) {
+		this.repeatByWeek = repeatByWeek;
 	}
+
+
+
+	public boolean isRepeatByMinute() {
+		return repeatByMinute;
+	}
+
+
+
+	public void setRepeatByMinute(boolean repeatByMinute) {
+		this.repeatByMinute = repeatByMinute;
+	}
+
+
+
+	public int getRepeatedMinute() {
+		return repeatedMinute;
+	}
+
+
+
+	public void setRepeatedMinute(int repeatedMinute) {
+		this.repeatedMinute = repeatedMinute;
+	}
+
+
+
 	public int getRepeatedDayInWeek() {
 		return repeatedDayInWeek;
 	}
@@ -146,18 +182,19 @@ public class PlaceIt {
 	//parameter must be a integer of length of 7, e.g 1010001 Monday, Wednesday, Sunday 
 	//the way to pass valid parameters is setRepeatedDayInWeek(PlaceIt.MON + PlaceIt.WED + PlaceIt.SUN)
 	public void setRepeatedDayInWeek(int repeatedDayInWeek) { 
-		if(isRepeated){
+		repeatedDay = new boolean[7];
+		if(repeatByWeek){
 			this.repeatedDayInWeek = repeatedDayInWeek;
 			int n = 1000000;
-			int r = repeatedDayInWeek / n;
+			int r = 0;
 			for(int i = 0; i < 7; i++){
+				r = repeatedDayInWeek / n;
 				if(r == 1)
 					repeatedDay[i] = true;
 				else
 					repeatedDay[i] = false;
 				repeatedDayInWeek = repeatedDayInWeek % n;
 				n = n / 10;
-				r = repeatedDayInWeek / n;
 			}
 		}else{
 			this.repeatedDayInWeek = 0;
@@ -184,24 +221,20 @@ public class PlaceIt {
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
-	public Date getExpiration() {
-		return expiration;
+	
+	
+	public LatLng getCoordinate() {
+		return coordinate;
 	}
-	public void setExpiration(Date expiration) {
-		this.expiration = expiration;
+
+
+
+	public void setCoordinate(LatLng coordinate) {
+		this.coordinate = coordinate;
 	}
-	public double getLatitude() {
-		return latitude;
-	}
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-	public double getLongitude() {
-		return longitude;
-	}
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
+
+
+
 	public Status getStatus() {
 		return status;
 	}
@@ -219,8 +252,9 @@ public class PlaceIt {
 			return false;
 	}
 	
+	// access to get next post date of a place-it. It is for service
 	public Date nextPostDate() throws ContradictoryScheduleException{
-		if(isRepeated){
+		if(repeatByWeek){
 			boolean found = false;
 			int earliest = 0;
 			// find earliest post day in a week
@@ -229,7 +263,7 @@ public class PlaceIt {
 					break;
 			}
 			if(!found)
-				throw new ContradictoryScheduleException("set repeated, but no weekly schedule found!");
+				throw new ContradictoryScheduleException("set repeat by days in a week, but no weekly schedule found!");
 			
 			Calendar c = Calendar.getInstance();
 			int day = c.get(Calendar.DAY_OF_WEEK);
@@ -284,7 +318,7 @@ public class PlaceIt {
 				return c.getTime();
 			}
 
-		}else
+		}else 
 			return postDate;
 	}
 	

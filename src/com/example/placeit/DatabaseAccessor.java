@@ -1,5 +1,6 @@
 package com.example.placeit;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -10,16 +11,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.util.*;
 
 public class DatabaseAccessor {
 
 	private SQLiteDatabase database;
 	private MySQLiteHelper dbHelper;
 	private String[] allColumns = {MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_TITLE,
-			MySQLiteHelper.COLUMN_DESCRIPTION, MySQLiteHelper.COLUMN_IS_REPEATED,
+			MySQLiteHelper.COLUMN_DESCRIPTION, MySQLiteHelper.COLUMN_REPEAT_BY_MIN,
+			MySQLiteHelper.COLUMN_REPEATED_MIN, MySQLiteHelper.COLUMN_REPEAT_BY_WEEK,
 			MySQLiteHelper.COLUMN_REPEATED_DAY_IN_WEEK, MySQLiteHelper.COLUMN_NUM_OF_WEEK_REPEAT,
 			MySQLiteHelper.COLUMN_CREATE_DATE, MySQLiteHelper.COLUMN_POST_DATE,
-			MySQLiteHelper.COLUMN_EXPIRATION, MySQLiteHelper.COLUMN_STATUS,
+			MySQLiteHelper.COLUMN_STATUS,
 			MySQLiteHelper.COLUMN_LATITUDE, MySQLiteHelper.COLUMN_LONGITUDE
 	};
 	public DatabaseAccessor(Context context){
@@ -34,20 +39,55 @@ public class DatabaseAccessor {
 		dbHelper.close();
 	}
 	
-	public PlaceIt insertPlaceIt(String title, String description, boolean isRepeated,
+	private Map<Long, PlaceIt> searchPlaceItByStatus(boolean and, PlaceIt.Status[] status){
+		String where = null;
+		if(status != null && status.length >= 1){
+			String conjunction = " or ";
+			if(and)
+				conjunction = " and ";
+			where = MySQLiteHelper.COLUMN_STATUS + " = " + status[0].getValue();
+			for(int i = 1; i < status.length; i++)
+				where += conjunction + MySQLiteHelper.COLUMN_STATUS + " = " + status[i].getValue();
+		}
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
+				allColumns, where, null, null, null, null);
+		int count = cursor.getCount();
+		if(count == 0)
+			return null;
+		cursor.moveToFirst();
+		Map<Long, PlaceIt> map = new HashMap<Long, PlaceIt>();
+		for(int i = 0; i < count; i++){
+			PlaceIt pi = cursorToPlaceIt(cursor);
+			map.put(pi.getId(), pi);
+			cursor.moveToNext();
+		}
+		return map;
+	}
+	
+	public Map<Long, PlaceIt> activePlaceIt(){
+		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ACTIVE, PlaceIt.Status.ON_MAP});
+	}
+	
+	public Map<Long, PlaceIt> pulldownPlaceIt(){
+		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.PULL_DOWN});
+	}
+	
+	// insert a new place-it into database
+	public PlaceIt insertPlaceIt(String title, String description, boolean repeatByMinute,
+			int repeatedMinute, boolean repeatByWeek,
 			int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
-			Date createDate, Date postDate, Date expiration, double latitude,
-			double longitude){
+			Date createDate, Date postDate, double latitude, double longitude){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_TITLE, title);
 		values.put(MySQLiteHelper.COLUMN_DESCRIPTION, description);
-		values.put(MySQLiteHelper.COLUMN_IS_REPEATED, isRepeated);
+		values.put(MySQLiteHelper.COLUMN_REPEAT_BY_MIN, repeatByMinute);
+		values.put(MySQLiteHelper.COLUMN_REPEATED_MIN, repeatedMinute);
+		values.put(MySQLiteHelper.COLUMN_REPEAT_BY_WEEK, repeatByWeek);
 		values.put(MySQLiteHelper.COLUMN_REPEATED_DAY_IN_WEEK, repeatedDayInWeek);
 		values.put(MySQLiteHelper.COLUMN_NUM_OF_WEEK_REPEAT, numOfWeekRepeat.getValue());
 		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, dateFormat.format(createDate));
 		values.put(MySQLiteHelper.COLUMN_POST_DATE, dateFormat.format(postDate));
-		values.put(MySQLiteHelper.COLUMN_EXPIRATION, dateFormat.format(expiration));
 		values.put(MySQLiteHelper.COLUMN_STATUS, PlaceIt.Status.ACTIVE.getValue());
 		values.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
 		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
@@ -55,14 +95,57 @@ public class DatabaseAccessor {
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
 				allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId , null, null, null, null);
 		cursor.moveToFirst();
+		Log.v("database accessor","inserted");
 		return cursorToPlaceIt(cursor);
 	}
 	
+	// pull down a place-it
+	public boolean pullDown(long id){ 
+		return updatePlaceItStatus(id, PlaceIt.Status.PULL_DOWN);
+	}
+	
+	// change a place-it status to on map
+	public boolean onMap(long id){ 
+		return updatePlaceItStatus(id, PlaceIt.Status.ON_MAP);
+	}
+	
+	// delete a place-it in database
+	public boolean discard(long id){
+		return database.delete(MySQLiteHelper.TABLE_PLACE_IT,
+				MySQLiteHelper.COLUMN_ID + " = " + id, null) > 0;
+	}
+	
+	// check a place-it's status
+	public PlaceIt.Status checkStatus(long id){
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
+				new String[] { MySQLiteHelper.COLUMN_STATUS }, MySQLiteHelper.COLUMN_ID + " = " + id , null, null, null, null);
+		cursor.moveToFirst();
+		return PlaceIt.Status.genStatus(cursor.getInt(0));
+	}
+	
+	
+	// update place-it status in database
+	private boolean updatePlaceItStatus(long id, PlaceIt.Status status){
+		ContentValues values = new ContentValues();
+		values.put(MySQLiteHelper.COLUMN_STATUS, status.getValue());
+		int row = database.update(MySQLiteHelper.TABLE_PLACE_IT, values, 
+				MySQLiteHelper.COLUMN_ID + " = " + id, null);
+		return row == 1;		
+	}
+	
 	private PlaceIt cursorToPlaceIt(Cursor cursor){
-		return new PlaceIt(cursor.getLong(0), cursor.getString(1), cursor.getString(2),
-				cursor.getInt(3) == 1, cursor.getInt(4), PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(cursor.getInt(5)), 
-				new Date(cursor.getString(6)), new Date(cursor.getString(7)),
-				new Date(cursor.getString(8)), PlaceIt.Status.genStatus(cursor.getInt(9)),
-				cursor.getDouble(10),cursor.getDouble(11));
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return new PlaceIt(cursor.getLong(0), cursor.getString(1), cursor.getString(2),
+					cursor.getInt(3) == 1, cursor.getInt(4), cursor.getInt(5) == 1, cursor.getInt(6),
+					PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(cursor.getInt(7)), 
+					dateFormat.parse(cursor.getString(8)), dateFormat.parse(cursor.getString(9)),
+					cursor.getDouble(10),cursor.getDouble(11),
+					PlaceIt.Status.genStatus(cursor.getInt(12)));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
