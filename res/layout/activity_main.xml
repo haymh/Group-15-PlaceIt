@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
- 	android:id="@+id/map"
- 	android:layout_width="match_parent"
- 	android:layout_height="match_parent"
- 	android:name="com.google.android.gms.maps.MapFragment">
-		<RelativeLayout
-			android:id="@+id/linearLayout2" 
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:gravity="bottom">
-			<!--
-			<Button
-				android:id="@+id/retrack"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_marginLeft="5dp"
-				android:layout_marginRight="5dp"
-				android:layout_marginTop="5dp"
-				android:text="Retrack"
-				android:textStyle="bold" />
-			-->
+     android:id="@+id/map"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:name="com.google.android.gms.maps.MapFragment">
+        <RelativeLayout
+            android:id="@+id/linearLayout2" 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom">
+            <!--
+            <Button
+                android:id="@+id/retrack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:text="Retrack"
+                android:textStyle="bold" />
+            -->
 
-			<EditText
-			    android:id="@+id/sendLocation"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_alignParentLeft="true"
-			    android:layout_alignParentTop="true"
-			    android:layout_marginLeft="14dp"
-			    android:layout_marginTop="14dp"
-			    android:layout_weight="1"
-			    android:ems="10"
-			    android:gravity="top"
-			    android:hint="Lat, Lon"
-			    android:scrollHorizontally="true" >
-			    <requestFocus />
-			</EditText>
+            <EditText
+                android:id="@+id/sendLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="14dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:gravity="top"
+                android:hint="Address"
+                android:scrollHorizontally="true" >
+                <requestFocus />
+            </EditText>
 
-			<Button
-			    android:id="@+id/sendLocationBtn"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_alignLeft="@+id/sendLocation"
-			    android:layout_below="@+id/sendLocation"
-			    android:text="Goto"/>
+            <Button
+                android:id="@+id/sendLocationBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/sendLocation"
+                android:layout_below="@+id/sendLocation"
+                android:text="Goto"
+                android:onClick="geoLocate"/>
 
-			<Button
-			    android:id="@+id/listPageBtn"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:layout_alignBaseline="@+id/sendLocationBtn"
-			    android:layout_alignBottom="@+id/sendLocationBtn"
-			    android:layout_toRightOf="@+id/sendLocationBtn"
-				android:onClick="gotoListPage"
-			    android:text="List"/>
+            <Button
+                android:id="@+id/listPageBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/sendLocationBtn"
+                android:layout_alignBottom="@+id/sendLocationBtn"
+                android:layout_toRightOf="@+id/sendLocationBtn"
+                android:onClick="gotoListPage"
+                android:text="List"/>
 
-		</RelativeLayout>
-</fragment>  
-
+        </RelativeLayout>
+</fragment> 
