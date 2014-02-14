@@ -1,6 +1,7 @@
 package com.example.placeit;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,17 +19,22 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapActivity;
 
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -88,19 +94,21 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
              @Override
              public void onClick(View v)
              {
-                 try {
-                    geoLocate(v);
-                } catch (IOException e) {
+                try {
+                	if(checkWIFI())
+                		geoLocate(v);
+                	else
+                	{
+                		hideSoftKeyboard(v);
+                		Toast.makeText(MainActivity.this,"WIFI is off, plz turn it on", Toast.LENGTH_LONG).show();
+                	}
+                } catch (Exception e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Log.wtf("Exception", e);
+                    Toast.makeText(MainActivity.this,"Wrong input, try again :)", Toast.LENGTH_LONG).show();
+                	}
                 }
-                 /*String geoData = editText.getText().toString();
-                 String[] coordinate = geoData.split(",");
-                 latitude = Double.valueOf(coordinate[0]).doubleValue();
-                 longitude = Double.valueOf(coordinate[1]).doubleValue();
-                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12),2000,null);
-             */}
-         }                                );
+         });
 
          
     }
@@ -119,14 +127,68 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
          EditText editText = (EditText) findViewById(R.id.sendLocation);
          String location = editText.getText().toString();
          
-         Geocoder gc = new Geocoder(this);
-         List<Address> list = gc.getFromLocationName(location, 1);
-         Address add = list.get(0);
-         gotoLocation(add.getLatitude(), add.getLongitude(), 20);
-                 
-         String locality = add.getLocality();
-         Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
+         if(checkIfIsCoordante(location))
+         {
+             String geoData = editText.getText().toString();
+             String[] coordinate = geoData.split(",");
+             latitude = Double.valueOf(coordinate[0]).doubleValue();
+             longitude = Double.valueOf(coordinate[1]).doubleValue();
+             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12),2000,null);
+         }
+         else
+         {
+             Geocoder gc = new Geocoder(this);
+             List<Address> list = gc.getFromLocationName(location, 1);
+             Address add = list.get(0);
+             gotoLocation(add.getLatitude(), add.getLongitude(), 15);
+                     
+             String locality = add.getLocality();
+             Toast.makeText(this, locality, Toast.LENGTH_LONG).show();
+         }
          
+     }
+     public boolean checkGPS()
+     {
+    	 LocationManager mlocManager = 
+    			 (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+    	    boolean enabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    	    return enabled;
+    			 
+     }
+     public boolean checkWIFI()
+     {
+    	 ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    	 NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+    	 if (mWifi.isConnected())
+    	     return true;
+    	 else
+    		 return false;
+     }
+     //check if the input is a coordinate
+     public boolean checkIfIsCoordante(String location)
+     {
+    	 String string = location;
+    	 string.replaceAll("\\s+","");
+    	 int i=0;
+    	 int j=0;
+    	 int k=0;
+    	 String str[] = new String[3];
+    	 for(;i<string.length();i++)
+    	 {
+    		 if(string.charAt(i)==',')
+    		 {
+    			 str[k] = string.substring(j, i-1);
+    			 str[++k] = string.substring(i,1+i++);
+    			 str[++k] = string.substring(i);
+    			 break;
+    		 } 
+    		 return false;
+    	 }    	 
+    	 if(str[0].matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+") &&
+    			 str[2].matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+"))
+    		 return true;
+    	 else
+    		 return false;
      }
      private void hideSoftKeyboard(View v)
      {
@@ -136,6 +198,7 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
     
     // This sends the camera to the user current location
     // Called during onCreate()
+     
     private void gotoCurrentLocation()
     {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -210,11 +273,12 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
                  Marker added = mMap.addMarker(new MarkerOptions()
                  .position(pos)
                  .title(value)
-                 .snippet("You can put other info here!"));
-             
+                 //.snippet("You can put other info here!"));
+                 .snippet(""+(int)CalculationByDistance(new LatLng(latitude, longitude), pos)+"kms from current location"));
                  mMarkers.add(added);
              }
          });
+         CalculationByDistance(new LatLng(latitude, longitude), pos);
          
          alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() 
          {
@@ -225,6 +289,29 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
          });
          alert.show();
      }
+     public double CalculationByDistance(LatLng StartP, LatLng EndP) 
+     {
+	        int Radius=6371;//radius of earth in Km         
+	        double lat1 = StartP.latitude;
+	        double lat2 = EndP.latitude;
+	        double lon1 = StartP.longitude;
+	        double lon2 = EndP.longitude;
+	        double dLat = Math.toRadians(lat2-lat1);
+	        double dLon = Math.toRadians(lon2-lon1);
+	        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+	        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+	        Math.sin(dLon/2) * Math.sin(dLon/2);
+	        double c = 2 * Math.asin(Math.sqrt(a));
+	        double valueResult= Radius*c;
+	        double km=valueResult/1;
+	        DecimalFormat newFormat = new DecimalFormat("####");
+	        int kmInDec =  Integer.valueOf(newFormat.format(km));
+	        double meter=valueResult%1000;
+	        int  meterInDec= Integer.valueOf(newFormat.format(meter));
+	        Log.i("Radius Value",""+valueResult+"   KM  "+kmInDec+" Meter   "+meterInDec);
+	
+	        return Radius * c;
+      }
 
     @Override
     public void onCancel() {
