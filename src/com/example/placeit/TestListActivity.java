@@ -26,17 +26,14 @@ public class TestListActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_test_list);	
+		sManager = new ServiceManager(TestListActivity.this);
 	}
 	
 	
-
-
-
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		sManager = new ServiceManager(TestListActivity.this);
 		new AsyncTask<Void, Void, Integer>(){
 	        protected void onPreExecute() { }
 	        protected Integer doInBackground(Void... params) {
@@ -45,8 +42,6 @@ public class TestListActivity extends Activity {
 	            return new Integer(1);
 	        }
 	        protected void onPostExecute(Integer result) {
-	             // service is up, m_SrvConnection is set
-	             // what you wanted to do with the service in onCreate() goes here
 	        	if(service == null)
 	    			Log.v("TestListActivity onStart","service is null");
 	    		TextView text = (TextView)findViewById(R.id.textView1);

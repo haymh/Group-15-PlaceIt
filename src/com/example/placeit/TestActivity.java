@@ -1,10 +1,13 @@
 package com.example.placeit;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Random;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.app.Activity;
@@ -16,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class TestActivity extends Activity {
@@ -24,23 +28,9 @@ public class TestActivity extends Activity {
 
 	private MyService service;
 	
-	private ServiceConnection connection = new ServiceConnection(){
-
-		@Override
-		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-			// TODO Auto-generated method stub
-			service = ((MyService.LocalBinder)arg1).getService();
-			Toast.makeText(TestActivity.this, "connnected to service", Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			// TODO Auto-generated method stub
-			service = null;
-			Toast.makeText(TestActivity.this, "disconnnected from service", Toast.LENGTH_SHORT).show();
-		}
-		
-	};
+	//ServiceManager is managing service connection
+	//when activity is destroyed, we should call service = sManager.unBindService() to disconnect
+	private ServiceManager sManager;
 	
 	
 
@@ -48,8 +38,7 @@ public class TestActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_test);
-		
-		
+		sManager = new ServiceManager(this);
 	}
 	
 	
@@ -58,7 +47,18 @@ public class TestActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		bindService(new Intent(TestActivity.this, MyService.class), connection, Context.BIND_AUTO_CREATE);
+		/// AsyncTask to make sure service is not null
+		new AsyncTask<Void, Void, Integer>(){
+	        protected void onPreExecute() { }
+	        protected Integer doInBackground(Void... params) {
+	            while(service == null)
+	            	service = sManager.bindService();
+	            return new Integer(1);
+	        }
+	        protected void onPostExecute(Integer result) {
+	             
+	        }
+	     }.execute();
 	}
 
 
@@ -75,8 +75,7 @@ public class TestActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		this.unbindService(connection);
-		service = null;
+		service = sManager.unBindService();
 	}
 
 	public void generatePlaceIt(View view){
