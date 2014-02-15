@@ -185,7 +185,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 				Marker added = mMap.addMarker(new MarkerOptions()
 				.position(pos)
 				.title(value)
-				.icon(BitmapDescriptorFactory.fromResource(R.drawable.rsz_note))
+				.icon(BitmapDescriptorFactory.fromResource(R.drawable.note))
 				.snippet(""+(int)distanceManager.calculateDistance(new LatLng(latitude, longitude)) +"kms from current location"));
 				mMarkers.add(added);
 			}
@@ -319,6 +319,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	
 //TEST BUTTON HANDLERS, intent whatever you want
 	public void test1(View view){
+		Intent myIntent = new Intent(MainActivity.this, PlaceItDetailActivity.class);
+		MainActivity.this.startActivity(myIntent);
+		
 	}
 	
 	public void test2(View view){
