@@ -29,6 +29,7 @@ public class MyService extends Service {
 	private Map<Long, PlaceIt> pulldown;
 	private Map<Long, PlaceIt> onMap;
 	private Map<Long, PlaceIt> prePost;
+	private Iterator<PlaceIt> onMapIterator;
 
 	private NotifyThread nThread;
 	private PostThread pThread;
@@ -46,13 +47,13 @@ public class MyService extends Service {
 		}
 		public void run(){
 			while(!stop){
+				synchronized(onMap){
+					onMapIterator = onMap.values().iterator();
+				}
 				dManager.getCurrentLocation();
-				Iterator<PlaceIt> i = onMap.values().iterator();
-				while(i.hasNext()){
+				while(onMapIterator.hasNext()){
 					PlaceIt pi = null;
-					synchronized(i){
-						pi = i.next();
-					}
+					pi = onMapIterator.next();
 					if(dManager.calculateDistance(pi.getCoordinate()) <= 0.8){
 						Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 						intent.putExtra("id", pi.getId());
@@ -93,10 +94,11 @@ public class MyService extends Service {
 						pi = i.next();
 					}
 					if(pi.getPostDate().before(new Date())){
-						synchronized(i){
-							i.remove();
-						}
-						onMap.put(pi.getId(), pi);
+						i.remove();
+						synchronized(onMapIterator){
+							onMap.put(pi.getId(), pi);
+							onMapIterator = onMap.values().iterator();
+						}	
 					}
 				}
 				try {
@@ -234,9 +236,13 @@ public class MyService extends Service {
 	}
 
 	public boolean repostPlaceIt(long id){
-		boolean success = database.onMap(id);
+		PlaceIt pi = pulldown.get(id).clone();
+		pi.extendPostDate(Calendar.MINUTE, 45);
+		pi.setCreateDate(new Date());
+		boolean success = database.repostPlaceIt(pi);
 		if(success){		
-			active.put(id, pulldown.remove(id));
+			pulldown.remove(id);
+			active.put(id, pi);
 		}
 		return success;
 	}

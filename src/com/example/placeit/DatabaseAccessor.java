@@ -74,6 +74,10 @@ public class DatabaseAccessor {
 		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ON_MAP});
 	}
 	
+	public Map<Long, PlaceIt> prepostPlaceIt(){
+		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ACTIVE});
+	}
+	
 	// insert a new place-it into database
 	public PlaceIt insertPlaceIt(String title, String description, boolean repeatByMinute,
 			int repeatedMinute, boolean repeatByWeek,
@@ -101,6 +105,16 @@ public class DatabaseAccessor {
 		return cursorToPlaceIt(cursor);
 	}
 	
+	public boolean repostPlaceIt(PlaceIt pi){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		ContentValues values = new ContentValues();
+		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, dateFormat.format(pi.getCreateDate()));
+		values.put(MySQLiteHelper.COLUMN_POST_DATE, dateFormat.format(pi.getPostDate()));
+		int row = database.update(MySQLiteHelper.TABLE_PLACE_IT, values, 
+				MySQLiteHelper.COLUMN_ID + " = " + pi.getId(), null);
+		return row == 1;
+	}
+	
 	// pull down a place-it
 	public boolean pullDown(long id){ 
 		return updatePlaceItStatus(id, PlaceIt.Status.PULL_DOWN);
@@ -116,6 +130,7 @@ public class DatabaseAccessor {
 		return database.delete(MySQLiteHelper.TABLE_PLACE_IT,
 				MySQLiteHelper.COLUMN_ID + " = " + id, null) > 0;
 	}
+	
 	
 	
 	// check a place-it's status

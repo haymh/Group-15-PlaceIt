@@ -242,6 +242,13 @@ public class PlaceIt {
 		this.status = status;
 	}
 	
+	// extend number of unit time from current time
+	public void extendPostDate(int unit, int number){
+		Calendar c = Calendar.getInstance();
+		c.add(unit, number);
+		this.setPostDate(c.getTime());
+	}
+	
 	public boolean postToday() throws ContradictoryScheduleException{ 
 		Date postDate = nextPostDate();
 		Date today = new Date();
@@ -320,6 +327,14 @@ public class PlaceIt {
 
 		}else 
 			return postDate;
+	}
+	
+	public PlaceIt clone(){
+		return new PlaceIt(id, title, description,
+				repeatByMinute, repeatedMinute,
+				repeatByWeek, repeatedDayInWeek,
+				numOfWeekRepeat, createDate, postDate,
+				coordinate, status);
 	}
 	
 	
