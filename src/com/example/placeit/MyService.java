@@ -26,6 +26,18 @@ public class MyService extends Service {
 		}
 	}
 	
+	private class NotifyThread extends Thread{
+		public void run(){
+			
+		}
+	}
+	
+	private class PostThread extends Thread{
+		public void run(){
+			
+		}
+	}
+	
 	public MyService() {
 		
 	}
