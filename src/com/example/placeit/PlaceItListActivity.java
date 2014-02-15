@@ -1,5 +1,10 @@
 package com.example.placeit;
 
+import java.util.Date;
+import java.util.Random;
+
+import com.google.android.gms.maps.model.LatLng;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -77,8 +82,10 @@ public class PlaceItListActivity extends Activity {
     	
     	Log.wtf(TAG, "Go to detail page with: " + placeItId);
     	
-    	TestActivity test = new TestActivity();
-    	test.generatePlaceIt(view);
+		Random r = new Random();
+		service.createPlaceIt("title", "description", r.nextInt(40) < 20, r.nextInt(),
+				r.nextInt(40) < 20, PlaceIt.FRI + PlaceIt.MON, PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(r.nextInt(3) + 1),
+				new Date(), new Date(), new LatLng(r.nextInt(90), r.nextInt(180)));
     }
     
     // Repost button clicked, repost placeit
