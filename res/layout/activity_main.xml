@@ -9,17 +9,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="bottom">
-            <!--
-            <Button
-                android:id="@+id/retrack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="5dp"
-                android:text="Retrack"
-                android:textStyle="bold" />
-            -->
 
             <EditText
                 android:id="@+id/sendLocation"
@@ -44,7 +33,7 @@
                 android:layout_alignLeft="@+id/sendLocation"
                 android:layout_below="@+id/sendLocation"
                 android:text="Goto"
-                android:onClick="geoLocate"/>
+                android:onClick="sendToLocation"/>
 
             <Button
                 android:id="@+id/listPageBtn"
