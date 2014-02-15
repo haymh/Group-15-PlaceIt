@@ -31,6 +31,9 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -278,7 +281,20 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
                  mMarkers.add(added);
              }
          });
-         CalculationByDistance(new LatLng(latitude, longitude), pos);
+ 
+         if(CalculationByDistance(new LatLng(latitude, longitude), pos) < 0.8){
+        	 Intent intent = new Intent();
+        	 PendingIntent pIntent = PendingIntent.getActivity(MainActivity.this,0,intent,0);
+        	 Notification noti = new Notification.Builder(MainActivity.this)
+        	 .setTicker("Ticker Title")
+        	 .setContentTitle("Notification Content Title")
+        	 .setContentText("Notification Content.")
+        	 .setSmallIcon(R.drawable.ic_launcher)
+        	 .setContentIntent(pIntent).getNotification();
+        	 noti.flags=Notification.FLAG_AUTO_CANCEL;
+        	 NotificationManager notificationManager = (NotificationManager)getSystemService(this.NOTIFICATION_SERVICE);
+        	 notificationManager.notify(0,noti);
+         }
          
          alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() 
          {
