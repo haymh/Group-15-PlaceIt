@@ -19,34 +19,28 @@ import android.widget.Toast;
 public class TestListActivity extends Activity {
 
 	private MyService service;
+	private ServiceManager sManager = new ServiceManager(this);
 	
-	private ServiceConnection connection = new ServiceConnection(){
-
-		@Override
-		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-			// TODO Auto-generated method stub
-			service = ((MyService.LocalBinder)arg1).getService();
-			Toast.makeText(TestListActivity.this, "connnected to service", Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			// TODO Auto-generated method stub
-			service = null;
-			Toast.makeText(TestListActivity.this, "disconnnected from service", Toast.LENGTH_SHORT).show();
-		}
-		
-	};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_test_list);
-		bindService(new Intent(TestListActivity.this, MyService.class), connection, Context.BIND_AUTO_CREATE);
+		setContentView(R.layout.activity_test_list);	
+	}
+	
+	
+
+
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
 		new AsyncTask<Void, Void, Integer>(){
 	        protected void onPreExecute() { }
 	        protected Integer doInBackground(Void... params) {
-	            while(service == null);
+	            while(service == null)
+	            	service = sManager.bindService();
 	            return new Integer(1);
 	        }
 	        protected void onPostExecute(Integer result) {
@@ -55,21 +49,31 @@ public class TestListActivity extends Activity {
 	        	if(service == null)
 	    			Log.v("TestListActivity onStart","service is null");
 	    		TextView text = (TextView)findViewById(R.id.textView1);
-	    		Collection<PlaceIt> pis = service.getActiveList();
+	    		Intent i = getIntent();
+	    		boolean active = i.getBooleanExtra("active", true);
+	    		Collection<PlaceIt> pis;
+	    		if(active){
+	    			pis = service.getActiveList();
+	    			if(pis == null)
+	    				Log.v("collection","collection is null");
+	    		}else{
+	    			pis = service.getPulldownList();
+	    			if(pis == null)
+	    				Log.v("collection","collection is null");
+	    		}
 	    		Iterator<PlaceIt> next = pis.iterator();
 	    		String s = "";
 	    		while(next.hasNext()){
 	    			PlaceIt pi = next.next();
-	    			s = pi.getId() + ": " + pi.getTitle() + "\n";
+	    			s += pi.getId() + ": " + pi.getTitle() + "\n";
 	    		}
 	    		text.setText(s);
 	        }
 	     }.execute();
 		Log.v("TestListActivity onStart","connectted to service");
-		
 	}
-	
-	
+
+
 
 
 
@@ -78,6 +82,17 @@ public class TestListActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.test_list, menu);
 		return true;
+	}
+
+
+
+
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		service = sManager.unBindService();
 	}
 
 }

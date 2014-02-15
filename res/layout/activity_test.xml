@@ -14,19 +14,82 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="101dp"
-        android:text="generate random place-it" 
-        android:onClick="generatePlaceIt"/>
+        android:layout_marginTop="28dp"
+        android:onClick="generatePlaceIt"
+        android:text="generate random place-it" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button1"
         android:layout_below="@+id/button1"
-        android:layout_marginLeft="56dp"
-        android:layout_marginTop="59dp"
-        android:text="go to list"
-        android:onClick="gotoList" />
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="16dp"
+        android:layout_toLeftOf="@+id/button5"
+        android:onClick="gotoActive"
+        android:text="active list" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button2"
+        android:layout_alignBottom="@+id/button2"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="22dp"
+        android:text="pull down list"
+        android:onClick="gotoPulldown" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button2"
+        android:layout_below="@+id/button2"
+        android:layout_marginTop="48dp"
+        android:text="ID" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button3"
+        android:layout_alignBottom="@+id/button3"
+        android:layout_centerHorizontal="true"
+        android:text="discard"
+        android:onClick="discard" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button4"
+        android:layout_alignBottom="@+id/button4"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="18dp"
+        android:text="repost"
+        android:onClick="repost" />
+
+    <EditText
+        android:id="@+id/editId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/textView1"
+        android:layout_alignBottom="@+id/textView1"
+        android:layout_alignRight="@+id/button6"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/editId"
+        android:layout_marginTop="52dp"
+        android:onClick="pulldown"
+        android:text="pull down" />
 
 </RelativeLayout>

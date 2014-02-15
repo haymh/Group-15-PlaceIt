@@ -15,10 +15,13 @@ import android.content.ServiceConnection;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class TestActivity extends Activity {
 	
+	
+
 	private MyService service;
 	
 	private ServiceConnection connection = new ServiceConnection(){
@@ -45,9 +48,20 @@ public class TestActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_test);
-		bindService(new Intent(TestActivity.this, MyService.class), connection, Context.BIND_AUTO_CREATE);
+		
 		
 	}
+	
+	
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		bindService(new Intent(TestActivity.this, MyService.class), connection, Context.BIND_AUTO_CREATE);
+	}
+
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -56,10 +70,11 @@ public class TestActivity extends Activity {
 		return true;
 	}
 	
+	
 	@Override
-	protected void onStop() {
+	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		super.onStop();
+		super.onDestroy();
 		this.unbindService(connection);
 		service = null;
 	}
@@ -72,9 +87,45 @@ public class TestActivity extends Activity {
 		Log.v("create place it","success");
 	}
 	
-	public void gotoList(View view){
+	public void gotoActive(View view){
 		Intent i = new Intent(this, TestListActivity.class);
+		i.putExtra("active", true);
+		//Intent i = new Intent(this, PlaceItListActivity.class);
 		startActivity(i);
+	}
+	
+	public void gotoPulldown(View view){
+		Intent i = new Intent(this, TestListActivity.class);
+		i.putExtra("active", false);
+		//Intent i = new Intent(this, PlaceItListActivity.class);
+		startActivity(i);
+	}
+	
+	public void discard(View view){
+		long id = Long.parseLong(((EditText)findViewById(R.id.editId)).getText().toString());
+		Log.v("TestActivity","discard");
+		if(service.discardPlaceIt(id))
+			Toast.makeText(TestActivity.this, id + " was discarded", Toast.LENGTH_SHORT).show();
+		else
+			Toast.makeText(TestActivity.this, id + " was not discarded", Toast.LENGTH_SHORT).show();
+	}
+	
+	public void repost(View view){
+		long id = Long.parseLong(((EditText)findViewById(R.id.editId)).getText().toString());
+		Log.v("TestActivity","repost");
+		if(service.repostPlaceIt(id))
+			Toast.makeText(TestActivity.this, id + " was reposted", Toast.LENGTH_SHORT).show();
+		else
+			Toast.makeText(TestActivity.this, id + " was not reposted", Toast.LENGTH_SHORT).show();
+	}
+	
+	public void pulldown(View view){
+		long id = Long.parseLong(((EditText)findViewById(R.id.editId)).getText().toString());
+		Log.v("TestActivity","pull down");
+		if(service.pulldownPlaceIt(id))
+			Toast.makeText(TestActivity.this, id + " was pulled down", Toast.LENGTH_SHORT).show();
+		else
+			Toast.makeText(TestActivity.this, id + " was not pulled down", Toast.LENGTH_SHORT).show();
 	}
 
 }

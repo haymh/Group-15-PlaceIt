@@ -18,9 +18,10 @@ public class MyService extends Service {
 	private DatabaseAccessor database;
 	private Map<Long, PlaceIt> active;
 	private Map<Long, PlaceIt> pulldown;
+	private Map<Long, PlaceIt> onMap;
 
 	public class LocalBinder extends Binder{
-		MyService getService(){
+		public MyService getService(){
 			return MyService.this;
 		}
 	}
@@ -39,6 +40,7 @@ public class MyService extends Service {
 		database.open();
 		active = database.activePlaceIt();
 		pulldown = database.pulldownPlaceIt();
+		onMap = database.onMapPlaceIt();
 	}
 
 
@@ -92,12 +94,20 @@ public class MyService extends Service {
 	
 	// access this to get active list
 	public Collection<PlaceIt> getActiveList(){
+		Log.v("MyService","getActiveList");
 		return active.values();
 	}
 	
 	// access this to get pull down list
 	public Collection<PlaceIt> getPulldownList(){
+		Log.v("MyService","getPulldownList");
 		return pulldown.values();
+	}
+	
+	// access this to get a list of PlaceIt object that is on map
+	public Collection<PlaceIt> getOnMapList(){
+		Log.v("MyService","getOnMapList");
+		return onMap.values();
 	}
 	
 	// access this to get a place-it by id
@@ -112,7 +122,7 @@ public class MyService extends Service {
 	public boolean pulldownPlaceIt(long id){
 		boolean success = database.pullDown(id);
 		if(success)
-			active.remove(id);
+			pulldown.put(id,active.remove(id));
 		return success;
 	}
 	
@@ -124,6 +134,14 @@ public class MyService extends Service {
 				active.remove(id);
 			else
 				pulldown.remove(id);
+		}
+		return success;
+	}
+	
+	public boolean repostPlaceIt(long id){
+		boolean success = database.onMap(id);
+		if(success){
+			active.put(id, database.findPlaceIt(id));
 		}
 		return success;
 	}

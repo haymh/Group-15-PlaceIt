@@ -52,8 +52,6 @@ public class DatabaseAccessor {
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
 				allColumns, where, null, null, null, null);
 		int count = cursor.getCount();
-		if(count == 0)
-			return null;
 		cursor.moveToFirst();
 		Map<Long, PlaceIt> map = new HashMap<Long, PlaceIt>();
 		for(int i = 0; i < count; i++){
@@ -70,6 +68,10 @@ public class DatabaseAccessor {
 	
 	public Map<Long, PlaceIt> pulldownPlaceIt(){
 		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.PULL_DOWN});
+	}
+	
+	public Map<Long, PlaceIt> onMapPlaceIt(){
+		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ON_MAP});
 	}
 	
 	// insert a new place-it into database
@@ -115,12 +117,25 @@ public class DatabaseAccessor {
 				MySQLiteHelper.COLUMN_ID + " = " + id, null) > 0;
 	}
 	
+	
 	// check a place-it's status
 	public PlaceIt.Status checkStatus(long id){
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
 				new String[] { MySQLiteHelper.COLUMN_STATUS }, MySQLiteHelper.COLUMN_ID + " = " + id , null, null, null, null);
 		cursor.moveToFirst();
 		return PlaceIt.Status.genStatus(cursor.getInt(0));
+	}
+	
+	// find a place-it by id
+	public PlaceIt findPlaceIt(long id){
+		String where = MySQLiteHelper.COLUMN_ID+ " = " + id;
+		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
+				allColumns, where, null, null, null, null);
+		int count = cursor.getCount();
+		if(count <= 0)
+			return null;
+		cursor.moveToFirst();
+		return cursorToPlaceIt(cursor);
 	}
 	
 	
@@ -133,6 +148,8 @@ public class DatabaseAccessor {
 		return row == 1;		
 	}
 	
+	
+	//helper method that turns each row into a PlaceIt object
 	private PlaceIt cursorToPlaceIt(Cursor cursor){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
