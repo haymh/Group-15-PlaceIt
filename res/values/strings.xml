@@ -8,4 +8,8 @@
     <string name="title_activity_create_place_it">Create a Place It</string>
     <string name="title_activity_place_it_detail">Place It Detail</string>
 
+        <string name="title">Title</string>
+        <string name="detail">Title</string>
+    
+    
 </resources>

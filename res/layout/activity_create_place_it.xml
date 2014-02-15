@@ -1,41 +1,89 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    
+    android:orientation="vertical"
+    
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="@dimen/activity_vertical_margin" 
     tools:context=".CreatePlaceItActivity" >
 
-    <TextView
-        android:id="@+id/lat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="17dp"
-        android:layout_marginTop="61dp"
-        android:text="Create a Place It Here" />
+    
+    
+    <!-- Display title and prompt use to edit text -->
+    
+   		 <TextView
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="Place It Title"
+	        style="?android:listSeparatorTextViewStyle"
+	        />
+    
+        <EditText
+	        android:id="@+id/title"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="Please enter in a title"
+	        />
+    
+    <!-- Display coordinates title and print longtidue
+    		and latitude positions-->
+    		
+         <TextView
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="Map Coordinates"
+	        style="?android:listSeparatorTextViewStyle"
+	        />
+               
+	    <TextView
+	        android:id="@+id/lat"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Create a Place It Here" 
+	        style="?android:windowBackground" 
+	        />
 
-    <TextView
-        android:id="@+id/lng"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="17dp"
-        android:layout_marginTop="20dp"
-        android:text="Create a Place It Here" />
+	    
+	    <TextView
+		    android:id="@+id/lng"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:text="Create a Place It Here" 
+		    />
+        
+    <!-- Display Details and prompt use to type 
+    	detailed information-->        
+        
+        <TextView
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="Details"
+	        style="?android:listSeparatorTextViewStyle"
+	        />
+        
+        <EditText
+	        android:id="@+id/detail"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:hint="Please enter in details"
+	        />
 
-    <Button
-        android:id="@+id/sendMeBackToMain"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:onClick="sendMeBack"
-        android:text="Button" />
+	<!-- Button to go back-->
+        
+	    <Button
+	        android:id="@+id/sendMeBackToMain"
+	        style="?android:attr/buttonStyleSmall"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_alignParentTop="true"
+	        android:onClick="sendMeBack"
+	        android:text="Back" />
 
-</RelativeLayout>
+</LinearLayout>
