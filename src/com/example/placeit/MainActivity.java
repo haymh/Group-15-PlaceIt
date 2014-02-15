@@ -226,11 +226,11 @@ public class MainActivity extends Activity implements OnMapClickListener, Cancel
     // Sends user to list of place-it activity
     public void gotoListPage(View view)
     {
-        Intent i = new Intent(this, PlaceItListActivity.class);
-        startActivity(i);
-        
-        //Intent i = new Intent(this, TestActivity.class);
+        //Intent i = new Intent(this, PlaceItListActivity.class);
         //startActivity(i);
+        
+        Intent i = new Intent(this, TestActivity.class);
+        startActivity(i);
     }
 
     @Override

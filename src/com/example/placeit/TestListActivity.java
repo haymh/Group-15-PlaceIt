@@ -19,7 +19,7 @@ import android.widget.Toast;
 public class TestListActivity extends Activity {
 
 	private MyService service;
-	private ServiceManager sManager = new ServiceManager(this);
+	private ServiceManager sManager;
 	
 	
 	@Override
@@ -36,6 +36,7 @@ public class TestListActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		sManager = new ServiceManager(TestListActivity.this);
 		new AsyncTask<Void, Void, Integer>(){
 	        protected void onPreExecute() { }
 	        protected Integer doInBackground(Void... params) {
