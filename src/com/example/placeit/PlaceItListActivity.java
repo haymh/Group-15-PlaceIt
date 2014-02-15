@@ -5,37 +5,23 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.TextView;
  
 public class PlaceItListActivity extends Activity {
- 
+	private static String TAG = PlaceItListActivity.class.getSimpleName();
+	
 	private MyService service;
+	private ServiceManager manager;
+	private Fragment currentFragment;
+	private long placeItId;
 	
-	private ServiceConnection connection = new ServiceConnection(){
-
-		@Override
-		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-			// TODO Auto-generated method stub
-			service = ((MyService.LocalBinder)arg1).getService();
-			Toast.makeText(PlaceItListActivity.this, "connnected to service", Toast.LENGTH_SHORT).show();
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			// TODO Auto-generated method stub
-			service = null;
-			Toast.makeText(PlaceItListActivity.this, "disconnnected from service", Toast.LENGTH_SHORT).show();
-		}
-		
-	};
+//ACTIVITY DEFINITIONS
 	
+    // Creates tabs view
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,16 +43,100 @@ public class PlaceItListActivity extends Activity {
         TabListener<TabPulledDown> t2 = new TabListener<TabPulledDown>(this, pulledDownLabel, TabPulledDown.class);
         tab.setTabListener(t2);
         actionBar.addTab(tab);
- 
+        
+        manager = new ServiceManager(this);
     }
     
-    public void onStart(){
-    	super.onStart();
-    	Log.v("PlaceItListActivity onStart","trying to connect to service");
-		bindService(new Intent(this, MyService.class), connection, Context.BIND_AUTO_CREATE);
-		Log.v("PlaceItListActivity onStart","connectted to service");
+    // Binds service
+    public void onResume(){
+    	super.onResume();
+    	
+        new AsyncTask<Void, Void, Integer>() {
+	        protected void onPreExecute() {}
+
+	        protected Integer doInBackground(Void... params) {
+	            while(service == null)
+	            	service = manager.bindService();
+	            return Integer.valueOf(1);
+	        }
+	        
+	        protected void onPostExecute(Integer result) { }
+	    }.execute();
+    }
+    
+    public void onDestroy(){
+    	service = manager.unBindService();
+    	super.onDestroy();
+    }
+    
+//FRAGMENT & BUTTON HANDLERS
+    
+    // List object clicked, go to detail page
+    public void gotoDetailPage(View view) {
+    	getPlaceItId(view);
+    	
+    	Log.wtf(TAG, "Go to detail page with: " + placeItId);
+    	
+    	TestActivity test = new TestActivity();
+    	test.generatePlaceIt(view);
+    }
+    
+    // Repost button clicked, repost placeit
+    public void repostPlaceIt(View view) {
+    	View parent = (View) view.getParent();
+    	getPlaceItId(parent);
+ 
+    	Log.wtf(TAG, "Repost this: " + placeItId);
+    	
+    	service.repostPlaceIt(placeItId);
+    	
+    	fragmentRefresh();
+    }
+    
+    // Pull down button clicked, pull down placeit
+    public void pullDownPlaceIt(View view) {
+    	View parent = (View) view.getParent();
+    	getPlaceItId(parent);
+    	
+    	Log.wtf(TAG, "Pull down this:" + placeItId);
+    	
+    	service.pulldownPlaceIt(placeItId);
+    	
+    	fragmentRefresh();
+    }
+    
+    // Discard button clicked, discards placeit
+    // Same behavior for both active and pull down lists
+    public void discardPlaceIt(View view)
+    {
+    	// Gets parent of the view (button)
+    	View parent = (View) view.getParent();
+    	getPlaceItId(parent);
+    	
+    	Log.wtf(TAG, "Discard this: " + placeItId);
+    	service.discardPlaceIt(placeItId);
+    	
+    	fragmentRefresh();
+    }
+    
+//HANDLERS SUPPORT methods
+    
+    // Gets placeit ID to be used for pull down, discard or repost
+    // Uses ID to access service
+    public void getPlaceItId(View view) {
+    	TextView id = (TextView) view.findViewById(R.id.inListID);
+    	placeItId = Long.valueOf( (String) id.getText() );
+    }
+    
+    // Refresh current fragment
+    public void fragmentRefresh() {
+    	currentFragment.getFragmentManager().findFragmentByTag("FRAGMENT");
+    	currentFragment.onResume();
     }
  
+//UI DEFINITION, for UI only
+    
+    // Tab listener, changes tab on tap
     private class TabListener<T extends Fragment> implements ActionBar.TabListener {
         private Fragment mFragment;
         private final Activity mActivity;
@@ -79,32 +149,24 @@ public class PlaceItListActivity extends Activity {
             mClass = clz;
         }
  
+        // Attaches fragment if respective tab is selected
 		public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            // Check if the fragment is already initialized
             if (mFragment == null) {
-                // If not, instantiate and add it to the activity
                 mFragment = Fragment.instantiate(mActivity, mClass.getName());
                 ft.add(android.R.id.content, mFragment, mTag);
             } else {
-                // If it exists, simply attach it in order to show it
                 ft.attach(mFragment);
             }
+            
+            currentFragment = mFragment;
         }
 
+		// Detaches fragment on unselect
 		public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            if (mFragment != null) {
-                // Detach the fragment, because another one is being attached
+            if (mFragment != null)
                 ft.detach(mFragment);
-            }
         }
  
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
-            // User selected the already selected tab. Usually do nothing.
-        }
-        
-        public MyService getService(){
-        	return service;
-        }
+        public void onTabReselected(Tab tab, FragmentTransaction ft) { }
     }
- 
 }

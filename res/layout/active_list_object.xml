@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="vertical"
+	android:paddingTop="5dp"
+	android:paddingBottom="5dp"
+	android:paddingLeft="5dp"
+	android:paddingRight="15dp"
+	android:background="@android:drawable/list_selector_background"
+	android:descendantFocusability="blocksDescendants" 
+	android:onClick="gotoDetailPage"
+	>
+    
+	<TextView
+	    android:id="@+id/inListTitle"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:textSize="25sp" 
+	    android:maxLength="13"
+	    android:text="Active List"
+	   	/>
+
+	<TextView
+	    android:id="@+id/inListDetail"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignLeft="@+id/inListTitle"
+	    android:layout_below="@+id/inListTitle"
+	    android:maxLength="27"
+	    android:text="Detail"
+	    />
+	
+	<TextView
+        android:id="@+id/inListID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        />
+
+	<Button
+	    android:id="@+id/pullDownBtn"
+	    style="?android:attr/buttonStyleSmall"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentTop="true"
+	    android:layout_toLeftOf="@+id/discardBtn"
+	    android:onClick="pullDownPlaceIt"
+	    android:text="A" />
+
+	<Button
+	    android:id="@+id/discardBtn"
+	    style="?android:attr/buttonStyleSmall"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignBaseline="@+id/pullDownBtn"
+	    android:layout_alignBottom="@+id/pullDownBtn"
+	    android:layout_alignParentRight="true"
+	    android:onClick="discardPlaceIt"
+	    android:text="X" />
+
+</RelativeLayout>

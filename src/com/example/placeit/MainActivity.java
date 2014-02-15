@@ -76,25 +76,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
         // Turns off compass
         mMap.getUiSettings().setCompassEnabled(false);
        
-        /*
-         Button btnReTrack = (Button) findViewById(R.id.retrack);
-         btnReTrack.setOnClickListener(new View.OnClickListener()
-         {
-             @Override
-             public void onClick(View v)
-             {
-                 marker = mMarkers.iterator();
-                 if (marker.hasNext())
-                 {
-                 Marker current = (Marker) marker.next();
-                 mMap.animateCamera(CameraUpdateFactory.newLatLng(current.getPosition()), 2000, MainActivity.this);
-                 current.showInfoWindow();
-                 }
-             }
-         }                                );
-         */
-         
-         
          Button btnUpdate = (Button) findViewById(R.id.sendLocationBtn);
          btnUpdate.setOnClickListener(new View.OnClickListener()
          {
@@ -230,11 +211,11 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
     // Sends user to list of place-it activity
     public void gotoListPage(View view)
     {
-        //Intent i = new Intent(this, PlaceItListActivity.class);
-        //startActivity(i);
-       
-        Intent i = new Intent(this, TestActivity.class);
+        Intent i = new Intent(this, PlaceItListActivity.class);
         startActivity(i);
+       
+        //Intent i = new Intent(this, TestActivity.class);
+        //startActivity(i);
     }
  
     @Override
