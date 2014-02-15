@@ -11,6 +11,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -37,7 +39,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements OnMapClickListener, OnInfoWindowClickListener, CancelableCallback {
+public class MainActivity extends Activity implements OnMapClickListener, OnInfoWindowClickListener, CancelableCallback,
+	OnMapLongClickListener, OnMarkerClickListener {
 
 	private GoogleMap mMap;
 	private List mMarkers = new ArrayList();
@@ -48,6 +51,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	
 	private DistanceManager distanceManager;
 	private PhoneStatus phoneStatus;
+	
+	// Return activity request codes
+	private final int CREATE_PLACEIT = 1;
 
 //ACTIVITY DEFINITIONS
 	
@@ -56,13 +62,17 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		Log.wtf("MAIN", "Creator~");
+		
 		// Setups map if it's not
 		setUpMapIfNeeded();
 		
 		// Initializes map
 		mMap.setMyLocationEnabled(true);
 		mMap.setOnMapClickListener(this);
+		mMap.setOnMapLongClickListener(this);
 		mMap.setOnInfoWindowClickListener(this);
+		mMap.setOnMarkerClickListener(this);
 		
 		// Initialize support classes
 		distanceManager = new DistanceManager(this);
@@ -92,8 +102,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	public void onCancel() {}
 
 	@Override
-	public void onFinish()
-	{
+	public void onFinish() {
 		if (marker.hasNext())
 		{
 			Marker current = (Marker) marker.next();
@@ -106,13 +115,10 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	
 	// List button handler
 	// Sends user to list of place-it activity
-	public void gotoListPage(View view)
-	{
+	public void gotoListPage(View view) {
 		Intent i = new Intent(this, PlaceItListActivity.class);
 		startActivity(i);
 
-		//Intent i = new Intent(this, TestActivity.class);
-		//startActivity(i);
 	}
 	
 	// Goto button handler 
@@ -130,10 +136,40 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 			Toast.makeText(MainActivity.this,"Wrong input, try again :)", Toast.LENGTH_LONG).show();
 		}
 	}
+	
+	// Send user to create a place it activity on a long click
+	@Override
+	public void onMapLongClick(LatLng position) {
+		//Marker newMarker = mMap.addMarker(new MarkerOptions().position(position));
+		//mMarkers.add(newMarker);
+		
+		// Send location to activity
+		Bundle send = new Bundle();
+		send.putParcelable("position", position);
+		
+		Intent i = new Intent(this, CreatePlaceItActivity.class);
+		i.putExtra("bundle", send);
+		startActivityForResult(i, CREATE_PLACEIT);
+	}
+	
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch(requestCode) {
+		case CREATE_PLACEIT:
+			if(resultCode == RESULT_OK)
+				Log.wtf("MAIN", "It's ok");
+			break;
+		}
+	}
+	
+	public boolean onMarkerClick(Marker marker) {
+		Intent i = new Intent(this, PlaceItDetailActivity.class);
+		startActivity(i);
+		
+		return false;
+	}
 
 	@Override
-	public void onMapClick(LatLng position)
-	{
+	public void onMapClick(LatLng position) {
 		final LatLng pos = position;
 
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -142,10 +178,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		// Set an EditText view to get user input
 		final EditText input = new EditText(this);
 		alert.setView(input);
-		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener()
-		{
-			public void onClick(DialogInterface dialog, int whichButton)
-			{
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
 				String value = input.getText().toString();
 				Toast.makeText(MainActivity.this, "Tag added!", Toast.LENGTH_SHORT).show();
 				Marker added = mMap.addMarker(new MarkerOptions()
@@ -281,5 +315,15 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		}
 
 		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12),2000,null);
+	}
+	
+//TEST BUTTON HANDLERS, intent whatever you want
+	public void test1(View view){
+	}
+	
+	public void test2(View view){
+	}
+	
+	public void test3(View view){
 	}
 }
