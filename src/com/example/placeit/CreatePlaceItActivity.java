@@ -70,6 +70,7 @@ public class CreatePlaceItActivity extends Activity {
 		
 		Bundle bundle = getIntent().getParcelableExtra("bundle");
 		coordinate = bundle.getParcelable("position");
+		((EditText)findViewById(R.id.editLatLng)).setText("Latitude: " + coordinate.latitude + "\nLongitude: " + coordinate.longitude);
 		addlisteners();
 		
 

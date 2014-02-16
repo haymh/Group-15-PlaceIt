@@ -23,6 +23,7 @@ import android.util.Log;
 import java.util.*;
 
 public class MyService extends Service {
+	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
 	private final static double RANGE = 0.8;
 	private final static long NOTIFY_TIME_LAG = 5000;
 	private final static long POST_TIME_LAG = 4;
@@ -92,15 +93,15 @@ public class MyService extends Service {
 							onMap.put(pi.getId(), pi);
 							onMapIterator = onMap.values().iterator();	
 							
-							/*
-							Intent in = new Intent(MyService.this, MainActivity.class);
-							in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							
+							Intent in = new Intent(NOTIFICATION);
 							Bundle send = new Bundle();
 							send.putParcelable("position", pi.getCoordinate());
 							send.putLong("id", pi.getId());
 							in.putExtra("bundle", send);
-							startActivity(in);
-							*/
+							sendBroadcast(in);
+							
+							
 						}
 					}
 				}
