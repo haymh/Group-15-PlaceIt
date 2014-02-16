@@ -2,12 +2,10 @@ package com.example.placeit;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,11 +47,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 
 	private GoogleMap mMap;
 	private List<Marker> mMarkers = new ArrayList<Marker>();
-	private Iterator marker = mMarkers.iterator();
+	private Iterator<Marker> marker = mMarkers.iterator();
 	
 	private Map<String, Long> markerIdContainer;
-	
-	//private HashMap<String, long> marker;
 
 	private double latitude;
 	private double longitude;
@@ -64,9 +60,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	// Service definitions
 	private MyService service;
 	private ServiceManager serviceManager;
-	
-	// Return activity request codes
-	private final int CREATE_PLACEIT = 1;
 	
 	private String tag = MainActivity.class.getSimpleName();
 
@@ -159,13 +152,13 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 			.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));
 			mMarkers.add(addMarker);
 			
-			//Log.wtf(tag, String.valueOf(object.getId()) + " vs " + addMarker.getId());
-			
-			// Store placeit ID with marker ID for tracking
+			// Store placeit ID with marker ID in a hashmap for easy tracking
 			markerIdContainer.put(addMarker.getId(), object.getId());
-			
-			//Log.wtf(tag, "ID Container size: " + markerIdContainer.size());
 		}
+	}
+	
+	private void putMarkerOnMap() {
+		//DO SOMETHING
 	}
 	
 	@Override
@@ -182,7 +175,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	
 	protected void onDestroy() {
 		service = serviceManager.unBindService();
-		
 		super.onDestroy();
 	}
 
@@ -200,8 +192,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		try {
 			if(phoneStatus.checkWIFI())
 				geoLocate(view);
-			else
-			{
+			else {
 				hideSoftKeyboard(view);
 				Toast.makeText(MainActivity.this,"WIFI is off, plz turn it on", Toast.LENGTH_LONG).show();
 			}
@@ -233,6 +224,12 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 
 	@Override
 	public void onMapClick(LatLng position) {
+	
+		String mapClickMessage = "Hold tap to create Place It";
+		Toast toast = Toast.makeText(this, mapClickMessage, Toast.LENGTH_SHORT);
+		toast.show();
+		
+		/*
 		final LatLng pos = position;
 
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -274,6 +271,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 			}
 		});
 		alert.show();
+		*/
 	}
 
 	@Override
@@ -327,18 +325,15 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	}
 	
 	//check if the input is a coordinate
-	public boolean checkIfIsCoordante(String location)
-	{
+	public boolean checkIfIsCoordante(String location) {
 		String string = location;
 		string.replaceAll("\\s+","");
 		int i=0;
 		int j=0;
 		int k=0;
 		String str[] = new String[3];
-		for(;i<string.length();i++)
-		{
-			if(string.charAt(i)==',')
-			{
+		for(;i<string.length();i++) {
+			if(string.charAt(i)==',') {
 				str[k] = string.substring(j, i-1);
 				str[++k] = string.substring(i,1+i++);
 				str[++k] = string.substring(i);
@@ -352,55 +347,14 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		else
 			return false;
 	}
-	private void hideSoftKeyboard(View v)
-	{
+	private void hideSoftKeyboard(View v) {
 		InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(v.getWindowToken(),0);
 	}
 
 	// This sends the camera to the user current location
 	// Called during onCreate()
-	private void gotoCurrentLocation()
-	{
-		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		List<String> providers = lm.getProviders(true);
-
-		Location l = null;
-		for (int i = 0; i < providers.size(); i++) {
-			l = lm.getLastKnownLocation(providers.get(i));
-			if (l != null)
-				break;
-		}
-
-		if (l != null) {
-			latitude = l.getLatitude();
-			longitude = l.getLongitude();
-		}
-
-		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12),2000,null);
-	}
-	
-//TEST BUTTON HANDLERS, intent whatever you want
-	public void test1(View view){
-		Intent myIntent = new Intent(MainActivity.this, PlaceItDetailActivity.class);
-		MainActivity.this.startActivity(myIntent);
-		
-	}
-	
-	public void test2(View view){
-	}
-	
-	public void test3(View view){
-		Random r = new Random();
-		
-		double lat = (latitude - 0.5) + r.nextDouble();
-		double lon = (longitude - 0.5) + r.nextDouble();
-		
-		LatLng local = new LatLng(lat, lon);
-		
-		service.createPlaceIt("Test title length to test how long", "Test description length to test how long description can be", 
-				r.nextInt(40) < 20, r.nextInt(),
-				r.nextInt(40) < 20, PlaceIt.FRI + PlaceIt.MON, PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(r.nextInt(3) + 1),
-				new Date(), new Date(), local);
+	private void gotoCurrentLocation() {
+		mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(distanceManager.getCurrentCoordinates(), 12),2000,null);
 	}
 }

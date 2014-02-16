@@ -45,38 +45,5 @@
                 android:onClick="gotoListPage"
                 android:text="List"/>
 
-            <Button
-                android:id="@+id/testBtn1"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
-                android:text="Test 1" 
-                android:onClick="test1"
-                />
-
-            <Button
-                android:id="@+id/testBtn2"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/testBtn1"
-                android:layout_alignParentLeft="true"
-                android:text="Test 2" 
-                android:onClick="test2"
-                />
-
-            <Button
-                android:id="@+id/testBtn3"
-                style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/testBtn2"
-                android:layout_alignParentLeft="true"
-                android:text="Test 3" 
-                android:onClick="test3"
-                />
-
         </RelativeLayout> 
 </fragment>

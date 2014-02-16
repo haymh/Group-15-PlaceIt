@@ -66,7 +66,7 @@ public class PlaceItDetailActivity extends ListActivity {
 		}.execute();
 	}
 	
-	// Fills detail page
+	// Fills detail page, use DetailContent to format
 	// Calls service to obtain Place It referenced by ID from MainActivity
 	private void fillDetailPage() {
 		placeIt = service.findPlaceIt(placeItId);
@@ -158,7 +158,9 @@ public class PlaceItDetailActivity extends ListActivity {
 	}
 	
 //BUTTON HANDLERS 
-	public void omniPlaceIt(View view) {
+	
+	// Handle omni button depending on place it type
+	public void omniPlaceItHandler(View view) {
 		
 		// Type 1 and 2: On Map Place It, To Be Posted Place It
 		// Type 3: Pulled Down Place It
