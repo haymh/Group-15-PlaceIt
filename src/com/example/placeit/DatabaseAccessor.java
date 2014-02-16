@@ -172,8 +172,9 @@ public class DatabaseAccessor {
 					cursor.getInt(3) == 1, cursor.getInt(4), cursor.getInt(5) == 1, cursor.getInt(6),
 					PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(cursor.getInt(7)), 
 					dateFormat.parse(cursor.getString(8)), dateFormat.parse(cursor.getString(9)),
-					cursor.getDouble(10),cursor.getDouble(11),
-					PlaceIt.Status.genStatus(cursor.getInt(12)));
+					cursor.getDouble(11),cursor.getDouble(12),
+					PlaceIt.Status.genStatus(cursor.getInt(10))
+					);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
