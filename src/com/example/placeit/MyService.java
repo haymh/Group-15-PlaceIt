@@ -169,11 +169,6 @@ public class MyService extends Service {
 		return true;
 	}
 
-	public Collection<PlaceIt> getActiveList(){
-		Collection c =  onMap.values();
-		c.addAll(prePost.values());
-		return c;
-	}
 
 	// access this to get pull down list
 	public Collection<PlaceIt> getPulldownList(){
