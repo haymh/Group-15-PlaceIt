@@ -178,7 +178,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		}
 	}
 	
-	public void onDestroy() {
+	protected void onDestroy() {
 		service = serviceManager.unBindService();
 		
 		super.onDestroy();
@@ -221,17 +221,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		
 		Intent i = new Intent(this, CreatePlaceItActivity.class);
 		i.putExtra("bundle", send);
-		startActivityForResult(i, CREATE_PLACEIT);
-	}
-	
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
-		case CREATE_PLACEIT:
-			if(resultCode == RESULT_OK) {
-				Log.wtf("MAIN", "It's ok");
-			}
-			break;
-		}
+		startActivity(i);
 	}
 	
 	public boolean onMarkerClick(Marker marker) {
@@ -404,8 +394,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	public void test3(View view){
 		Random r = new Random();
 		
-		double lat = latitude + r.nextDouble();
-		double lon = longitude - r.nextDouble();
+		double lat = (latitude - 0.5) + r.nextDouble();
+		double lon = (longitude - 0.5) + r.nextDouble();
 		
 		LatLng local = new LatLng(lat, lon);
 		

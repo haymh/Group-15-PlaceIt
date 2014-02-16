@@ -1,18 +1,21 @@
 package com.example.placeit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
-import android.content.Intent;
+import android.app.ListActivity;
+import android.content.Context;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class PlaceItDetailActivity extends Activity {
+public class PlaceItDetailActivity extends ListActivity {
 
 	private MyService service; 
 	private ServiceManager manager; 
@@ -21,7 +24,10 @@ public class PlaceItDetailActivity extends Activity {
 	private long placeItId;
 	
 	private String tag = PlaceItDetailActivity.class.getSimpleName();
-
+	
+	private List<String> list = new ArrayList<String>();
+	
+//ACTIVITY DEFINITIONS
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,22 +38,6 @@ public class PlaceItDetailActivity extends Activity {
 		
 		// Initialize service manager, required for serving bind
 		manager = new ServiceManager(this);
-		
-		/*
-		//TextView text1 = (TextView)  findViewById(R.id.editText1);
-		//text1.setText(this.getDescription());
-		//text1.setText("Description goes here");
-
-		//TextView text2 = (TextView) findViewById(R.id.editText2);
-		//text2.setText("Date Set for goes here");
-
-		//DecimalFormat df = new DecimalFormat("#.##");
-		//TextView text3 = (TextView) findViewById(R.id.editText3);
-		//text3.setText(df.format(lat) + "," + df.format(lon));
-
-		TextView text4 = (TextView) findViewById(R.id.editText4);
-		text4.setText("Repetition Schedule goes here");
-		*/
 	}
 	
 	// Binds service
@@ -75,6 +65,65 @@ public class PlaceItDetailActivity extends Activity {
 		placeIt = service.findPlaceIt(placeItId);
 		
 		Log.wtf(tag, "PlaceIt ID " + placeItId + " : " + placeIt.getId());
+		
+		list.add(placeIt.getTitle());
+		
+		String description = placeIt.getDescription();
+		
+		if( description.isEmpty() != true ) {
+			Log.wtf(tag,  "Description <" + placeIt.getDescription() + ">");
+			
+			list.add(description);
+		}
+		
+		list.add(String.valueOf(placeIt.getCreateDate()));
+		
+		list.add("Location: " + placeIt.getCoordinate().latitude + ", " + placeIt.getCoordinate().longitude);
+		
+		try {
+			list.add(String.valueOf(placeIt.getPostDate()));
+		} catch (Exception e) {
+			Log.wtf(tag, e);
+		}
+		
+		if( placeIt.isRepeatByMinute() == true ) {
+			list.add(String.valueOf(placeIt.getRepeatedMinute()) + " minutes");
+		}
+		
+		if( placeIt.isRepeatByWeek() == true) {
+			boolean[] days = placeIt.getRepeatedDay().clone();
+			
+			for(int i = 0; i < 7; ++i) {
+				if(days[i] == true) 
+					list.add(getDayOfWeek(i));
+			}
+		}
+		
+		
+		
+		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
+	}
+	
+	private String getDayOfWeek(int day) {
+		switch(day) {
+		case 0:
+			return "Monday";
+		case 1:
+			return "Tuesday";
+		case 2:
+			return "Wednesday";
+		case 3:
+			return "Thursday";
+		case 4:
+			return "Friday";
+		case 5:
+			return "Saturday";
+		case 6:
+			return "Sunday";
+		default:
+			Log.wtf(tag, "Day " + String.valueOf(day) + " not found");
+			return null;
+		}
 	}
 
 	@Override
@@ -85,7 +134,7 @@ public class PlaceItDetailActivity extends Activity {
 	}
 
 	@Override
-	public void onDestroy() {
+	protected void onDestroy() {
 		service = manager.unBindService();
 		super.onDestroy();
 	}
@@ -97,5 +146,34 @@ public class PlaceItDetailActivity extends Activity {
 	
 	public void pullDownPlaceIt(View view) {
 		service.pulldownPlaceIt(placeItId);
+	}
+	
+// UI DEFINTION
+	public class Adapter extends ArrayAdapter<String> {
+		
+		public Adapter(Context context, int textResource, List<String> objects) {
+			super(context, textResource, objects);
+		}
+
+		// Fills the list fragment
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View row = convertView;
+
+			if(row == null) {
+				LayoutInflater inflater = (LayoutInflater) PlaceItDetailActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				row = inflater.inflate(R.layout.detail_list_object, null);
+			}
+
+			String item = getItem(position);
+
+			// Sets text into respective TextView
+			if(item != null) {
+				TextView text = (TextView) row.findViewById(R.id.detailListData);
+				if(text != null)
+					text.setText(item);
+			}
+			return row;
+		}
 	}
 }
