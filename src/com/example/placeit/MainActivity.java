@@ -211,12 +211,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		}
 	}
 	
-	// Send user to create a place it activity on a long click
+	// Send user to create a place it activity on a long tap (Hold)
 	@Override
 	public void onMapLongClick(LatLng position) {
-		//Marker newMarker = mMap.addMarker(new MarkerOptions().position(position));
-		//mMarkers.add(newMarker);
-		
 		// Send location to activity
 		Bundle send = new Bundle();
 		send.putParcelable("position", position);

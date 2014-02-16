@@ -180,6 +180,12 @@ public class PlaceItDetailActivity extends ListActivity {
 		this.finish();
 	}
 	
+	public void discardPlaceIt(View view) {
+		service.discardPlaceIt(placeItId);
+		this.finish();
+	}
+	
+	// Set ups button for either Pull Down or Repost depending on Place It type
 	public void setUpOmniButton() {
 		Button omniButton = (Button) findViewById(R.id.detailOmniBtn);
 		switch(statusType) {

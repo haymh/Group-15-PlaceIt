@@ -22,12 +22,21 @@
             android:layout_weight="1"
             android:onClick="omniPlaceIt"
             android:text="Omni" />
+        
+        <Button
+            android:id="@+id/discardBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="discardPlaceIt"
+            android:text="Discard" />
+            
 
         <Button
             android:id="@+id/detailCancelBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:onClick="goBack"
             android:text="Go Back" />
     </LinearLayout>

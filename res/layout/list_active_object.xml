@@ -19,8 +19,9 @@
 	    android:layout_alignParentLeft="true"
 	    android:layout_alignParentTop="true"
 	    android:textSize="25sp" 
-	    android:maxLength="30"
-	    android:text="Active List"
+	    android:maxLength="20"
+	    android:maxLines="1"
+	    android:text="Empty Title"
 	   	/>
 
 	<TextView
@@ -29,8 +30,9 @@
 	    android:layout_height="wrap_content"
 	    android:layout_alignLeft="@+id/inListTitle"
 	    android:layout_below="@+id/inListTitle"
-	    android:maxLength="27"
-	    android:text="Detail"
+		android:maxLength="35"
+		android:maxLines="1"
+	    android:text="Empty Detail"
 	    />
 	
 	<TextView
