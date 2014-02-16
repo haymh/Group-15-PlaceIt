@@ -13,7 +13,9 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -65,7 +67,9 @@ public class MyService extends Service {
 								.setSmallIcon(R.drawable.note)
 								.setContentTitle(pi.getTitle())
 								.setContentText(pi.getDescription())
-								.setContentIntent(resultPendingIntent);
+								.setContentIntent(resultPendingIntent)
+								.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+								.setAutoCancel(true);
 						TaskStackBuilder stackBuilder = TaskStackBuilder.create(MyService.this);
 						stackBuilder.addParentStack(PlaceItDetailActivity.class);
 						stackBuilder.addNextIntent(intent);
@@ -87,7 +91,16 @@ public class MyService extends Service {
 							pi.setStatus(PlaceIt.Status.ON_MAP);
 							onMap.put(pi.getId(), pi);
 							onMapIterator = onMap.values().iterator();	
-
+							
+							/*
+							Intent in = new Intent(MyService.this, MainActivity.class);
+							in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							Bundle send = new Bundle();
+							send.putParcelable("position", pi.getCoordinate());
+							send.putLong("id", pi.getId());
+							in.putExtra("bundle", send);
+							startActivity(in);
+							*/
 						}
 					}
 				}
@@ -215,12 +228,21 @@ public class MyService extends Service {
 		boolean success = database.pullDown(id);
 		if(success){
 			PlaceIt pi = onMap.get(id);
-			if(pi == null)
-				pi = prePost.remove(id);
-			else
+			if(pi == null){
+				pi = prePost.get(id);
+				if(!pi.isRepeated()){
+					prePost.remove(id);
+					pi.setStatus(PlaceIt.Status.PULL_DOWN);
+					pulldown.put(id, pi);
+				}
+			}else{
 				onMap.remove(id);
-			pi.setStatus(PlaceIt.Status.PULL_DOWN);
-			pulldown.put(id,pi);
+				if(!pi.isRepeated()){
+					pi.setStatus(PlaceIt.Status.PULL_DOWN);
+					pulldown.put(id, pi);
+				}else
+					prePost.put(id, pi);
+			}		
 		}
 		return success;
 	}

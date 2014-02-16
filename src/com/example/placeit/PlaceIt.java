@@ -149,7 +149,10 @@ public class PlaceIt {
 		this.repeatByWeek = repeatByWeek;
 	}
 
-
+	
+	public boolean isRepeated(){
+		return repeatByMinute || repeatByWeek;
+	}
 
 	public boolean isRepeatByMinute() {
 		return repeatByMinute;
@@ -328,7 +331,13 @@ public class PlaceIt {
 				return c.getTime();
 			}
 
-		}else 
+		}else if(repeatByMinute){
+			Calendar c = Calendar.getInstance();
+			c.setTime(createDate);
+			c.add(Calendar.MINUTE, repeatedMinute);
+			createDate = c.getTime();
+			return createDate;
+		}else
 			return postDate;
 	}
 	
