@@ -32,6 +32,7 @@ import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -176,6 +177,17 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	protected void onDestroy() {
 		service = serviceManager.unBindService();
 		super.onDestroy();
+	}
+	
+//BROADCAST HANDLER
+	public class MyReceiver extends BroadcastReceiver {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			long placeItId = intent.getLongExtra("id",0);
+			Bundle bundle = intent.getParcelableExtra("bundle");
+			LatLng placeItLocation = bundle.getParcelable("position");
+		}
 	}
 
 //EVENT HANDLERS
