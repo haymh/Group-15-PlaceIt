@@ -3,8 +3,6 @@ package com.example.placeit;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.placeit.PlaceIt.Status;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ListActivity;
@@ -15,6 +13,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class PlaceItDetailActivity extends ListActivity {
@@ -24,6 +23,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	
 	private PlaceIt placeIt;
 	private long placeItId;
+	private int statusType;
 	
 	private String tag = PlaceItDetailActivity.class.getSimpleName();
 	
@@ -61,6 +61,7 @@ public class PlaceItDetailActivity extends ListActivity {
 			
 			protected void onPostExecute(Integer result) {
 				fillDetailPage();
+				setUpOmniButton();
 			}
 		}.execute();
 	}
@@ -71,7 +72,8 @@ public class PlaceItDetailActivity extends ListActivity {
 		placeIt = service.findPlaceIt(placeItId);
 		
 		String status = "";
-		switch(placeIt.getStatus().getValue()) {
+		statusType = placeIt.getStatus().getValue();
+		switch(statusType) {
 		case 1: 
 			status = "ON MAP";
 			break;
@@ -155,16 +157,51 @@ public class PlaceItDetailActivity extends ListActivity {
 		super.onDestroy();
 	}
 	
-// BUTTON HANDLERS 
+//BUTTON HANDLERS 
+	public void omniPlaceIt(View view) {
+		
+		// Type 1 and 2: On Map Place It, To Be Posted Place It
+		// Type 3: Pulled Down Place It
+		switch(statusType) {
+		case 1:
+		case 2:
+			service.pulldownPlaceIt(placeItId);
+			this.finish();
+		case 3:
+			service.repostPlaceIt(placeItId);
+			this.finish();
+		default:
+			Log.wtf(tag, "Status " + statusType + " not supported");
+			this.finish();
+		}
+	}
+	
+	public void goBack(View view) {
+		this.finish();
+	}
+	
 	public void discardPlaceIt(View view) {
 		service.discardPlaceIt(placeItId);
+		this.finish();
 	}
 	
-	public void pullDownPlaceIt(View view) {
-		service.pulldownPlaceIt(placeItId);
+	// Set ups button for either Pull Down or Repost depending on Place It type
+	public void setUpOmniButton() {
+		Button omniButton = (Button) findViewById(R.id.detailOmniBtn);
+		switch(statusType) {
+		case 1:
+		case 2:
+			omniButton.setText("Pull Down");
+			return;
+		case 3:
+			omniButton.setText("Repost");
+			return;
+		default:
+			Log.wtf(tag, "Button of " + statusType + " could not be set");
+		}
 	}
 	
-// UI DEFINTION
+//UI DEFINTION
 	public class Adapter extends ArrayAdapter<DetailContent> {
 		
 		public Adapter(Context context, int textResource, List<DetailContent> objects) {
