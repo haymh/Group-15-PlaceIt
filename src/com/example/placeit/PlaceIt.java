@@ -234,6 +234,9 @@ public class PlaceIt {
 	}
 
 
+	public boolean [] getRepeatedDay(){
+		return repeatedDay;
+	}
 
 	public Status getStatus() {
 		return status;

@@ -38,6 +38,10 @@ public class DistanceManager {
         }
     }
     
+    public LatLng getCoordinates(){
+    	return new LatLng(this.currentLatitude,this.currentLongitude);
+    }
+    
     // Calculate distance from user
     public double calculateDistance(LatLng fromHere) {
     	getCurrentLocation();

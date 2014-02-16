@@ -83,6 +83,7 @@ public class DatabaseAccessor {
 			int repeatedMinute, boolean repeatByWeek,
 			int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
 			Date createDate, Date postDate, double latitude, double longitude){
+		Log.v("database accessor","enter insert method");
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_TITLE, title);
@@ -91,12 +92,15 @@ public class DatabaseAccessor {
 		values.put(MySQLiteHelper.COLUMN_REPEATED_MIN, repeatedMinute);
 		values.put(MySQLiteHelper.COLUMN_REPEAT_BY_WEEK, repeatByWeek);
 		values.put(MySQLiteHelper.COLUMN_REPEATED_DAY_IN_WEEK, repeatedDayInWeek);
+		Log.v("database accessor","before numOfWeekRepeat.getValue()");
 		values.put(MySQLiteHelper.COLUMN_NUM_OF_WEEK_REPEAT, numOfWeekRepeat.getValue());
+		Log.v("database accessor","numOfWeekRepeat.getValue()");
 		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, dateFormat.format(createDate));
 		values.put(MySQLiteHelper.COLUMN_POST_DATE, dateFormat.format(postDate));
 		values.put(MySQLiteHelper.COLUMN_STATUS, PlaceIt.Status.ACTIVE.getValue());
 		values.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
 		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
+		Log.v("database accessor","ready to insert");
 		long insertId = database.insert(MySQLiteHelper.TABLE_PLACE_IT, null, values);
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
 				allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId , null, null, null, null);

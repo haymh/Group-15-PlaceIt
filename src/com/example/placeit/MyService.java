@@ -20,7 +20,7 @@ import java.util.*;
 public class MyService extends Service {
 	private final static double RANGE = 0.8;
 	private final static long NOTIFY_TIME_LAG = 5000;
-	private final static long POST_TIME_LAG = 3600000;
+	private final static long POST_TIME_LAG = 720;
 	private final IBinder mBinder = new LocalBinder();
 	private DistanceManager dManager = new DistanceManager(this);
 	private boolean stop = false;
@@ -29,10 +29,7 @@ public class MyService extends Service {
 	private Map<Long, PlaceIt> pulldown;
 	private Map<Long, PlaceIt> onMap;
 	private Map<Long, PlaceIt> prePost;
-	private Iterator<PlaceIt> onMapIterator;
-
-	private NotifyThread nThread;
-	private PostThread pThread;
+	private NotifyPostThread nThread;
 
 	public class LocalBinder extends Binder{
 		public MyService getService(){
@@ -40,17 +37,14 @@ public class MyService extends Service {
 		}
 	}
 
-	private class NotifyThread extends Thread{
-		private long timeLag;
-		public NotifyThread(long timeLag){
-			this.timeLag = timeLag;
-		}
+	private class NotifyPostThread extends Thread{
+		private int i = 0;
+		
 		public void run(){
 			while(!stop){
-				synchronized(onMap){
-					onMapIterator = onMap.values().iterator();
-				}
+				Iterator<PlaceIt> onMapIterator = onMap.values().iterator();			
 				dManager.getCurrentLocation();
+				Log.v("coordinates:", "Lat: " + dManager.getCoordinates().latitude + " Log: " + dManager.getCoordinates().longitude);
 				while(onMapIterator.hasNext()){
 					PlaceIt pi = null;
 					pi = onMapIterator.next();
@@ -69,44 +63,30 @@ public class MyService extends Service {
 						notificationManager.notify(0,noti);
 					}
 				}
-				try {
-					sleep(timeLag);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	private class PostThread extends Thread{
-		private long timeLag;
-		public PostThread(long timeLag){
-			this.timeLag = timeLag;
-		}
-		public void run(){
-			while(!stop){
-				Iterator<PlaceIt> i = prePost.values().iterator();
 				
-				while(i.hasNext()){
-					PlaceIt pi = null;
-					synchronized(i){
-						pi = i.next();
-					}
-					if(pi.getPostDate().before(new Date())){
-						i.remove();
-						synchronized(onMapIterator){
-							onMap.put(pi.getId(), pi);
-							onMapIterator = onMap.values().iterator();
-						}	
+				i++;
+				if(i >= POST_TIME_LAG){
+					i = 0;
+					Iterator<PlaceIt> i = prePost.values().iterator();
+					while(i.hasNext()){
+						PlaceIt pi = i.next();
+						if(pi.getPostDate().before(new Date())){
+							i.remove();
+							synchronized(onMapIterator){
+								onMap.put(pi.getId(), pi);
+								onMapIterator = onMap.values().iterator();
+							}	
+						}
 					}
 				}
+				
 				try {
-					sleep(timeLag);
+					sleep(NOTIFY_TIME_LAG);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 			}
 		}
 	}
@@ -127,8 +107,7 @@ public class MyService extends Service {
 		pulldown = database.pulldownPlaceIt();
 		onMap = database.onMapPlaceIt();
 		prePost = database.prepostPlaceIt();
-		(nThread = new NotifyThread(NOTIFY_TIME_LAG)).start();
-		(pThread = new PostThread(POST_TIME_LAG)).start();
+		(nThread = new NotifyPostThread()).start();
 	}
 
 
@@ -205,6 +184,11 @@ public class MyService extends Service {
 	public Collection<PlaceIt> getOnMapList(){
 		Log.v("MyService","getOnMapList");
 		return onMap.values();
+	}
+	
+	// access this to get a list of PlaceIt object that is going to be posted
+	public Collection<PlaceIt> getPrepostList(){
+		return prePost.values();
 	}
 
 	// access this to get a place-it by id
