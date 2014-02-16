@@ -66,7 +66,8 @@ public class PlaceItDetailActivity extends ListActivity {
 		
 		Log.wtf(tag, "PlaceIt ID " + placeItId + " : " + placeIt.getId());
 		
-		list.add(placeIt.getTitle());
+		list.add("Title:" + placeIt.getTitle());
+		
 		
 		String description = placeIt.getDescription();
 		

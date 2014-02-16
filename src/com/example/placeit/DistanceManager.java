@@ -14,10 +14,12 @@ public class DistanceManager {
     
     private double currentLatitude;
     private double currentLongitude;
+    private Location location;
     private Context context;
     
     public DistanceManager(Context context) {
     	this.context = context;
+    	location = null;
     }
 
     // Obtains user current location
@@ -25,7 +27,6 @@ public class DistanceManager {
         LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         List<String> providers = manager.getProviders(true);
 
-        Location location = null;
         for (int i = 0; i < providers.size(); i++) {
             location = manager.getLastKnownLocation(providers.get(i));
             if (location != null)
@@ -40,6 +41,13 @@ public class DistanceManager {
     
     public LatLng getCoordinates(){
     	return new LatLng(this.currentLatitude,this.currentLongitude);
+    }
+    
+    public float distanceTo(LatLng dest){
+    	Location l = new Location("");
+    	l.setLatitude(dest.latitude);
+    	l.setLongitude(dest.longitude);
+    	return location.distanceTo(l);
     }
     
     // Calculate distance from user

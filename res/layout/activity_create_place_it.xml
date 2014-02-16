@@ -30,7 +30,7 @@
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <EditText
-                    android:id="@+id/editDescription"
+                    android:id="@+id/editTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -38,7 +38,7 @@
             </TableRow>
 
             <TableRow
-                android:id="@+id/tableRow1"
+                android:id="@+id/tableRow2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" >
@@ -53,13 +53,13 @@
             </TableRow>
 
             <TableRow
-                android:id="@+id/tableRow1"
+                android:id="@+id/tableRow3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" >
 
                 <EditText
-                    android:id="@+id/editTitle"
+                    android:id="@+id/editDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -67,7 +67,7 @@
             </TableRow>
 
             <TableRow
-                android:id="@+id/tableRow2"
+                android:id="@+id/tableRow4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" >
@@ -90,7 +90,7 @@
             </TableRow>
 
             <TableRow
-                android:id="@+id/tableRow3"
+                android:id="@+id/tableRow5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" >
@@ -112,7 +112,7 @@
             </TableRow>
 
             <TableRow
-                android:id="@+id/tableRow4"
+                android:id="@+id/tableRow6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" >

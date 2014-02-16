@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
@@ -181,18 +182,23 @@ public class CreatePlaceItActivity extends Activity {
 				title = description;
 			else{
 				for(int i = 0; i < 3; i++)
-					title += s[i];
+					title += (s[i] + " ");
 			}
+			Log.wtf("heng decription","<" + description + ">");
 		}
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-		try {
-			postDate = formatter.parse(editPostdate.getText().toString());
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Toast.makeText(this, "date format: dd-MM-yyyy", Toast.LENGTH_SHORT).show();
-			editPostdate.requestFocus();
-			return false;
+		if(editPostdate.getText().toString().equals(""))
+			postDate = new Date();
+		else{
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			try {
+				postDate = formatter.parse(editPostdate.getText().toString());
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				Toast.makeText(this, "date format: dd-MM-yyyy", Toast.LENGTH_SHORT).show();
+				editPostdate.requestFocus();
+				return false;
+			}
 		}
 		boolean isRepeat = ((CheckBox)findViewById(R.id.checkBoxRepeat)).isChecked();
 		if(isRepeat){

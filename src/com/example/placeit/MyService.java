@@ -20,7 +20,7 @@ import java.util.*;
 public class MyService extends Service {
 	private final static double RANGE = 0.8;
 	private final static long NOTIFY_TIME_LAG = 5000;
-	private final static long POST_TIME_LAG = 720;
+	private final static long POST_TIME_LAG = 4;
 	private final IBinder mBinder = new LocalBinder();
 	private DistanceManager dManager = new DistanceManager(this);
 	private boolean stop = false;
@@ -48,7 +48,7 @@ public class MyService extends Service {
 				while(onMapIterator.hasNext()){
 					PlaceIt pi = null;
 					pi = onMapIterator.next();
-					if(dManager.calculateDistance(pi.getCoordinate()) <= 0.8){
+					if(dManager.distanceTo(pi.getCoordinate()) <= 0.8){
 						Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 						intent.putExtra("id", pi.getId());
 						PendingIntent pIntent = PendingIntent.getActivity(MyService.this,0,new Intent(MyService.this,PlaceItDetailActivity.class),0);
