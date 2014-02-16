@@ -30,7 +30,6 @@ public abstract class TabListFragment extends ListFragment {
 		setFields();
 		
 		manager = new ServiceManager(getActivity());
-		Log.wtf(tag, "onCreate()");
 	}
 	
 	// Allows inherited classes to set fields
@@ -46,8 +45,6 @@ public abstract class TabListFragment extends ListFragment {
     // Binds service, if service bound, pull data by calling filllist()
     public void onResume() {
         super.onResume();
-        
-        Log.wtf(tag, "onResume()");
         
         new AsyncTask<Void, Void, Integer>() {
 	        protected void onPreExecute() {}

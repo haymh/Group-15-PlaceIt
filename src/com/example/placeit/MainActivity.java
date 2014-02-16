@@ -2,8 +2,12 @@ package com.example.placeit;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +27,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -43,8 +48,12 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	OnMapLongClickListener, OnMarkerClickListener {
 
 	private GoogleMap mMap;
-	private List mMarkers = new ArrayList();
+	private List<Marker> mMarkers = new ArrayList<Marker>();
 	private Iterator marker = mMarkers.iterator();
+	
+	private Map<String, Long> markerIdContainer;
+	
+	//private HashMap<String, long> marker;
 
 	private double latitude;
 	private double longitude;
@@ -52,8 +61,14 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	private DistanceManager distanceManager;
 	private PhoneStatus phoneStatus;
 	
+	// Service definitions
+	private MyService service;
+	private ServiceManager serviceManager;
+	
 	// Return activity request codes
 	private final int CREATE_PLACEIT = 1;
+	
+	private String tag = MainActivity.class.getSimpleName();
 
 //ACTIVITY DEFINITIONS
 	
@@ -61,8 +76,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		Log.wtf("MAIN", "Creator~");
 		
 		// Setups map if it's not
 		setUpMapIfNeeded();
@@ -83,6 +96,12 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 
 		// Turns off compass
 		mMap.getUiSettings().setCompassEnabled(false);
+		
+		// Initialize Service Manager
+		serviceManager = new ServiceManager(this);
+		
+		// Initialize marker ID container
+		markerIdContainer = new HashMap<String, Long>();
 	}
 	
 	// Check if the map is instantiated
@@ -98,17 +117,72 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		return true;
 	}
 	
+	// Binds service
+	// Fills map with placeits
+	public void onResume() {
+		super.onResume();
+		
+		Log.wtf(tag, "onResume()");
+		
+        new AsyncTask<Void, Void, Integer>() {
+	        protected void onPreExecute() {}
+
+	        protected Integer doInBackground(Void... params) {
+	            while(service == null)
+	            	service = serviceManager.bindService();
+	            return Integer.valueOf(1);
+	        }
+	        
+	        protected void onPostExecute(Integer result) {
+	        	fillMapWithPlaceIts();
+	        }
+	    }.execute();
+	}
+	
+	// Fill the map with placeits
+	// Only gets called when service is successfully bound
+	private void fillMapWithPlaceIts() {
+		ArrayList<PlaceIt> list = new ArrayList<PlaceIt>( service.getActiveList() );
+		Log.wtf(tag, "Filling map");
+		
+		// Refreshes the map with new data
+		mMarkers.clear();
+		markerIdContainer.clear();
+		mMap.clear();
+		
+		Iterator<PlaceIt> it = list.iterator();
+		while(it.hasNext()) {
+			PlaceIt object = it.next();
+			
+			Marker addMarker = mMap.addMarker(new MarkerOptions()
+			.position(object.getCoordinate())
+			.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));
+			mMarkers.add(addMarker);
+			
+			//Log.wtf(tag, String.valueOf(object.getId()) + " vs " + addMarker.getId());
+			
+			markerIdContainer.put(addMarker.getId(), object.getId());
+			
+			//Log.wtf(tag, "ID Container size: " + markerIdContainer.size());
+		}
+	}
+	
 	@Override
 	public void onCancel() {}
 
 	@Override
 	public void onFinish() {
-		if (marker.hasNext())
-		{
+		if (marker.hasNext()) {
 			Marker current = (Marker) marker.next();
 			mMap.animateCamera(CameraUpdateFactory.newLatLng(current.getPosition()), 2000, this);
 			current.showInfoWindow();
 		}
+	}
+	
+	public void onDestroy() {
+		service = serviceManager.unBindService();
+		
+		super.onDestroy();
 	}
 
 //EVENT HANDLERS
@@ -155,15 +229,21 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch(requestCode) {
 		case CREATE_PLACEIT:
-			if(resultCode == RESULT_OK)
+			if(resultCode == RESULT_OK) {
 				Log.wtf("MAIN", "It's ok");
+			}
 			break;
 		}
 	}
 	
 	public boolean onMarkerClick(Marker marker) {
+		Log.wtf(tag, String.valueOf(markerIdContainer.get(marker.getId())));
+		
+		
+		/*
 		Intent i = new Intent(this, PlaceItDetailActivity.class);
 		startActivity(i);
+		*/
 		
 		return false;
 	}
@@ -328,5 +408,15 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	}
 	
 	public void test3(View view){
+		Random r = new Random();
+		
+		double lat = latitude + r.nextDouble();
+		double lon = longitude - r.nextDouble();
+		
+		LatLng local = new LatLng(lat, lon);
+		
+		service.createPlaceIt("Test title length", "Test description length", r.nextInt(40) < 20, r.nextInt(),
+				r.nextInt(40) < 20, PlaceIt.FRI + PlaceIt.MON, PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(r.nextInt(3) + 1),
+				new Date(), new Date(), local);
 	}
 }
