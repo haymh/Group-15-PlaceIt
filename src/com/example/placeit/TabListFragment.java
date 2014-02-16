@@ -61,14 +61,6 @@ public abstract class TabListFragment extends ListFragment {
 	        		Log.wtf(tag, "No service");
 	        		return;
 	        	}
-
-	        	try {
-	        		service.getActiveList();
-	        	}
-	        	catch(Exception e) {
-	        		Log.wtf(tag, e);
-	        		return;
-	        	}
 	        	
 	        	fillList();
 	        }

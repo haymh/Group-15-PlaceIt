@@ -2,6 +2,8 @@ package com.example.placeit;
 
 import java.util.ArrayList;
 
+import android.util.Log;
+
 public class TabActive extends TabListFragment {
 	
 	@Override
@@ -12,7 +14,13 @@ public class TabActive extends TabListFragment {
 
 	@Override
 	public void fillList() {
-		list = new ArrayList<PlaceIt>(service.getActiveList());
+		try {
+			list = new ArrayList<PlaceIt>(service.getActiveList());
+		} catch(Exception e) {
+			Log.wtf(tag, e);
+			return;
+		}
+		
     	setListAdapter(new Adapter(getActivity(), imageResource, list));
 	}
 }

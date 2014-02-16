@@ -48,7 +48,7 @@
 	    android:layout_alignParentTop="true"
 	    android:layout_toLeftOf="@+id/discardBtn"
 	    android:onClick="repostPlaceIt"
-	    android:text="P" />
+	    android:text="R" />
 
 	<Button
 	    android:id="@+id/discardBtn"

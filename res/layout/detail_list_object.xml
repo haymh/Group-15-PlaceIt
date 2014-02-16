@@ -4,11 +4,24 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/detailListData"
+        android:id="@+id/detailListDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="Empty" />
+        android:paddingLeft="7dp"
+        android:text="Empty description" />
+
+    <TextView
+        android:id="@+id/detailListContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/detailListDescription"
+        android:paddingLeft="14dp"
+        android:paddingRight="7dp"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:text="Empty Content" />
 
 </RelativeLayout>

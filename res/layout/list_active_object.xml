@@ -48,7 +48,7 @@
 	    android:layout_alignParentTop="true"
 	    android:layout_toLeftOf="@+id/discardBtn"
 	    android:onClick="pullDownPlaceIt"
-	    android:text="A" />
+	    android:text="P" />
 
 	<Button
 	    android:id="@+id/discardBtn"

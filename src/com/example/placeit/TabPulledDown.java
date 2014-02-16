@@ -2,6 +2,8 @@ package com.example.placeit;
 
 import java.util.ArrayList;
 
+import android.util.Log;
+
 public class TabPulledDown extends TabListFragment {
 
 	@Override
@@ -12,7 +14,13 @@ public class TabPulledDown extends TabListFragment {
 
 	@Override
 	public void fillList() {
-		list = new ArrayList<PlaceIt>(service.getPulldownList());
+		try {
+			list = new ArrayList<PlaceIt>(service.getPulldownList());
+		} catch(Exception e) {
+			Log.wtf(tag, e);
+			return;
+		}
+		
     	setListAdapter(new Adapter(getActivity(), imageResource, list));
 	}
 

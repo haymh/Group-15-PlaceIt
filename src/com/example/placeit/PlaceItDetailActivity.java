@@ -25,7 +25,11 @@ public class PlaceItDetailActivity extends ListActivity {
 	
 	private String tag = PlaceItDetailActivity.class.getSimpleName();
 	
-	private List<String> list = new ArrayList<String>();
+	private List<DetailContent> list = new ArrayList<DetailContent>();
+	
+	private final int SMALLFONT = 16;
+	private final int MEDIUMFONT = 20;
+	private final int TITLEFONT = 40;
 	
 //ACTIVITY DEFINITIONS
 	@Override
@@ -64,43 +68,38 @@ public class PlaceItDetailActivity extends ListActivity {
 	private void fillDetailPage() {
 		placeIt = service.findPlaceIt(placeItId);
 		
-		Log.wtf(tag, "PlaceIt ID " + placeItId + " : " + placeIt.getId());
-		
-		list.add("Title:" + placeIt.getTitle());
-		
+		list.add(new DetailContent("TITLE", placeIt.getTitle(), TITLEFONT));
 		
 		String description = placeIt.getDescription();
+		if( !description.isEmpty() ) 
+			list.add(new DetailContent("DESCRIPTION", description, MEDIUMFONT));
 		
-		if( description.isEmpty() != true ) {
-			Log.wtf(tag,  "Description <" + placeIt.getDescription() + ">");
-			
-			list.add(description);
-		}
+		list.add(new DetailContent("DATE", String.valueOf(placeIt.getCreateDate()), SMALLFONT));
 		
-		list.add(String.valueOf(placeIt.getCreateDate()));
-		
-		list.add("Location: " + placeIt.getCoordinate().latitude + ", " + placeIt.getCoordinate().longitude);
+		list.add(new DetailContent("LOCATION", placeIt.getCoordinate().latitude + ", " + placeIt.getCoordinate().longitude, SMALLFONT));
 		
 		try {
-			list.add(String.valueOf(placeIt.getPostDate()));
+			list.add(new DetailContent("DATE to be POSTED", String.valueOf(placeIt.getPostDate()), SMALLFONT));
 		} catch (Exception e) {
 			Log.wtf(tag, e);
 		}
 		
 		if( placeIt.isRepeatByMinute() == true ) {
-			list.add(String.valueOf(placeIt.getRepeatedMinute()) + " minutes");
+			list.add(new DetailContent("MINUTES to be POSTED", String.valueOf(placeIt.getRepeatedMinute()) + " minutes", SMALLFONT));
 		}
 		
 		if( placeIt.isRepeatByWeek() == true) {
 			boolean[] days = placeIt.getRepeatedDay().clone();
+			String daysPosted = "";
 			
 			for(int i = 0; i < 7; ++i) {
 				if(days[i] == true) 
-					list.add(getDayOfWeek(i));
+					daysPosted += getDayOfWeek(i) + " ";
 			}
+			
+			if( !daysPosted.isEmpty() )
+				list.add(new DetailContent("REPEATS", daysPosted, SMALLFONT));
 		}
-		
-		
 		
 		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
 	}
@@ -123,7 +122,7 @@ public class PlaceItDetailActivity extends ListActivity {
 			return "Sunday";
 		default:
 			Log.wtf(tag, "Day " + String.valueOf(day) + " not found");
-			return null;
+			return "";
 		}
 	}
 
@@ -150,9 +149,9 @@ public class PlaceItDetailActivity extends ListActivity {
 	}
 	
 // UI DEFINTION
-	public class Adapter extends ArrayAdapter<String> {
+	public class Adapter extends ArrayAdapter<DetailContent> {
 		
-		public Adapter(Context context, int textResource, List<String> objects) {
+		public Adapter(Context context, int textResource, List<DetailContent> objects) {
 			super(context, textResource, objects);
 		}
 
@@ -166,13 +165,20 @@ public class PlaceItDetailActivity extends ListActivity {
 				row = inflater.inflate(R.layout.detail_list_object, null);
 			}
 
-			String item = getItem(position);
+			DetailContent item = getItem(position);
 
 			// Sets text into respective TextView
 			if(item != null) {
-				TextView text = (TextView) row.findViewById(R.id.detailListData);
-				if(text != null)
-					text.setText(item);
+				TextView description = (TextView) row.findViewById(R.id.detailListDescription);
+				if(description != null)
+					description.setText(item.description);
+				
+				TextView content = (TextView) row.findViewById(R.id.detailListContent);
+				if(content != null) {
+					if(item.contentFontSize > 0)
+						content.setTextSize(item.contentFontSize);
+					content.setText(item.content);
+				}
 			}
 			return row;
 		}
