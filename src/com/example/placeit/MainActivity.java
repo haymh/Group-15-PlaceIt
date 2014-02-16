@@ -102,6 +102,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		
 		// Initialize marker ID container
 		markerIdContainer = new HashMap<String, Long>();
+		Intent intent = new Intent(this, MyService.class);
+		startService(intent);
 	}
 	
 	// Check if the map is instantiated
@@ -140,7 +142,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	// Fill the map with placeits
 	// Only gets called when service is successfully bound
 	private void fillMapWithPlaceIts() {
-		ArrayList<PlaceIt> list = new ArrayList<PlaceIt>( service.getActiveList() );
+		ArrayList<PlaceIt> list = new ArrayList<PlaceIt>( service.getOnMapList() );
 		//Log.wtf(tag, "Filling map");
 		
 		// Refreshes the map with new data

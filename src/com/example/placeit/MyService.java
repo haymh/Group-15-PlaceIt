@@ -25,7 +25,7 @@ public class MyService extends Service {
 	private DistanceManager dManager = new DistanceManager(this);
 	private boolean stop = false;
 	private DatabaseAccessor database;
-	private Map<Long, PlaceIt> active;
+	//private Map<Long, PlaceIt> active;
 	private Map<Long, PlaceIt> pulldown;
 	private Map<Long, PlaceIt> onMap;
 	private Map<Long, PlaceIt> prePost;
@@ -48,7 +48,7 @@ public class MyService extends Service {
 				while(onMapIterator.hasNext()){
 					PlaceIt pi = null;
 					pi = onMapIterator.next();
-					if(dManager.distanceTo(pi.getCoordinate()) <= 0.8){
+					if(dManager.distanceTo(pi.getCoordinate()) <= 800){
 						Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 						intent.putExtra("id", pi.getId());
 						PendingIntent pIntent = PendingIntent.getActivity(MyService.this,0,new Intent(MyService.this,PlaceItDetailActivity.class),0);
@@ -103,7 +103,7 @@ public class MyService extends Service {
 		super.onCreate();
 		database = new DatabaseAccessor(this);
 		database.open();
-		active = database.activePlaceIt();
+		//active = database.activePlaceIt();
 		pulldown = database.pulldownPlaceIt();
 		onMap = database.onMapPlaceIt();
 		prePost = database.prepostPlaceIt();
@@ -164,14 +164,15 @@ public class MyService extends Service {
 		Log.v("myService createPlaceIt","pi is created");
 		if(pi == null)
 			return false;
-		active.put(pi.getId(), pi);
+		//active.put(pi.getId(), pi);
+		prePost.put(pi.getId(),pi);
 		return true;
 	}
 
-	// access this to get active list
 	public Collection<PlaceIt> getActiveList(){
-		Log.v("MyService","getActiveList");
-		return active.values();
+		Collection c =  onMap.values();
+		c.addAll(prePost.values());
+		return c;
 	}
 
 	// access this to get pull down list
@@ -193,17 +194,26 @@ public class MyService extends Service {
 
 	// access this to get a place-it by id
 	public PlaceIt findPlaceIt(long id){
-		PlaceIt pi = active.get(id);
-		if(pi == null)
+		PlaceIt pi = onMap.get(id);
+		if(pi == null){
 			pi = pulldown.get(id);
+			if(pi == null)
+				pi = prePost.get(id);
+		}
 		return pi;
 	}
 
 	// to pull down a place from active
 	public boolean pulldownPlaceIt(long id){
 		boolean success = database.pullDown(id);
-		if(success)
-			pulldown.put(id,active.remove(id));
+		if(success){
+			PlaceIt pi = onMap.get(id);
+			if(pi == null)
+				pi = prePost.remove(id);
+			else
+				onMap.remove(id);
+			pulldown.put(id,pi);
+		}
 		return success;
 	}
 
@@ -211,10 +221,15 @@ public class MyService extends Service {
 	public boolean discardPlaceIt(long id){
 		boolean success = database.discard(id);
 		if(success){
-			if(active.get(id) != null)
-				active.remove(id);
-			else
-				pulldown.remove(id);
+			PlaceIt pi = onMap.get(id);
+			if(pi == null){
+				pi = prePost.get(id);
+				if(pi == null)
+					pulldown.remove(id);
+				else
+					prePost.remove(id);
+			}else
+				onMap.remove(id);
 		}
 		return success;
 	}
@@ -226,7 +241,7 @@ public class MyService extends Service {
 		boolean success = database.repostPlaceIt(pi);
 		if(success){		
 			pulldown.remove(id);
-			active.put(id, pi);
+			prePost.put(id, pi);
 		}
 		return success;
 	}

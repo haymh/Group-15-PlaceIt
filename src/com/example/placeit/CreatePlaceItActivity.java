@@ -189,13 +189,13 @@ public class CreatePlaceItActivity extends Activity {
 		if(editPostdate.getText().toString().equals(""))
 			postDate = new Date();
 		else{
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 			try {
 				postDate = formatter.parse(editPostdate.getText().toString());
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				Toast.makeText(this, "date format: dd-MM-yyyy", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "date format: MM-dd-yyyy", Toast.LENGTH_SHORT).show();
 				editPostdate.requestFocus();
 				return false;
 			}
