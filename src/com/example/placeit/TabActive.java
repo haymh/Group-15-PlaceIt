@@ -6,7 +6,7 @@ public class TabActive extends TabListFragment {
 	
 	@Override
 	public void setFields() {
-		imageResource = R.layout.active_list_object;
+		imageResource = R.layout.list_active_object;
 		tag = TabActive.class.getSimpleName();
 	}
 

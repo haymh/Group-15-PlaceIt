@@ -122,8 +122,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	public void onResume() {
 		super.onResume();
 		
-		Log.wtf(tag, "onResume()");
-		
         new AsyncTask<Void, Void, Integer>() {
 	        protected void onPreExecute() {}
 
@@ -143,7 +141,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	// Only gets called when service is successfully bound
 	private void fillMapWithPlaceIts() {
 		ArrayList<PlaceIt> list = new ArrayList<PlaceIt>( service.getActiveList() );
-		Log.wtf(tag, "Filling map");
+		//Log.wtf(tag, "Filling map");
 		
 		// Refreshes the map with new data
 		mMarkers.clear();
@@ -161,6 +159,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 			
 			//Log.wtf(tag, String.valueOf(object.getId()) + " vs " + addMarker.getId());
 			
+			// Store placeit ID with marker ID for tracking
 			markerIdContainer.put(addMarker.getId(), object.getId());
 			
 			//Log.wtf(tag, "ID Container size: " + markerIdContainer.size());
@@ -192,7 +191,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	public void gotoListPage(View view) {
 		Intent i = new Intent(this, PlaceItListActivity.class);
 		startActivity(i);
-
 	}
 	
 	// Goto button handler 
@@ -237,13 +235,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	}
 	
 	public boolean onMarkerClick(Marker marker) {
-		Log.wtf(tag, String.valueOf(markerIdContainer.get(marker.getId())));
-		
-		
-		/*
 		Intent i = new Intent(this, PlaceItDetailActivity.class);
+		i.putExtra("id", markerIdContainer.get(marker.getId()));
 		startActivity(i);
-		*/
 		
 		return false;
 	}
@@ -415,7 +409,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		
 		LatLng local = new LatLng(lat, lon);
 		
-		service.createPlaceIt("Test title length", "Test description length", r.nextInt(40) < 20, r.nextInt(),
+		service.createPlaceIt("Test title length to test how long", "Test description length to test how long description can be", 
+				r.nextInt(40) < 20, r.nextInt(),
 				r.nextInt(40) < 20, PlaceIt.FRI + PlaceIt.MON, PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(r.nextInt(3) + 1),
 				new Date(), new Date(), local);
 	}

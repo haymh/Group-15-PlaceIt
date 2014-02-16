@@ -19,8 +19,8 @@
 	    android:layout_alignParentLeft="true"
 	    android:layout_alignParentTop="true"
 	    android:textSize="25sp" 
-	    android:maxLength="13"
-	    android:text="Pulled Down List"
+	    android:maxLength="30"
+	    android:text="Active List"
 	   	/>
 
 	<TextView
@@ -41,22 +41,22 @@
         />
 
 	<Button
-	    android:id="@+id/repostBtn"
+	    android:id="@+id/pullDownBtn"
 	    style="?android:attr/buttonStyleSmall"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_alignParentTop="true"
 	    android:layout_toLeftOf="@+id/discardBtn"
-	    android:onClick="repostPlaceIt"
-	    android:text="P" />
+	    android:onClick="pullDownPlaceIt"
+	    android:text="A" />
 
 	<Button
 	    android:id="@+id/discardBtn"
 	    style="?android:attr/buttonStyleSmall"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_alignBaseline="@+id/repostBtn"
-	    android:layout_alignBottom="@+id/repostBtn"
+	    android:layout_alignBaseline="@+id/pullDownBtn"
+	    android:layout_alignBottom="@+id/pullDownBtn"
 	    android:layout_alignParentRight="true"
 	    android:onClick="discardPlaceIt"
 	    android:text="X" />

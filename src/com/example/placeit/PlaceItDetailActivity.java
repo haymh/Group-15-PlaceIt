@@ -1,12 +1,5 @@
 package com.example.placeit;
 
-import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.Iterator;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -22,69 +15,25 @@ import android.widget.Toast;
 public class PlaceItDetailActivity extends Activity {
 
 	private MyService service; 
-	private ServiceManager sManager; // this is to handle service connection( bind / unbind)
+	private ServiceManager manager; 
 	
+	private PlaceIt placeIt;
+	private long placeItId;
 	
-	private PlaceIt pi;
+	private String tag = PlaceItDetailActivity.class.getSimpleName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		Intent intent = getIntent();
-		String name = intent.getStringExtra("Name");
-		final long id = intent.getLongExtra("ID", 3);
-		String description = intent.getStringExtra("Description");
-		double lat = intent.getDoubleExtra("Latitude", 0);
-		double lon = intent.getDoubleExtra("Longitude", 0);
-
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_place_it_detail);
 		
-		sManager = new ServiceManager(this);
+		// Gets id number of placeit passed by MainActivity
+		placeItId = getIntent().getLongExtra("id", 0);
 		
-		new AsyncTask<Void, Void, Integer>(){ // a thread to initiate service and update UI
-	        protected void onPreExecute() { }
-	        protected Integer doInBackground(Void... params) {
-	            while(service == null)
-	            	service = sManager.bindService();
-	            return new Integer(1);
-	        }
-	        protected void onPostExecute(Integer result) {
-	        	pi = service.findPlaceIt(id);
-	        	((TextView)PlaceItDetailActivity.this.findViewById(R.id.editText1)).setText(pi.getTitle());
-	        	((TextView)PlaceItDetailActivity.this.findViewById(R.id.editText2)).setText(pi.getDescription());
-	        	((TextView)PlaceItDetailActivity.this.findViewById(R.id.editText3)).setText(pi.getCoordinate().toString());
-	        }
-	     }.execute();
-
-		Button button1 = (Button) findViewById(R.id.button1);
-		button1.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				
-				// service.pulldownPlaceIt(id);  I am going to write this code here right now because the id is made up
-				Toast.makeText(PlaceItDetailActivity.this, "Pulled Down Successfully!", Toast.LENGTH_LONG).show();
-				finish();
-				//Pull down
-			}
-		});
-
-		Button button2 = (Button) findViewById(R.id.button2);
-		button2.setOnClickListener(new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				//MyService.discardPlaceIt(id); Incorrect, but what to do?
-				// service.discardPlaceIt(id);  I am going to write this code here right now because the id is made up
-				
-						Toast.makeText(PlaceItDetailActivity.this, "Deleted Successfully!", Toast.LENGTH_LONG).show();
-						finish();
-						//Delete
-			}
-		});
-
+		// Initialize service manager, required for serving bind
+		manager = new ServiceManager(this);
+		
+		/*
 		//TextView text1 = (TextView)  findViewById(R.id.editText1);
 		//text1.setText(this.getDescription());
 		//text1.setText("Description goes here");
@@ -98,6 +47,34 @@ public class PlaceItDetailActivity extends Activity {
 
 		TextView text4 = (TextView) findViewById(R.id.editText4);
 		text4.setText("Repetition Schedule goes here");
+		*/
+	}
+	
+	// Binds service
+	// Calls fillDetailPage is successful
+	public void onResume() {
+		super.onResume();
+		
+		new AsyncTask<Void, Void, Integer>(){ 
+			protected void onPreExecute() { }
+			protected Integer doInBackground(Void... params) {
+				while(service == null)
+					service = manager.bindService();
+				return Integer.valueOf(1);
+			}
+			
+			protected void onPostExecute(Integer result) {
+				fillDetailPage();
+			}
+		}.execute();
+	}
+	
+	// Fills detail page
+	// Calls service to obtain Place It referenced by ID from MainActivity
+	private void fillDetailPage() {
+		placeIt = service.findPlaceIt(placeItId);
+		
+		Log.wtf(tag, "PlaceIt ID " + placeItId + " : " + placeIt.getId());
 	}
 
 	@Override
@@ -108,11 +85,17 @@ public class PlaceItDetailActivity extends Activity {
 	}
 
 	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		service = sManager.unBindService();
+	public void onDestroy() {
+		service = manager.unBindService();
 		super.onDestroy();
-		
 	}
-
+	
+// BUTTON HANDLERS 
+	public void discardPlaceIt(View view) {
+		service.discardPlaceIt(placeItId);
+	}
+	
+	public void pullDownPlaceIt(View view) {
+		service.pulldownPlaceIt(placeItId);
+	}
 }

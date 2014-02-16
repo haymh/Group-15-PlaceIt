@@ -125,17 +125,19 @@
         android:layout_height="0dp" >
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/detailPullDownBtn"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="pullDownPlaceIt"
             android:text="Pull Down" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/detailDiscardBtn"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="discardPlaceIt"
             android:text="Delete" />
     </TableRow>
 

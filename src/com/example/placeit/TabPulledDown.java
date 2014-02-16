@@ -6,7 +6,7 @@ public class TabPulledDown extends TabListFragment {
 
 	@Override
 	public void setFields() {
-		imageResource = R.layout.pulled_list_object;
+		imageResource = R.layout.list_pulled_object;
 		tag = TabPulledDown.class.getSimpleName();
 	}
 

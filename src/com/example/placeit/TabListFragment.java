@@ -24,6 +24,7 @@ public abstract class TabListFragment extends ListFragment {
 	protected String tag;
 
 //FRAGMENT DEFINITIONS		
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,10 +78,9 @@ public abstract class TabListFragment extends ListFragment {
     public abstract void fillList();
     
     @Override
-    public void onDetach() {
+    public void onDestroy() {
     	service = manager.unBindService();
-    	
-    	super.onDetach();
+    	super.onDestroy();
     }
 
 //UI DEFINITIONS
@@ -110,7 +110,7 @@ public abstract class TabListFragment extends ListFragment {
 
 				TextView detail = (TextView) row.findViewById(R.id.inListDetail);
 				if(detail != null)
-					detail.setText("ID: " + item.getId());
+					detail.setText("ID: " + item.getId() + " & " + item.getDescription());
 				
 				TextView id = (TextView) row.findViewById(R.id.inListID);
 				if(id != null)

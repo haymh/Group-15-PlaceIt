@@ -10,6 +10,7 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,27 +27,26 @@ public class PlaceItListActivity extends Activity {
 	
 //ACTIVITY DEFINITIONS
 	
-    // Creates tabs view
+    // Creates tabs and corresponding lists
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         ActionBar actionBar = getActionBar();
- 
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
  
         String activeLabel = "Active", pulledDownLabel = "Pulled Down";
         
         Tab tab = actionBar.newTab();
         tab.setText(activeLabel);
-        TabListener<TabActive> tl = new TabListener<TabActive>(this, activeLabel, TabActive.class);
-        tab.setTabListener(tl);
+        TabListener<TabActive> activeTab = new TabListener<TabActive>(this, activeLabel, TabActive.class);
+        tab.setTabListener(activeTab);
         actionBar.addTab(tab);
         
         tab = actionBar.newTab();
         tab.setText(pulledDownLabel);
-        TabListener<TabPulledDown> t2 = new TabListener<TabPulledDown>(this, pulledDownLabel, TabPulledDown.class);
-        tab.setTabListener(t2);
+        TabListener<TabPulledDown> pullDownTab = new TabListener<TabPulledDown>(this, pulledDownLabel, TabPulledDown.class);
+        tab.setTabListener(pullDownTab);
         actionBar.addTab(tab);
         
         manager = new ServiceManager(this);
@@ -80,49 +80,36 @@ public class PlaceItListActivity extends Activity {
     public void gotoDetailPage(View view) {
     	getPlaceItId(view);
     	
-    	Log.wtf(TAG, "Go to detail page with: " + placeItId);
-    	
-		Random r = new Random();
-		service.createPlaceIt("title", "description", r.nextInt(40) < 20, r.nextInt(),
-				r.nextInt(40) < 20, PlaceIt.FRI + PlaceIt.MON, PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(r.nextInt(3) + 1),
-				new Date(), new Date(), new LatLng(r.nextInt(90), r.nextInt(180)));
+    	Intent i = new Intent(this, PlaceItDetailActivity.class);
+    	i.putExtra("id", placeItId);
+    	startActivity(i);
     }
     
     // Repost button clicked, repost placeit
     public void repostPlaceIt(View view) {
     	View parent = (View) view.getParent();
+    	
     	getPlaceItId(parent);
- 
-    	Log.wtf(TAG, "Repost this: " + placeItId);
-    	
     	service.repostPlaceIt(placeItId);
-    	
     	fragmentRefresh();
     }
     
     // Pull down button clicked, pull down placeit
     public void pullDownPlaceIt(View view) {
     	View parent = (View) view.getParent();
+    	
     	getPlaceItId(parent);
-    	
-    	Log.wtf(TAG, "Pull down this:" + placeItId);
-    	
     	service.pulldownPlaceIt(placeItId);
-    	
     	fragmentRefresh();
     }
     
     // Discard button clicked, discards placeit
     // Same behavior for both active and pull down lists
-    public void discardPlaceIt(View view)
-    {
-    	// Gets parent of the view (button)
+    public void discardPlaceIt(View view) {
     	View parent = (View) view.getParent();
+    	
     	getPlaceItId(parent);
-    	
-    	Log.wtf(TAG, "Discard this: " + placeItId);
     	service.discardPlaceIt(placeItId);
-    	
     	fragmentRefresh();
     }
     
