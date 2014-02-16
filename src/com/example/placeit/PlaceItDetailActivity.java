@@ -3,6 +3,8 @@ package com.example.placeit;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.placeit.PlaceIt.Status;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ListActivity;
@@ -67,6 +69,20 @@ public class PlaceItDetailActivity extends ListActivity {
 	// Calls service to obtain Place It referenced by ID from MainActivity
 	private void fillDetailPage() {
 		placeIt = service.findPlaceIt(placeItId);
+		
+		String status = "";
+		switch(placeIt.getStatus().getValue()) {
+		case 1: 
+			status = "ON MAP";
+			break;
+		case 2:
+			status = "TO BE POSTED";
+			break;
+		case 3:
+			status = "PULLED DOWN";
+			break;
+		}
+		list.add(new DetailContent(status, 10));
 		
 		list.add(new DetailContent("TITLE", placeIt.getTitle(), TITLEFONT));
 		
