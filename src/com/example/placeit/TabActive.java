@@ -14,9 +14,22 @@ public class TabActive extends TabListFragment {
 
 	@Override
 	public void fillList() {
+	
 		try {
-			list = new ArrayList<PlaceIt>(service.getActiveList());
+			list = new ArrayList<PlaceIt>(service.getPrepostList());
 		} catch(Exception e) {
+			Log.wtf(tag, e);
+		}
+		
+		try {
+			list.addAll(service.getOnMapList());
+		} catch(Exception e) {
+			try {
+				list = new ArrayList<PlaceIt>(service.getOnMapList());
+			} catch(Exception e2) {
+				Log.wtf(tag + " inner", e2);
+				return;
+			}
 			Log.wtf(tag, e);
 			return;
 		}
