@@ -10,9 +10,12 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.*;
@@ -39,31 +42,39 @@ public class MyService extends Service {
 
 	private class NotifyPostThread extends Thread{
 		private int i = 0;
-		
+		private int counter = 0;
+
 		public void run(){
 			while(!stop){
 				Iterator<PlaceIt> onMapIterator = onMap.values().iterator();			
 				dManager.getCurrentLocation();
-				Log.v("coordinates:", "Lat: " + dManager.getCoordinates().latitude + " Log: " + dManager.getCoordinates().longitude);
 				while(onMapIterator.hasNext()){
-					PlaceIt pi = null;
-					pi = onMapIterator.next();
+					PlaceIt pi = onMapIterator.next();
 					if(dManager.distanceTo(pi.getCoordinate()) <= 800){
+						database.pullDown(pi.getId());
+						onMapIterator.remove();
+						pi.setStatus(PlaceIt.Status.PULL_DOWN);
+						pulldown.put(pi.getId(), pi);
 						Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 						intent.putExtra("id", pi.getId());
-						PendingIntent pIntent = PendingIntent.getActivity(MyService.this,0,new Intent(MyService.this,PlaceItDetailActivity.class),0);
-						Notification noti = new Notification.Builder(MyService.this)
-						.setTicker("Place-It Title")
-						.setContentTitle(pi.getTitle())
-						.setContentText(pi.getDescription())
-						.setSmallIcon(R.drawable.note)
-						.setContentIntent(pIntent).getNotification();
-						noti.flags=Notification.FLAG_AUTO_CANCEL;
-						NotificationManager notificationManager = (NotificationManager)getSystemService(Activity.NOTIFICATION_SERVICE);
-						notificationManager.notify(0,noti);
+						PendingIntent resultPendingIntent = 
+								PendingIntent.getActivity(MyService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+						
+						NotificationCompat.Builder mBuilder =
+								new NotificationCompat.Builder(MyService.this)
+								.setSmallIcon(R.drawable.note)
+								.setContentTitle(pi.getTitle())
+								.setContentText(pi.getDescription())
+								.setContentIntent(resultPendingIntent);
+						TaskStackBuilder stackBuilder = TaskStackBuilder.create(MyService.this);
+						stackBuilder.addParentStack(PlaceItDetailActivity.class);
+						stackBuilder.addNextIntent(intent);
+						NotificationManager mNotificationManager =
+								(NotificationManager) MyService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+						mNotificationManager.notify(counter++, mBuilder.build());
 					}
 				}
-				
+
 				i++;
 				if(i >= POST_TIME_LAG){
 					i = 0;
@@ -72,21 +83,22 @@ public class MyService extends Service {
 						PlaceIt pi = i.next();
 						if(pi.getPostDate().before(new Date())){
 							i.remove();
-							synchronized(onMapIterator){
-								onMap.put(pi.getId(), pi);
-								onMapIterator = onMap.values().iterator();
-							}	
+							database.onMap(pi.getId());
+							pi.setStatus(PlaceIt.Status.ON_MAP);
+							onMap.put(pi.getId(), pi);
+							onMapIterator = onMap.values().iterator();	
+
 						}
 					}
 				}
-				
+
 				try {
 					sleep(NOTIFY_TIME_LAG);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 			}
 		}
 	}
@@ -181,7 +193,7 @@ public class MyService extends Service {
 		Log.v("MyService","getOnMapList");
 		return onMap.values();
 	}
-	
+
 	// access this to get a list of PlaceIt object that is going to be posted
 	public Collection<PlaceIt> getPrepostList(){
 		return prePost.values();
@@ -207,6 +219,7 @@ public class MyService extends Service {
 				pi = prePost.remove(id);
 			else
 				onMap.remove(id);
+			pi.setStatus(PlaceIt.Status.PULL_DOWN);
 			pulldown.put(id,pi);
 		}
 		return success;
@@ -233,6 +246,7 @@ public class MyService extends Service {
 		PlaceIt pi = pulldown.get(id).clone();
 		pi.extendPostDate(Calendar.MINUTE, 45);
 		pi.setCreateDate(new Date());
+		pi.setStatus(PlaceIt.Status.ACTIVE);
 		boolean success = database.repostPlaceIt(pi);
 		if(success){		
 			pulldown.remove(id);
