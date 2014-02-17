@@ -1,7 +1,9 @@
 package com.example.placeit;
 
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import com.example.placeit.PlaceIt.NumOfWeekRepeat;
@@ -10,13 +12,16 @@ import com.google.android.gms.maps.model.LatLng;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -47,9 +52,22 @@ public class CreatePlaceItActivity extends Activity {
 	private TableRow tableRowRepeatMinuteDetail;
 	private TableRow tableRowRepeatChoice;
 	private View line;
+	private DatePickerDialog dialog = null;
 	
 	private ServiceManager sManager;
 	private MyService service;
+	
+	private DatePickerDialog.OnDateSetListener pickDate = new DatePickerDialog.OnDateSetListener() {
+
+		@Override
+		public void onDateSet(DatePicker view, int year, int monthOfYear,
+				int dayOfMonth) {
+			view.updateDate(year, monthOfYear, dayOfMonth);
+			editPostdate.setText(monthOfYear + 1 + "/" + dayOfMonth + "/" + year);
+			dialog.hide();
+		}
+
+	};
 	
 
 	@Override
@@ -66,11 +84,25 @@ public class CreatePlaceItActivity extends Activity {
 		tableRowRepeatChoice = (TableRow)findViewById(R.id.repeatChoice);
 		line = (View)findViewById(R.id.line);
 		
+		editPostdate.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View arg0) {
+				Calendar c = Calendar.getInstance();
+				if(dialog == null)
+					dialog = new DatePickerDialog(CreatePlaceItActivity.this, pickDate,
+							c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH));
+				dialog.show();
+			}
+		
+		});
+		
 		sManager = new ServiceManager(this);
 		
 		Bundle bundle = getIntent().getParcelableExtra("bundle");
 		coordinate = bundle.getParcelable("position");
-		((EditText)findViewById(R.id.editLatLng)).setText("Latitude: " + coordinate.latitude + "\nLongitude: " + coordinate.longitude);
+		DecimalFormat df = new DecimalFormat("#.####");
+		((EditText)findViewById(R.id.editLatLng)).setText("( " + df.format(coordinate.latitude) + " , " + df.format(coordinate.longitude) + " )");
 		addlisteners();
 		
 
@@ -178,7 +210,7 @@ public class CreatePlaceItActivity extends Activity {
 			return false;
 		}
 		if(title.equals("") && !description.equals("")){
-			String s[] = description.split(" ");
+			String s[] = description.split(" |\n");
 			if(s.length <= 3)
 				title = description;
 			else{
@@ -190,13 +222,13 @@ public class CreatePlaceItActivity extends Activity {
 		if(editPostdate.getText().toString().equals(""))
 			postDate = new Date();
 		else{
-			SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
+			SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 			try {
 				postDate = formatter.parse(editPostdate.getText().toString());
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				Toast.makeText(this, "date format: MM-dd-yyyy", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "date format: MM/dd/yyyy", Toast.LENGTH_SHORT).show();
 				editPostdate.requestFocus();
 				return false;
 			}
@@ -204,7 +236,7 @@ public class CreatePlaceItActivity extends Activity {
 		boolean isRepeat = ((CheckBox)findViewById(R.id.checkBoxRepeat)).isChecked();
 		if(isRepeat){
 			repeatByMinute = ((RadioButton)findViewById(R.id.radioButtonByMinute)).isSelected();
-			repeatByWeek = !repeatByMinute;
+			repeatByWeek = ((RadioButton)findViewById(R.id.radioButtonByWeek)).isSelected();
 		}else{
 			repeatByMinute = false;
 			repeatByWeek = false;
