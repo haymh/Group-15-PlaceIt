@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
  
 public class PlaceItListActivity extends Activity {
 	private static String TAG = PlaceItListActivity.class.getSimpleName();
@@ -97,6 +98,13 @@ public class PlaceItListActivity extends Activity {
     // Pull down button clicked, pull down placeit
     public void pullDownPlaceIt(View view) {
     	View parent = (View) view.getParent();
+    	
+    	// Specially handles the place its that are periodic
+    	if( service.findPlaceIt(placeItId).isRepeated() ) {
+			Toast toast = Toast.makeText(this, "Repeated Place-It's stays active on pull down", Toast.LENGTH_SHORT);
+			toast.show();
+    	}
+    		
     	
     	getPlaceItId(parent);
     	service.pulldownPlaceIt(placeItId);

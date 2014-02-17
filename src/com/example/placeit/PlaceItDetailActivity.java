@@ -206,8 +206,7 @@ public class PlaceItDetailActivity extends ListActivity {
 		switch(statusType) {
 		case 1:
 		case 2:
-			service.pulldownPlaceIt(placeItId);
-			this.finish();
+			pullDownHandler();
 			break;
 		case 3:
 			service.repostPlaceIt(placeItId);

@@ -1,6 +1,12 @@
 package com.example.placeit;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import com.example.placeit.PlaceIt.Status;
 
 import android.app.ListFragment;
 import android.content.Context;
@@ -101,14 +107,43 @@ public abstract class TabListFragment extends ListFragment {
 					title.setText(item.getTitle());
 
 				TextView detail = (TextView) row.findViewById(R.id.inListDetail);
-				if(detail != null)
-					detail.setText("ID: " + item.getId() + " & " + item.getDescription());
+				if(detail != null) {
+					
+					int status = item.getStatus().getValue();
+					String message = "";
+					
+					// Place It was pulled down, display posted date
+					// Place It is active, post type
+					switch(status) {
+					case 1:
+						message = "ON MAP";
+						break;
+					case 2:
+						message = "TO BE POSTED";
+						break;
+					case 3:
+						message = dateParser(item.getCreateDate());
+						break;
+					default:
+						Log.wtf(tag, "Bad Place It Status " + status);
+						message = "FUNNY ERROR";
+					}
+					detail.setText(message);
+				}
 				
 				TextView id = (TextView) row.findViewById(R.id.inListID);
 				if(id != null)
 					id.setText("" + item.getId());
 			}
 			return row;
+		}
+		
+		private String dateParser(Date date) {
+			DateFormat day = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
+			
+			String parsedDate = day.format(date);
+			
+			return "DATE POSTED " + parsedDate;
 		}
 	}
 }
