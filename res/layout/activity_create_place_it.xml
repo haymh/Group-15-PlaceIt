@@ -83,9 +83,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:enabled="false"
-                    android:focusable="false"
-                    android:minLines="2"
                     android:text="( Latitude , Longitude )"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
             </TableRow>
@@ -100,8 +97,9 @@
                     android:id="@+id/editLatLng"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:inputType="numberDecimal" />
+                    android:enabled="false"
+                    android:focusable="false"
+                    android:layout_weight="1" />
             </TableRow>
 
             <TableRow
