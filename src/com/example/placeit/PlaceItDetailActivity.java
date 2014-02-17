@@ -33,6 +33,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	private PlaceIt placeIt;
 	private long placeItId;
 	private int statusType;
+	private boolean listIsFilled = false;
 	
 	private String tag = PlaceItDetailActivity.class.getSimpleName();
 	
@@ -69,8 +70,11 @@ public class PlaceItDetailActivity extends ListActivity {
 			}
 			
 			protected void onPostExecute(Integer result) {
-				fillDetailPage();
-				setUpOmniButton();
+				if( !listIsFilled ) {
+					fillDetailPage();
+					setUpOmniButton();
+					listIsFilled = true;
+				}
 			}
 		}.execute();
 	}
@@ -133,8 +137,6 @@ public class PlaceItDetailActivity extends ListActivity {
 		
 		if( placeIt.isRepeatByWeek() == true )
 			weekParser();
-		else 
-			Log.wtf(tag, "Repeat by week, not true");
 		
 		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
 	}

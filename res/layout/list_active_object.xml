@@ -21,7 +21,7 @@
 	    android:textSize="25sp" 
 	    android:maxLength="18"
 	    android:maxLines="1"
-	    android:text="Empty Title"
+	    android:text="@string/empty"
 	   	/>
 
 	<TextView
@@ -32,7 +32,7 @@
 	    android:layout_below="@+id/inListTitle"
 		android:maxLength="35"
 		android:maxLines="1"
-	    android:text="Empty Detail"
+	    android:text="@string/empty"
 	    />
 	
 	<TextView

@@ -10,7 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:paddingLeft="7dp"
-        android:text="Empty description" />
+        android:text="@string/empty" />
 
     <TextView
         android:id="@+id/detailListContent"
@@ -23,6 +23,6 @@
         android:paddingLeft="14dp"
         android:paddingRight="7dp"
         android:paddingTop="5dp"
-        android:text="Empty Content" />
+        android:text="@string/empty" />
 
 </RelativeLayout>
