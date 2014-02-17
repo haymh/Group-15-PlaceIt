@@ -42,6 +42,7 @@ public class MyService extends Service {
 		}
 	}
 
+	// a thread to check Place-it schedule and put them up, also check if there is any nearby place-it and notify user 
 	private class NotifyPostThread extends Thread{
 		private int i = 0;
 		private int counter = 0;
@@ -62,6 +63,7 @@ public class MyService extends Service {
 						PendingIntent resultPendingIntent = 
 								PendingIntent.getActivity(MyService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 						
+						//build notification
 						NotificationCompat.Builder mBuilder =
 								new NotificationCompat.Builder(MyService.this)
 								.setSmallIcon(R.drawable.note)
@@ -92,6 +94,7 @@ public class MyService extends Service {
 							onMap.put(pi.getId(), pi);
 							onMapIterator = onMap.values().iterator();	
 							
+							//intent to broadcast receiver in MainActivity to notify putting up a place-it icon
 							Intent in = new Intent(NOTIFICATION);
 							Bundle send = new Bundle();
 							send.putParcelable("position", pi.getCoordinate());
@@ -119,10 +122,12 @@ public class MyService extends Service {
 		super.onCreate();
 		database = new DatabaseAccessor(this);
 		database.open();
+		// get list of place-it from Data base
 		pulldown = database.pulldownPlaceIt();
 		onMap = database.onMapPlaceIt();
 		prePost = database.prepostPlaceIt();
-		(nThread = new NotifyPostThread()).start();
+		// launch the thread
+		(nThread = new NotifyPostThread()).start(); 
 	}
 
 	@Override
@@ -140,7 +145,7 @@ public class MyService extends Service {
 
 	@Override
 	public void onDestroy() {
-		stop = true;
+		stop = true; // set stop to true make thread stop running
 		super.onDestroy();
 	}
 
@@ -215,8 +220,10 @@ public class MyService extends Service {
 				if(!pi.isRepeated()){
 					pi.setStatus(PlaceIt.Status.PULL_DOWN);
 					pulldown.put(id, pi);
-				}else
+				}else{
+					pi.setStatus(PlaceIt.Status.ACTIVE);
 					prePost.put(id, pi);
+				}
 			}		
 		}
 		return success;
@@ -239,6 +246,7 @@ public class MyService extends Service {
 		return success;
 	}
 
+	// to repost a place-it from pulldown list
 	public boolean repostPlaceIt(long id){
 		PlaceIt pi = pulldown.get(id).clone();
 		pi.extendPostDate(Calendar.MINUTE, 45);

@@ -8,6 +8,7 @@ import android.util.Log;
 
 public class MySQLiteHelper extends SQLiteOpenHelper{
 
+	// table entries
 	public static final String TABLE_PLACE_IT = "placeIt";
 	public static final String COLUMN_ID = "id";
 	public static final String COLUMN_TITLE = "title";
@@ -23,9 +24,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 	public static final String COLUMN_LATITUDE = "latitude";
 	public static final String COLUMN_LONGITUDE = "longitude";
 	
+	// database name
 	private static final String DATABASE_NAME = "placeIts";
 	private static final int DATABASE_VERSION = 1;
 	
+	// create table SQL
 	private static final String DATABASE_CREATE = "create table "
 			+ TABLE_PLACE_IT + "(" + COLUMN_ID
 			+ " integer primary key autoincrement, "
@@ -56,6 +59,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 		db.execSQL(DATABASE_CREATE);
 	}
 
+	// method to handle upgrade
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// TODO Auto-generated method stub

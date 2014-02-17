@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
@@ -57,6 +58,8 @@ public class CreatePlaceItActivity extends Activity {
 	private ServiceManager sManager;
 	private MyService service;
 	
+	
+	/// implementing OnDateSetListener for listening DatePicker
 	private DatePickerDialog.OnDateSetListener pickDate = new DatePickerDialog.OnDateSetListener() {
 
 		@Override
@@ -103,29 +106,18 @@ public class CreatePlaceItActivity extends Activity {
 		coordinate = bundle.getParcelable("position");
 		DecimalFormat df = new DecimalFormat("#.####");
 		((EditText)findViewById(R.id.editLatLng)).setText("( " + df.format(coordinate.latitude) + " , " + df.format(coordinate.longitude) + " )");
-		addlisteners();
-		
-
-		// Get marker location
-		
-
-		//TextView text = (TextView) findViewById(R.id.lat);
-		//text.setText(String.valueOf(location.latitude));
-
-		//text = (TextView) findViewById(R.id.lng);
-		//text.setText(String.valueOf(location.longitude));
-
+		addlisteners(); // call a helper method to add listener
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.create_place_it, menu);
 		return true;
 	}
 
 	public void onResume() {
 		super.onResume();
+		// ensure service is not null, also not block the UI, so launch a AsyncTask
 		new AsyncTask<Void, Void, Integer>() {
 	        protected void onPreExecute() {}
 
@@ -141,13 +133,15 @@ public class CreatePlaceItActivity extends Activity {
 
 
 	public void onDestroy(){
-		service = sManager.unBindService();
+		service = sManager.unBindService(); // unbind from service
 		super.onDestroy();
 	}
 	
+	// when user click on create button, then call this method to create a Place-it
 	public void create(View view){
 		if(validate()){
 			boolean s = service.createPlaceIt(title, description, repeatByMinute, repeatedMinute, repeatByWeek, repeatedDayInWeek, numOfWeekRepeat, createDate, postDate, coordinate);
+			Log.wtf("create", "repeatedMinute: " + repeatedMinute + " repeatbyMinute: " + repeatByMinute);
 			if(s){
 				Toast.makeText(this, "New Place-it Created", Toast.LENGTH_SHORT).show();
 				this.finish();
@@ -156,10 +150,13 @@ public class CreatePlaceItActivity extends Activity {
 		}
 	}
 	
+	
+	// when user click on cancel button, then call this method to cancel creating Place-it
 	public void cancel(View view){
 		this.finish();
 	}
 
+	// add listeners to a radiobuttongroup which select repeat by minute and repeat by week and checkbox for repeat option
 	public void addlisteners(){
 		RadioGroup rg = (RadioGroup)findViewById(R.id.radioGroupRepeatChoice);
 		rg.setOnCheckedChangeListener(new OnCheckedChangeListener() 
@@ -196,11 +193,16 @@ public class CreatePlaceItActivity extends Activity {
 					tableRowRepeatMinuteDetail.setVisibility(View.GONE);
 					line.setVisibility(View.GONE);
 				}
+				InputMethodManager input = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+				input.hideSoftInputFromWindow(CreatePlaceItActivity.this.findViewById(android.R.id.content).getWindowToken(),0);
 			}
+			
 		});
 		
 	}
 	
+	
+	// validating user input
 	public boolean validate(){
 		title = editTitle.getText().toString();
 		description = editDescription.getText().toString();
@@ -235,28 +237,33 @@ public class CreatePlaceItActivity extends Activity {
 		}
 		boolean isRepeat = ((CheckBox)findViewById(R.id.checkBoxRepeat)).isChecked();
 		if(isRepeat){
-			repeatByMinute = ((RadioButton)findViewById(R.id.radioButtonByMinute)).isSelected();
-			repeatByWeek = ((RadioButton)findViewById(R.id.radioButtonByWeek)).isSelected();
+			repeatByMinute = ((RadioButton)findViewById(R.id.radioButtonByMinute)).isChecked();
+			repeatByWeek = ((RadioButton)findViewById(R.id.radioButtonByWeek)).isChecked();
 		}else{
 			repeatByMinute = false;
 			repeatByWeek = false;
 		}
 		
 		if(repeatByMinute){
-			repeatedMinute = Integer.parseInt(((EditText)findViewById(R.id.editMinute)).getText().toString());
+			try{
+				repeatedMinute = Integer.parseInt(((EditText)findViewById(R.id.editMinute)).getText().toString());
+			}catch(NumberFormatException e){
+				((EditText)findViewById(R.id.editMinute)).requestFocus();
+				Toast.makeText(this, "Invalid input for minutes", Toast.LENGTH_SHORT).show();
+			}
 		}else
 			repeatedMinute = 0;
 		
 		repeatedDayInWeek = 0;
 		numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.ONE;
 		if(repeatByWeek){
-			if(((RadioButton)findViewById(R.id.radioButtonEveryWeek)).isSelected())
+			if(((RadioButton)findViewById(R.id.radioButtonEveryWeek)).isChecked())
 				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.ONE;
-			if(((RadioButton)findViewById(R.id.radioButtonEveryOtherWeek)).isSelected())
+			if(((RadioButton)findViewById(R.id.radioButtonEveryOtherWeek)).isChecked())
 				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.TWO;
-			if(((RadioButton)findViewById(R.id.radioButtonEveryThreeWeek)).isSelected())
+			if(((RadioButton)findViewById(R.id.radioButtonEveryThreeWeek)).isChecked())
 				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.THREE;
-			if(((RadioButton)findViewById(R.id.radioButtonEveryFourWeek)).isSelected())
+			if(((RadioButton)findViewById(R.id.radioButtonEveryFourWeek)).isChecked())
 				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.FOUR;
 			
 			if(((CheckBox)findViewById(R.id.checkBoxMon)).isChecked())
@@ -279,6 +286,7 @@ public class CreatePlaceItActivity extends Activity {
 			Toast.makeText(this, "coordinate is null", Toast.LENGTH_SHORT).show();
 			return false;
 		}
+		Log.wtf("create","isRepeat: " + isRepeat + " repeatByMinute: "+ repeatByMinute + " repeatByWeek: " + repeatByWeek);
 		return true;
 	}
 

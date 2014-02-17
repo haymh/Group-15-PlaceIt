@@ -13,17 +13,18 @@ public class ServiceManager {
 	private Context context;
 	private MyService service;
 	private boolean isBinded;
+	// implementing a ServiceConnection
 	private ServiceConnection connection = new ServiceConnection(){
 
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
-			// TODO Auto-generated method stub
+			
 			service = ((MyService.LocalBinder)arg1).getService();
 		}
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
-			// TODO Auto-generated method stub
+			
 			service = null;
 		}
 		
@@ -34,10 +35,13 @@ public class ServiceManager {
 		isBinded = true;
 	}
 	
+	
 	public MyService getService(){
 		return service;
 	}
 	
+	
+	// call this to bind service
 	public MyService bindService(){
 		if(!isBinded){
 			context.bindService(new Intent(context, MyService.class), connection, Context.BIND_AUTO_CREATE);
@@ -46,6 +50,7 @@ public class ServiceManager {
 		return service;
 	}
 	
+	// call this to unbind from service
 	public MyService unBindService(){
 		if(isBinded){
 			context.unbindService(connection);

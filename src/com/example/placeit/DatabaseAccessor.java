@@ -39,6 +39,7 @@ public class DatabaseAccessor {
 		dbHelper.close();
 	}
 	
+	// a helper method to search Place-its by status, parameter and means it AND or OR conjuction, status is a array of where conditions
 	private Map<Long, PlaceIt> searchPlaceItByStatus(boolean and, PlaceIt.Status[] status){
 		String where = null;
 		if(status != null && status.length >= 1){
@@ -62,18 +63,22 @@ public class DatabaseAccessor {
 		return map;
 	}
 	
+	// user friendly method to get active list
 	public Map<Long, PlaceIt> activePlaceIt(){
 		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ACTIVE, PlaceIt.Status.ON_MAP});
 	}
 	
+	// user friendly method to get pull down list
 	public Map<Long, PlaceIt> pulldownPlaceIt(){
 		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.PULL_DOWN});
 	}
 	
+	// user friendly method to get on map list
 	public Map<Long, PlaceIt> onMapPlaceIt(){
 		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ON_MAP});
 	}
 	
+	// user friendly method to get prepost list
 	public Map<Long, PlaceIt> prepostPlaceIt(){
 		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ACTIVE});
 	}
@@ -109,6 +114,7 @@ public class DatabaseAccessor {
 		return cursorToPlaceIt(cursor);
 	}
 	
+	// repost a place-it 
 	public boolean repostPlaceIt(PlaceIt pi){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		ContentValues values = new ContentValues();
@@ -180,7 +186,6 @@ public class DatabaseAccessor {
 					PlaceIt.Status.genStatus(cursor.getInt(10))
 					);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
