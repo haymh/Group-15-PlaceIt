@@ -103,6 +103,8 @@ public class CreatePlaceItActivity extends Activity {
 		
 		Calendar c = Calendar.getInstance();
 		checkBoxWeekDay[c.get(Calendar.DAY_OF_WEEK) - 1].setChecked(true);
+		editPostdate.setHint(c.get(Calendar.MONTH) + 1 + "/" + c.get(Calendar.DAY_OF_MONTH) + "/" + c.get(Calendar.YEAR)
+				+ " (Tap here to change)");
 		
 		editPostdate.setOnClickListener(new OnClickListener(){
 
@@ -203,6 +205,13 @@ public class CreatePlaceItActivity extends Activity {
 				if(isChecked){
 					tableRowRepeatChoice.setVisibility(View.VISIBLE);
 					line.setVisibility(View.VISIBLE);
+					if(radioButtonByMinute.isChecked()){
+						tableRowRepeatMinuteDetail.setVisibility(View.VISIBLE);
+					}
+					if(radioButtonByWeek.isChecked()){
+						tableRowRepeatWeekNumber.setVisibility(View.VISIBLE);
+						tableRowRepeatWeeklyDetail.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					tableRowRepeatChoice.setVisibility(View.INVISIBLE);
@@ -210,8 +219,6 @@ public class CreatePlaceItActivity extends Activity {
 					tableRowRepeatWeeklyDetail.setVisibility(View.GONE);
 					tableRowRepeatMinuteDetail.setVisibility(View.GONE);
 					line.setVisibility(View.GONE);
-					radioButtonByMinute.setChecked(false);
-					radioButtonByWeek.setChecked(false);
 				}
 				
 				InputMethodManager input = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
