@@ -55,6 +55,8 @@ public class CreatePlaceItActivity extends Activity {
 	private View line;
 	private DatePickerDialog dialog = null;
 	private CheckBox[] checkBoxWeekDay;
+	private RadioButton radioButtonByMinute;
+	private RadioButton radioButtonByWeek;
 	
 	private ServiceManager sManager;
 	private MyService service;
@@ -95,6 +97,9 @@ public class CreatePlaceItActivity extends Activity {
 		checkBoxWeekDay[5] = (CheckBox)findViewById(R.id.checkBoxFri);
 		checkBoxWeekDay[6] = (CheckBox)findViewById(R.id.checkBoxSat);
 		checkBoxWeekDay[0] = (CheckBox)findViewById(R.id.checkBoxSun);
+		
+		radioButtonByMinute = (RadioButton)findViewById(R.id.radioButtonByMinute);
+		radioButtonByWeek = (RadioButton)findViewById(R.id.radioButtonByWeek);
 		
 		Calendar c = Calendar.getInstance();
 		checkBoxWeekDay[c.get(Calendar.DAY_OF_WEEK) - 1].setChecked(true);
@@ -205,6 +210,8 @@ public class CreatePlaceItActivity extends Activity {
 					tableRowRepeatWeeklyDetail.setVisibility(View.GONE);
 					tableRowRepeatMinuteDetail.setVisibility(View.GONE);
 					line.setVisibility(View.GONE);
+					radioButtonByMinute.setChecked(false);
+					radioButtonByWeek.setChecked(false);
 				}
 				
 				InputMethodManager input = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
@@ -251,8 +258,8 @@ public class CreatePlaceItActivity extends Activity {
 		}
 		boolean isRepeat = ((CheckBox)findViewById(R.id.checkBoxRepeat)).isChecked();
 		if(isRepeat){
-			repeatByMinute = ((RadioButton)findViewById(R.id.radioButtonByMinute)).isChecked();
-			repeatByWeek = ((RadioButton)findViewById(R.id.radioButtonByWeek)).isChecked();
+			repeatByMinute = radioButtonByMinute.isChecked();
+			repeatByWeek = radioButtonByWeek.isChecked();
 		}else{
 			repeatByMinute = false;
 			repeatByWeek = false;
