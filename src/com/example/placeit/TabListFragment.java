@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import com.example.placeit.PlaceIt.Status;
-
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.AsyncTask;
