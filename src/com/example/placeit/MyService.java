@@ -31,7 +31,6 @@ public class MyService extends Service {
 	private DistanceManager dManager = new DistanceManager(this);
 	private boolean stop = false;
 	private DatabaseAccessor database;
-	//private Map<Long, PlaceIt> active;
 	private Map<Long, PlaceIt> pulldown;
 	private Map<Long, PlaceIt> onMap;
 	private Map<Long, PlaceIt> prePost;
@@ -93,15 +92,12 @@ public class MyService extends Service {
 							onMap.put(pi.getId(), pi);
 							onMapIterator = onMap.values().iterator();	
 							
-							
 							Intent in = new Intent(NOTIFICATION);
 							Bundle send = new Bundle();
 							send.putParcelable("position", pi.getCoordinate());
 							send.putLong("id", pi.getId());
 							in.putExtra("bundle", send);
 							sendBroadcast(in);
-							
-							
 						}
 					}
 				}
@@ -109,7 +105,6 @@ public class MyService extends Service {
 				try {
 					sleep(NOTIFY_TIME_LAG);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -117,34 +112,23 @@ public class MyService extends Service {
 		}
 	}
 
-	public MyService() {
-
-	}
-
-
+	public MyService() {}
 
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
 		super.onCreate();
 		database = new DatabaseAccessor(this);
 		database.open();
-		//active = database.activePlaceIt();
 		pulldown = database.pulldownPlaceIt();
 		onMap = database.onMapPlaceIt();
 		prePost = database.prepostPlaceIt();
 		(nThread = new NotifyPostThread()).start();
 	}
 
-
-
 	@Override
 	public void onRebind(Intent intent) {
-		// TODO Auto-generated method stub
 		super.onRebind(intent);
 	}
-
-
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -154,31 +138,21 @@ public class MyService extends Service {
 		return START_STICKY;
 	}
 
-
-
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
 		stop = true;
 		super.onDestroy();
 	}
 
-
-
 	@Override
 	public boolean onUnbind(Intent intent) {
-		// TODO Auto-generated method stub
 		return super.onUnbind(intent);
 	}
 
-
-
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO: Return the communication channel to the service.
 		return mBinder;
 	}
-
 
 	//create a place-it, return a boolean value indicates if it's successful
 	public boolean createPlaceIt(String title, String description, boolean repeatByMinute,
