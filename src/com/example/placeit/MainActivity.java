@@ -165,23 +165,11 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 			PlaceIt object = it.next();
 			
 			putMarkerOnMap(object.getId(), object.getCoordinate());
-			
-			/*
-			Marker addMarker = mMap.addMarker(new MarkerOptions()
-			.position(object.getCoordinate())
-			.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));
-			mMarkers.add(addMarker);
-			
-			// Store placeit ID with marker ID in a hashmap for easy tracking
-			markerIdContainer.put(addMarker.getId(), object.getId());
-			*/
 		}
 	}
 	
 	// Puts place it marker on map
 	private void putMarkerOnMap(long placeItId, LatLng placeItLocation) {
-		Log.wtf(tag, "Drawing this ID: " + placeItId);
-		
 		Marker addMarker = mMap.addMarker(new MarkerOptions()
 		.position(placeItLocation)
 		.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));

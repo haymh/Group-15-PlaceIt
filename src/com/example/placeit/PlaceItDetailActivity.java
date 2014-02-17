@@ -1,12 +1,18 @@
 package com.example.placeit;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -67,6 +73,21 @@ public class PlaceItDetailActivity extends ListActivity {
 		}.execute();
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.place_it_detail, menu);
+		return true;
+	}
+
+	@Override
+	protected void onDestroy() {
+		service = manager.unBindService();
+		super.onDestroy();
+	}
+	
+//UI DEFINTIONS & SUPPORT
+	
 	// Fills detail page, use DetailContent to format
 	// Calls service to obtain Place It referenced by ID from MainActivity
 	private void fillDetailPage() {
@@ -92,72 +113,85 @@ public class PlaceItDetailActivity extends ListActivity {
 		String description = placeIt.getDescription();
 		if( !description.isEmpty() ) 
 			list.add(new DetailContent("DESCRIPTION", description, MEDIUMFONT));
+				
+		Date dateCreated = placeIt.getCreateDate();
+		Date dateToBePosted = placeIt.getPostDate();
 		
-		list.add(new DetailContent("DATE", String.valueOf(placeIt.getCreateDate()), SMALLFONT));
+		list.add(new DetailContent("DATE", dateParser(dateCreated), SMALLFONT));
 		
 		list.add(new DetailContent("LOCATION", placeIt.getCoordinate().latitude + ", " + placeIt.getCoordinate().longitude, SMALLFONT));
 		
-		try {
-			list.add(new DetailContent("DATE to be POSTED", String.valueOf(placeIt.getPostDate()), SMALLFONT));
-		} catch (Exception e) {
-			Log.wtf(tag, e);
-		}
+		if( !dateToBePosted.equals(dateCreated) )
+			list.add(new DetailContent("DATE to be POSTED", dateParser(dateToBePosted), SMALLFONT));
 		
 		if( placeIt.isRepeatByMinute() == true ) {
 			list.add(new DetailContent("MINUTES to be POSTED", String.valueOf(placeIt.getRepeatedMinute()) + " minutes", SMALLFONT));
 		}
 		
-		if( placeIt.isRepeatByWeek() == true) {
-			boolean[] days = placeIt.getRepeatedDay().clone();
-			String daysPosted = "";
-			
-			for(int i = 0; i < 7; ++i) {
-				if(days[i] == true) 
-					daysPosted += getDayOfWeek(i) + " ";
-			}
-			
-			if( !daysPosted.isEmpty() )
-				list.add(new DetailContent("REPEATS", daysPosted, SMALLFONT));
-		}
+		if( placeIt.isRepeatByWeek() == true)
+			weekParser();
 		
 		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
+	}
+	
+	// Parses date string
+	private String dateParser(Date date) {
+		DateFormat day = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
+		DateFormat hour = new SimpleDateFormat("hh:mm aa", Locale.US);
+		
+		String parsedDate = day.format(date);
+		String parsedHour = hour.format(date);
+		
+		return "<B>" + parsedDate + "</B> " + parsedHour;
+	}
+	
+	// Parses weekly information
+	private void weekParser() {
+		int weeklyRepeat = placeIt.getNumOfWeekRepeat().getValue();
+		if(weeklyRepeat > 1)
+			list.add(new DetailContent("REPEAT EVERY " + weeklyRepeat + " WEEKS", 10, Gravity.RIGHT));
+		else
+			list.add(new DetailContent("REPEAT WEEKLY", 10, Gravity.RIGHT));
+		
+		Log.wtf(tag, String.valueOf(weeklyRepeat));
+		
+		boolean[] days = placeIt.getRepeatedDay();
+		String daysPosted = "";
+		int dayNumbers[] = {6, 0, 1, 2, 3, 4, 5};
+		
+		for( int i : dayNumbers ) {
+			if(days[i] == true) 
+				daysPosted += "<B>" + getDayOfWeek(i) + "</B> ";
+			else
+				daysPosted += "<font color=#D8D8D8 >" + getDayOfWeek(i) + "</font> ";		
+		}
+		
+		if( !daysPosted.isEmpty() )
+			list.add(new DetailContent("REPEATS", daysPosted, MEDIUMFONT));
 	}
 	
 	private String getDayOfWeek(int day) {
 		switch(day) {
 		case 0:
-			return "Monday";
+			return "M";
 		case 1:
-			return "Tuesday";
+			return "T";
 		case 2:
-			return "Wednesday";
+			return "W";
 		case 3:
-			return "Thursday";
+			return "T";
 		case 4:
-			return "Friday";
+			return "F";
 		case 5:
-			return "Saturday";
+			return "S";
 		case 6:
-			return "Sunday";
+			return "S";
 		default:
 			Log.wtf(tag, "Day " + String.valueOf(day) + " not found");
 			return "";
 		}
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.place_it_detail, menu);
-		return true;
-	}
-
-	@Override
-	protected void onDestroy() {
-		service = manager.unBindService();
-		super.onDestroy();
-	}
-	
 //BUTTON HANDLERS 
 	
 	// Handle omni button depending on place it type
@@ -237,7 +271,9 @@ public class PlaceItDetailActivity extends ListActivity {
 						content.setTextSize(item.contentFontSize);
 					if(item.contentAlignment > 0)
 						content.setGravity(item.contentAlignment);
-					content.setText(item.content);
+					
+					Spanned stringHTML = Html.fromHtml(item.content);
+					content.setText(stringHTML);
 				}
 			}
 			return row;
