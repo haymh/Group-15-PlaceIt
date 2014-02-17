@@ -109,6 +109,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		
 		// Initialize marker ID container
 		markerIdContainer = new HashMap<String, Long>();
+		
+		// Starts service
 		Intent intent = new Intent(this, MyService.class);
 		startService(intent);
 	}
@@ -153,7 +155,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	// Only gets called when service is successfully bound
 	private void fillMapWithPlaceIts() {
 		ArrayList<PlaceIt> list = new ArrayList<PlaceIt>( service.getOnMapList() );
-		//Log.wtf(tag, "Filling map");
 		
 		// Refreshes the map with new data
 		mMarkers.clear();
@@ -193,6 +194,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	
 	protected void onDestroy() {
 		service = serviceManager.unBindService();
+		unregisterReceiver(receiver);
 		super.onDestroy();
 	}
 
@@ -212,11 +214,11 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 				geoLocate(view);
 			else {
 				hideSoftKeyboard();
-				Toast.makeText(MainActivity.this,"WIFI is off, plz turn it on", Toast.LENGTH_LONG).show();
+				Toast.makeText(MainActivity.this,"WIFI is off, please turn in on", Toast.LENGTH_LONG).show();
 			}
 		} catch (Exception e) {
 			Log.wtf("Exception", e);
-			Toast.makeText(MainActivity.this,"Wrong input, try again :)", Toast.LENGTH_LONG).show();
+			Toast.makeText(MainActivity.this,"Wrong input, try again", Toast.LENGTH_LONG).show();
 		}
 	}
 	
@@ -245,65 +247,10 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		String mapClickMessage = "Hold tap to create Place It";
 		Toast toast = Toast.makeText(this, mapClickMessage, Toast.LENGTH_SHORT);
 		toast.show();
-		
-		/*
-		final LatLng pos = position;
-
-		AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		alert.setTitle("New Place-It");
-		alert.setMessage("Please enter a Place-It Title:");
-		// Set an EditText view to get user input
-		final EditText input = new EditText(this);
-		alert.setView(input);
-		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				String value = input.getText().toString();
-				Toast.makeText(MainActivity.this, "Tag added!", Toast.LENGTH_SHORT).show();
-				Marker added = mMap.addMarker(new MarkerOptions()
-				.position(pos)
-				.title(value)
-				.icon(BitmapDescriptorFactory.fromResource(R.drawable.note))
-				.snippet(""+(int)distanceManager.calculateDistance(new LatLng(latitude, longitude)) +"kms from current location"));
-				mMarkers.add(added);
-			}
-		});
-
-		if(distanceManager.calculateDistance(new LatLng(latitude, longitude)) < 0.8) {
-			Intent intent = new Intent();
-			PendingIntent pIntent = PendingIntent.getActivity(MainActivity.this,0,intent,0);
-			Notification noti = new Notification.Builder(MainActivity.this)
-			.setTicker("Place-It Title")
-			.setContentTitle("Notification Content Title")
-			.setContentText("Notification Content.")
-			.setSmallIcon(R.drawable.note)
-			.setContentIntent(pIntent).getNotification();
-			noti.flags=Notification.FLAG_AUTO_CANCEL;
-			NotificationManager notificationManager = (NotificationManager)getSystemService(this.NOTIFICATION_SERVICE);
-			notificationManager.notify(0,noti);
-		}
-
-		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				Toast.makeText(MainActivity.this, "Nothing added!", Toast.LENGTH_SHORT).show();
-			}
-		});
-		alert.show();
-		*/
 	}
 
 	@Override
-	public void onInfoWindowClick(Marker added) {
-		Intent myIntent = new Intent(MainActivity.this, PlaceItDetailActivity.class);
-		myIntent.putExtra("ID", added.getId());
-		myIntent.putExtra("Description", added.getSnippet());
-		myIntent.putExtra("Name", added.getTitle());
-		myIntent.putExtra("Latitude", latitude);
-		myIntent.putExtra("Longitude", longitude);
-
-		MainActivity.this.startActivity(myIntent);
-		//Toast.makeText(MainActivity.this, "This needs to open the Details page, but I dunno how to do it. :(", Toast.LENGTH_SHORT).show();
-		//PlaceItDetailActivity.setVisible(View.VISIBLE);              
-	}
+	public void onInfoWindowClick(Marker added) {}
 	
 //EVENT HANDLERS SUPPORT
 	

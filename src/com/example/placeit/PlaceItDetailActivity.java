@@ -1,6 +1,7 @@
 package com.example.placeit;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PlaceItDetailActivity extends ListActivity {
 
@@ -86,7 +88,7 @@ public class PlaceItDetailActivity extends ListActivity {
 		super.onDestroy();
 	}
 	
-//UI DEFINTIONS & SUPPORT
+//UI SETTERS AND SUPPORT
 	
 	// Fills detail page, use DetailContent to format
 	// Calls service to obtain Place It referenced by ID from MainActivity
@@ -119,17 +121,20 @@ public class PlaceItDetailActivity extends ListActivity {
 		
 		list.add(new DetailContent("DATE", dateParser(dateCreated), SMALLFONT));
 		
-		list.add(new DetailContent("LOCATION", placeIt.getCoordinate().latitude + ", " + placeIt.getCoordinate().longitude, SMALLFONT));
+		DecimalFormat decimal = new DecimalFormat("#.####");
+		list.add(new DetailContent("LOCATION", "(" + decimal.format(placeIt.getCoordinate().latitude)
+				+ ", " + decimal.format(placeIt.getCoordinate().longitude) + ")", SMALLFONT));
 		
 		if( !dateToBePosted.equals(dateCreated) )
 			list.add(new DetailContent("DATE to be POSTED", dateParser(dateToBePosted), SMALLFONT));
 		
-		if( placeIt.isRepeatByMinute() == true ) {
+		if( placeIt.isRepeatByMinute() == true )
 			list.add(new DetailContent("MINUTES to be POSTED", String.valueOf(placeIt.getRepeatedMinute()) + " minutes", SMALLFONT));
-		}
 		
-		if( placeIt.isRepeatByWeek() == true)
+		if( placeIt.isRepeatByWeek() == true )
 			weekParser();
+		else 
+			Log.wtf(tag, "Repeat by week, not true");
 		
 		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
 	}
@@ -148,12 +153,11 @@ public class PlaceItDetailActivity extends ListActivity {
 	// Parses weekly information
 	private void weekParser() {
 		int weeklyRepeat = placeIt.getNumOfWeekRepeat().getValue();
+		String week = "";
 		if(weeklyRepeat > 1)
-			list.add(new DetailContent("REPEAT EVERY " + weeklyRepeat + " WEEKS", 10, Gravity.RIGHT));
+			week = "REPEAT EVERY " + weeklyRepeat + " WEEKS";
 		else
-			list.add(new DetailContent("REPEAT WEEKLY", 10, Gravity.RIGHT));
-		
-		Log.wtf(tag, String.valueOf(weeklyRepeat));
+			week = "REPEAT WEEKLY";
 		
 		boolean[] days = placeIt.getRepeatedDay();
 		String daysPosted = "";
@@ -167,7 +171,7 @@ public class PlaceItDetailActivity extends ListActivity {
 		}
 		
 		if( !daysPosted.isEmpty() )
-			list.add(new DetailContent("REPEATS", daysPosted, MEDIUMFONT));
+			list.add(new DetailContent(week, daysPosted, MEDIUMFONT));
 	}
 	
 	private String getDayOfWeek(int day) {
@@ -213,6 +217,17 @@ public class PlaceItDetailActivity extends ListActivity {
 			Log.wtf(tag, "Status " + statusType + " not supported");
 			this.finish();
 		}
+	}
+	
+	// Handles periodic placeits pull down behavior
+	public void pullDownHandler() {
+		if( placeIt.isRepeated() ) {
+			Toast toast = Toast.makeText(this, "Repeated Place-It's stays active on pull down", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+			
+		service.pulldownPlaceIt(placeItId);
+		this.finish();
 	}
 	
 	public void goBack(View view) {
