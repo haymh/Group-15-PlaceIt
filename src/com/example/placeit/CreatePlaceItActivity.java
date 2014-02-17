@@ -54,6 +54,7 @@ public class CreatePlaceItActivity extends Activity {
 	private TableRow tableRowRepeatChoice;
 	private View line;
 	private DatePickerDialog dialog = null;
+	private CheckBox[] checkBoxWeekDay;
 	
 	private ServiceManager sManager;
 	private MyService service;
@@ -86,6 +87,17 @@ public class CreatePlaceItActivity extends Activity {
 		tableRowRepeatMinuteDetail = (TableRow)findViewById(R.id.repeatMinuteDetail);
 		tableRowRepeatChoice = (TableRow)findViewById(R.id.repeatChoice);
 		line = (View)findViewById(R.id.line);
+		checkBoxWeekDay = new CheckBox[7];
+		checkBoxWeekDay[1] = (CheckBox)findViewById(R.id.checkBoxMon);
+		checkBoxWeekDay[2] = (CheckBox)findViewById(R.id.checkBoxTue);
+		checkBoxWeekDay[3] = (CheckBox)findViewById(R.id.checkBoxWed);
+		checkBoxWeekDay[4] = (CheckBox)findViewById(R.id.checkBoxThur);
+		checkBoxWeekDay[5] = (CheckBox)findViewById(R.id.checkBoxFri);
+		checkBoxWeekDay[6] = (CheckBox)findViewById(R.id.checkBoxSat);
+		checkBoxWeekDay[0] = (CheckBox)findViewById(R.id.checkBoxSun);
+		
+		Calendar c = Calendar.getInstance();
+		checkBoxWeekDay[c.get(Calendar.DAY_OF_WEEK) - 1].setChecked(true);
 		
 		editPostdate.setOnClickListener(new OnClickListener(){
 
@@ -182,6 +194,7 @@ public class CreatePlaceItActivity extends Activity {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+				
 				if(isChecked){
 					tableRowRepeatChoice.setVisibility(View.VISIBLE);
 					line.setVisibility(View.VISIBLE);
@@ -193,6 +206,7 @@ public class CreatePlaceItActivity extends Activity {
 					tableRowRepeatMinuteDetail.setVisibility(View.GONE);
 					line.setVisibility(View.GONE);
 				}
+				
 				InputMethodManager input = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 				input.hideSoftInputFromWindow(CreatePlaceItActivity.this.findViewById(android.R.id.content).getWindowToken(),0);
 			}
@@ -245,8 +259,13 @@ public class CreatePlaceItActivity extends Activity {
 		}
 		
 		if(repeatByMinute){
+			String s = ((EditText)findViewById(R.id.editMinute)).getText().toString();
+			if(s.equals("")){
+				Toast.makeText(this, "Please Enter the Minutes", Toast.LENGTH_SHORT).show();
+				return false;
+			}
 			try{
-				repeatedMinute = Integer.parseInt(((EditText)findViewById(R.id.editMinute)).getText().toString());
+				repeatedMinute = Integer.parseInt(s);
 			}catch(NumberFormatException e){
 				((EditText)findViewById(R.id.editMinute)).requestFocus();
 				Toast.makeText(this, "Invalid input for minutes", Toast.LENGTH_SHORT).show();
@@ -266,20 +285,26 @@ public class CreatePlaceItActivity extends Activity {
 			if(((RadioButton)findViewById(R.id.radioButtonEveryFourWeek)).isChecked())
 				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.FOUR;
 			
-			if(((CheckBox)findViewById(R.id.checkBoxMon)).isChecked())
+			if(checkBoxWeekDay[1].isChecked())
 				repeatedDayInWeek += PlaceIt.MON;
-			if(((CheckBox)findViewById(R.id.checkBoxTue)).isChecked())
+			if(checkBoxWeekDay[2].isChecked())
 				repeatedDayInWeek += PlaceIt.TUE;
-			if(((CheckBox)findViewById(R.id.checkBoxWed)).isChecked())
+			if(checkBoxWeekDay[3].isChecked())
 				repeatedDayInWeek += PlaceIt.WED;
-			if(((CheckBox)findViewById(R.id.checkBoxThur)).isChecked())
+			if(checkBoxWeekDay[4].isChecked())
 				repeatedDayInWeek += PlaceIt.THURS;
-			if(((CheckBox)findViewById(R.id.checkBoxFri)).isChecked())
+			if(checkBoxWeekDay[5].isChecked())
 				repeatedDayInWeek += PlaceIt.FRI;
-			if(((CheckBox)findViewById(R.id.checkBoxSat)).isChecked())
+			if(checkBoxWeekDay[6].isChecked())
 				repeatedDayInWeek += PlaceIt.SAT;
-			if(((CheckBox)findViewById(R.id.checkBoxSun)).isChecked())
+			if(checkBoxWeekDay[0].isChecked())
 				repeatedDayInWeek += PlaceIt.SUN;
+			
+			if(repeatedDayInWeek == 0){
+				Toast.makeText(this, "Please pick the day you want to repeat", Toast.LENGTH_SHORT).show();
+				return false;
+			}
+				
 		}
 		createDate = new Date();
 		if(coordinate == null){

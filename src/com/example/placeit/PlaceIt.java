@@ -332,11 +332,15 @@ public class PlaceIt {
 			}
 
 		}else if(repeatByMinute){
+			Date now = new Date();
+			if(postDate.after(new Date()))
+				return postDate;
 			Calendar c = Calendar.getInstance();
-			c.setTime(createDate);
-			c.add(Calendar.MINUTE, repeatedMinute);
-			createDate = c.getTime();
-			return createDate;
+			c.setTime(postDate);
+			while(postDate.before(now))
+				c.add(Calendar.MINUTE, repeatedMinute);
+			postDate = c.getTime();
+			return postDate;
 		}else
 			return postDate;
 	}

@@ -25,8 +25,8 @@ import java.util.*;
 public class MyService extends Service {
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
 	private final static double RANGE = 0.8;
-	private final static long NOTIFY_TIME_LAG = 5000;
-	private final static long POST_TIME_LAG = 4;
+	private final static long NOTIFY_TIME_LAG = 1000;
+	private final static long POST_TIME_LAG = 20;
 	private final IBinder mBinder = new LocalBinder();
 	private DistanceManager dManager = new DistanceManager(this);
 	private boolean stop = false;
@@ -56,8 +56,13 @@ public class MyService extends Service {
 					if(dManager.distanceTo(pi.getCoordinate()) <= 800){
 						database.pullDown(pi.getId());
 						onMapIterator.remove();
-						pi.setStatus(PlaceIt.Status.PULL_DOWN);
-						pulldown.put(pi.getId(), pi);
+						if(!pi.isRepeated()){
+							pi.setStatus(PlaceIt.Status.PULL_DOWN);
+							pulldown.put(pi.getId(), pi);
+						}else{
+							pi.setStatus(PlaceIt.Status.ACTIVE);
+							prePost.put(pi.getId(), pi);
+						}
 						Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 						intent.putExtra("id", pi.getId());
 						PendingIntent resultPendingIntent = 
