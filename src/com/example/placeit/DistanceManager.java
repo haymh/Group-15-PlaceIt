@@ -20,8 +20,6 @@ public class DistanceManager {
     public DistanceManager(Context context) {
     	this.context = context;
     	location = null;
-    	
-    	getCurrentLocation();
     }
 
     // Obtains user current location
@@ -67,37 +65,4 @@ public class DistanceManager {
     	
     	return from.distanceTo(to);
     }
-    
-    /*
-    // Calculate distance from user
-    public double calculateDistance(LatLng fromHere) {
-    	getCurrentLocation();
-    	
-    	// Radius of the Earth in km
-        double radius = 6371;     
-        
-        double lat1 = currentLatitude;
-        double lat2 = fromHere.latitude;
-        
-        double lon1 = currentLongitude;
-        double lon2 = fromHere.longitude;
-        
-        double dLat = Math.toRadians(lat2-lat1);
-        double dLon = Math.toRadians(lon2-lon1);
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-        double c = 2 * Math.asin(Math.sqrt(a));
-        double valueResult= radius*c;
-        double km=valueResult/1;
-        DecimalFormat newFormat = new DecimalFormat("####");
-        int kmInDec =  Integer.valueOf(newFormat.format(km));
-        double meter=valueResult%1000;
-        int  meterInDec= Integer.valueOf(newFormat.format(meter));
-        
-        Log.i("Radius Value",""+valueResult+"   KM  "+kmInDec+" Meter   "+meterInDec);
-
-        return radius * c;
-    }
-    */
 }

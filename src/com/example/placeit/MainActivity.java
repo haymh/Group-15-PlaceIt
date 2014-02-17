@@ -23,8 +23,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -36,6 +34,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -63,7 +62,21 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	private ServiceManager serviceManager;
 	
 	private String tag = MainActivity.class.getSimpleName();
-
+	
+//BROADCAST HANDLER
+	private BroadcastReceiver receiver = new BroadcastReceiver(){
+		
+		// Receives broadcast from service
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getParcelableExtra("bundle");
+			long placeItId = bundle.getLong("id");
+			LatLng placeItLocation = bundle.getParcelable("position");
+			
+			putMarkerOnMap(placeItId, placeItLocation);
+		}
+	};
+	
 //ACTIVITY DEFINITIONS
 	
 	@Override
@@ -118,6 +131,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	public void onResume() {
 		super.onResume();
 		
+		// Dynamically registers the broadcaster
+		registerReceiver(receiver, new IntentFilter(MyService.NOTIFICATION));
+		
         new AsyncTask<Void, Void, Integer>() {
 	        protected void onPreExecute() {}
 
@@ -148,6 +164,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		while(it.hasNext()) {
 			PlaceIt object = it.next();
 			
+			putMarkerOnMap(object.getId(), object.getCoordinate());
+			
+			/*
 			Marker addMarker = mMap.addMarker(new MarkerOptions()
 			.position(object.getCoordinate())
 			.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));
@@ -155,11 +174,21 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 			
 			// Store placeit ID with marker ID in a hashmap for easy tracking
 			markerIdContainer.put(addMarker.getId(), object.getId());
+			*/
 		}
 	}
 	
-	private void putMarkerOnMap() {
-		//DO SOMETHING
+	// Puts place it marker on map
+	private void putMarkerOnMap(long placeItId, LatLng placeItLocation) {
+		Log.wtf(tag, "Drawing this ID: " + placeItId);
+		
+		Marker addMarker = mMap.addMarker(new MarkerOptions()
+		.position(placeItLocation)
+		.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));
+		mMarkers.add(addMarker);
+		
+		// Store placeit ID with marker ID in a hashmap for easy tracking
+		markerIdContainer.put(addMarker.getId(), placeItId);
 	}
 	
 	@Override
@@ -178,17 +207,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		service = serviceManager.unBindService();
 		super.onDestroy();
 	}
-	
-//BROADCAST HANDLER
-	public class MyReceiver extends BroadcastReceiver {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			long placeItId = intent.getLongExtra("id",0);
-			Bundle bundle = intent.getParcelableExtra("bundle");
-			LatLng placeItLocation = bundle.getParcelable("position");
-		}
-	}
 
 //EVENT HANDLERS
 	
@@ -205,7 +223,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 			if(phoneStatus.checkWIFI())
 				geoLocate(view);
 			else {
-				hideSoftKeyboard(view);
+				hideSoftKeyboard();
 				Toast.makeText(MainActivity.this,"WIFI is off, plz turn it on", Toast.LENGTH_LONG).show();
 			}
 		} catch (Exception e) {
@@ -225,7 +243,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		i.putExtra("bundle", send);
 		startActivity(i);
 	}
-	
 	public boolean onMarkerClick(Marker marker) {
 		Intent i = new Intent(this, PlaceItDetailActivity.class);
 		i.putExtra("id", markerIdContainer.get(marker.getId()));
@@ -236,7 +253,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 
 	@Override
 	public void onMapClick(LatLng position) {
-	
+		hideSoftKeyboard();
 		String mapClickMessage = "Hold tap to create Place It";
 		Toast toast = Toast.makeText(this, mapClickMessage, Toast.LENGTH_SHORT);
 		toast.show();
@@ -305,20 +322,18 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 	// Address bar, takes an address or coordinate
 	public void geoLocate(View v) throws IOException
 	{
-		hideSoftKeyboard(v);
+		hideSoftKeyboard();
 		EditText editText = (EditText) findViewById(R.id.sendLocation);
 		String location = editText.getText().toString();
 
-		if(checkIfIsCoordante(location))
-		{
+		if(checkIfIsCoordante(location)) {
 			String geoData = editText.getText().toString();
 			String[] coordinate = geoData.split(",");
 			latitude = Double.valueOf(coordinate[0]).doubleValue();
 			longitude = Double.valueOf(coordinate[1]).doubleValue();
 			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12),2000,null);
 		}
-		else
-		{
+		else {
 			Geocoder gc = new Geocoder(this);
 			List<Address> list = gc.getFromLocationName(location, 1);
 			Address add = list.get(0);
@@ -344,24 +359,26 @@ public class MainActivity extends Activity implements OnMapClickListener, OnInfo
 		int j=0;
 		int k=0;
 		String str[] = new String[3];
-		for(;i<string.length();i++) {
-			if(string.charAt(i)==',') {
+		if( !string.isEmpty() ) {
+			if( string.charAt(i) == ',') {
 				str[k] = string.substring(j, i-1);
 				str[++k] = string.substring(i,1+i++);
 				str[++k] = string.substring(i);
-				break;
 			}
 			return false;
-		}       
+		}
 		if(str[0].matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+") &&
 				str[2].matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+"))
 			return true;
 		else
 			return false;
 	}
-	private void hideSoftKeyboard(View v) {
-		InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(v.getWindowToken(),0);
+	
+	// Hides the keyboard 
+	private void hideSoftKeyboard() {
+		View view = this.findViewById(android.R.id.content);
+		InputMethodManager input = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+		input.hideSoftInputFromWindow(view.getWindowToken(),0);
 	}
 
 	// This sends the camera to the user current location

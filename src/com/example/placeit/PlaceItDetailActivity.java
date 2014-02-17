@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.app.ListActivity;
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -84,7 +85,7 @@ public class PlaceItDetailActivity extends ListActivity {
 			status = "PULLED DOWN";
 			break;
 		}
-		list.add(new DetailContent(status, 10));
+		list.add(new DetailContent(status, 10, Gravity.RIGHT));
 		
 		list.add(new DetailContent("TITLE", placeIt.getTitle(), TITLEFONT));
 		
@@ -232,6 +233,8 @@ public class PlaceItDetailActivity extends ListActivity {
 				if(content != null) {
 					if(item.contentFontSize > 0)
 						content.setTextSize(item.contentFontSize);
+					if(item.contentAlignment > 0)
+						content.setGravity(item.contentAlignment);
 					content.setText(item.content);
 				}
 			}

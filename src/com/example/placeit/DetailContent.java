@@ -4,6 +4,7 @@ public class DetailContent {
 	public String description;
 	public String content;
 	public int contentFontSize;
+	public int contentAlignment;
 	
 	// Helper class to Place-It Detail Activity
 	// Sets format
@@ -19,8 +20,9 @@ public class DetailContent {
 		this.content = content;
 	}
 	
-	public DetailContent(String content, int contentFontSize){
+	public DetailContent(String content, int contentFontSize, int contentAlignment){
 		this.content = content;
 		this.contentFontSize = contentFontSize;
+		this.contentAlignment = contentAlignment;
 	}
 }
