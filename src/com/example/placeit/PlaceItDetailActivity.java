@@ -170,9 +170,11 @@ public class PlaceItDetailActivity extends ListActivity {
 		case 2:
 			service.pulldownPlaceIt(placeItId);
 			this.finish();
+			break;
 		case 3:
 			service.repostPlaceIt(placeItId);
 			this.finish();
+			break;
 		default:
 			Log.wtf(tag, "Status " + statusType + " not supported");
 			this.finish();
