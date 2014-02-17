@@ -214,22 +214,12 @@ public class MyService extends Service {
 		if(success){
 			PlaceIt pi = onMap.get(id);
 			if(pi == null){
-				pi = prePost.get(id);
-				if(!pi.isRepeated()){
-					prePost.remove(id);
-					pi.setStatus(PlaceIt.Status.PULL_DOWN);
-					pulldown.put(id, pi);
-				}
+				pi = prePost.remove(id);
 			}else{
-				onMap.remove(id);
-				if(!pi.isRepeated()){
-					pi.setStatus(PlaceIt.Status.PULL_DOWN);
-					pulldown.put(id, pi);
-				}else{
-					pi.setStatus(PlaceIt.Status.ACTIVE);
-					prePost.put(id, pi);
-				}
+				onMap.remove(id);	
 			}		
+			pi.setStatus(PlaceIt.Status.PULL_DOWN);
+			pulldown.put(id, pi);
 		}
 		return success;
 	}
@@ -254,8 +244,10 @@ public class MyService extends Service {
 	// to repost a place-it from pulldown list
 	public boolean repostPlaceIt(long id){
 		PlaceIt pi = pulldown.get(id).clone();
-		pi.extendPostDate(Calendar.MINUTE, 45);
-		pi.setCreateDate(new Date());
+		if(dManager.distanceTo(pi.getCoordinate()) < 800){
+			pi.extendPostDate(Calendar.MINUTE, 45);
+			pi.setCreateDate(new Date());
+		}
 		pi.setStatus(PlaceIt.Status.ACTIVE);
 		boolean success = database.repostPlaceIt(pi);
 		if(success){		

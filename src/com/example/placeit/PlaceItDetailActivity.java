@@ -222,10 +222,12 @@ public class PlaceItDetailActivity extends ListActivity {
 	
 	// Handles periodic placeits pull down behavior
 	public void pullDownHandler() {
+		/*
 		if( placeIt.isRepeated() ) {
 			Toast toast = Toast.makeText(this, "Repeated Place-It's stays active on pull down", Toast.LENGTH_SHORT);
 			toast.show();
 		}
+		*/
 			
 		service.pulldownPlaceIt(placeItId);
 		this.finish();
