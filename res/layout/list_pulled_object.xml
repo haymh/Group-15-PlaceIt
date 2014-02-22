@@ -42,25 +42,24 @@
         android:visibility="invisible"
         />
 
-	<Button
-	    android:id="@+id/repostBtn"
-	    style="?android:attr/buttonStyleSmall"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentTop="true"
-	    android:layout_toLeftOf="@+id/discardBtn"
-	    android:onClick="repostPlaceIt"
-	    android:text="R" />
-
-	<Button
+	<ImageButton
 	    android:id="@+id/discardBtn"
-	    style="?android:attr/buttonStyleSmall"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_alignBaseline="@+id/repostBtn"
-	    android:layout_alignBottom="@+id/repostBtn"
 	    android:layout_alignParentRight="true"
+	    android:layout_alignParentTop="true"
+	    android:background="@null"
 	    android:onClick="discardPlaceIt"
-	    android:text="X" />
+	    android:src="@drawable/discard" />
+
+	<ImageButton
+	    android:id="@+id/repostBtn"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignTop="@+id/discardBtn"
+	    android:layout_toLeftOf="@+id/discardBtn"
+	    android:background="@null"
+	    android:onClick="repostPlaceIt"
+	    android:src="@drawable/repost" />
 
 </RelativeLayout>
