@@ -1,8 +1,9 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 import java.util.Date;
 
-import com.example.placeit.PlaceIt.NumOfWeekRepeat;
+import com.fifteen.placeit.R;
+import com.fifteen.placeit.PlaceIt.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;

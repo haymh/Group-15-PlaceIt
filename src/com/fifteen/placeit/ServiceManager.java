@@ -1,4 +1,4 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -6,7 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.example.placeit.PlaceIt.NumOfWeekRepeat;
+import com.fifteen.placeit.R;
+import com.fifteen.placeit.PlaceIt.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.os.AsyncTask;

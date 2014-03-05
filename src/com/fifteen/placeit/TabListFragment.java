@@ -1,10 +1,12 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import com.fifteen.placeit.R;
 
 import android.app.ListFragment;
 import android.content.Context;

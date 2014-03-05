@@ -1,10 +1,10 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.example.placeit.PlaceIt.NumOfWeekRepeat;
+import com.fifteen.placeit.PlaceIt.NumOfWeekRepeat;
 
 import android.content.ContentValues;
 import android.content.Context;

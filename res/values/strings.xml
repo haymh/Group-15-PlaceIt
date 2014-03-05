@@ -3,7 +3,6 @@
 
     <string name="app_name">Place It</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_list">Place Its View</string>
     <string name="title_activity_create_place_it">Create a Place It</string>
     <string name="title_activity_place_it_detail">Place It Detail</string>
@@ -12,5 +11,13 @@
     <string name="title">Title</string>
     <string name="detail">Title</string>
     
+    <string name="action_search">Search</string>
+    <string name="action_create">Create</string>
+    <string name="action_list">List</string>
+    
+    <string name="list">LIST</string>
+    <string name="register">Register</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
     
 </resources>

@@ -16,5 +16,27 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
+    
+    <style name="MainTheme" parent="AppTheme">
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:actionBarStyle">@style/ActionBar</item>
+    </style>
+    
+    <!--  Uncomment to change action bar color -->
+    
+    <style name="ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">#b3000000</item>
+    </style>
+    
+    <!--
+    This changes action button size and background    
+    <style name="ActionButton" parent="@android:style/Widget.Holo.Light.ActionButton">
+        <item name="android:background">#CC0066</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+    </style>
+    
+    -->
 
 </resources>

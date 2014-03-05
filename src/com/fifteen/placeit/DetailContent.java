@@ -1,4 +1,4 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 public class DetailContent {
 	public String description;

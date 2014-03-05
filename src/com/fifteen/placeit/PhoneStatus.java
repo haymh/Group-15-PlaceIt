@@ -1,4 +1,4 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 import android.content.Context;
 import android.location.LocationManager;

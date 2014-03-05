@@ -1,8 +1,9 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 import java.util.Date;
 import java.util.Random;
 
+import com.fifteen.placeit.R;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.ActionBar;

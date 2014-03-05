@@ -1,4 +1,4 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 import java.util.*;
 
 import com.google.android.gms.maps.model.LatLng;

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.placeit"
+    package="com.fifteen.placeit"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <permission
-        android:name="com.example.placeit.maps.permission.MAPS_RECEIVE"
+        android:name="com.fifteen.placeit.maps.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
     <uses-sdk
@@ -28,45 +28,52 @@
         android:allowBackup="true"
         android:icon="@drawable/note"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
+        
+        <!-- MAIN & MAP FRAGMENT -->
         <activity
-            android:name="com.example.placeit.MainActivity"
+            android:name="com.fifteen.placeit.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:theme="@style/MainTheme" >
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- LIST PAGE -->
         <activity
-            android:name="com.example.placeit.PlaceItListActivity"
+            android:name="com.fifteen.placeit.PlaceItListActivity"
             android:label="@string/title_activity_list"
             android:screenOrientation="portrait" >
         </activity>
+        
+        <!-- CREATE PAGE -->
         <activity
-            android:name="com.example.placeit.CreatePlaceItActivity"
+            android:name="com.fifteen.placeit.CreatePlaceItActivity"
             android:label="@string/title_activity_create_place_it"
             android:screenOrientation="portrait" >
         </activity>
+        
+        <!-- DETAIL PAGE -->
         <activity
-            android:name="com.example.placeit.PlaceItDetailActivity"
+            android:name="com.fifteen.placeit.PlaceItDetailActivity"
             android:label="@string/title_activity_place_it_detail"
             android:screenOrientation="portrait" >
         </activity>
 
-        
-        
-
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyCCqloye59-Ts0Ra9vmzCP26cq5BItNtZ0" />
+            android:value="AIzaSyCFBONeyqEAOfvjSeCkqdjHSSru3Vm382I" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <service
-            android:name="com.example.placeit.MyService"
+            android:name="com.fifteen.placeit.MyService"
             android:enabled="true"
             android:exported="true" >
         </service>

@@ -1,4 +1,4 @@
-package com.example.placeit;
+package com.fifteen.placeit;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import com.fifteen.placeit.R;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
