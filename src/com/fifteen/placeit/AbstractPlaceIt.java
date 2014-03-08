@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.os.Bundle;
+
 import com.google.android.gms.maps.model.LatLng;
 
 
@@ -54,6 +56,7 @@ public abstract class AbstractPlaceIt {
 	protected AbstractSchedule schedule;
 	protected Status status;
 	protected Map<String,String> placeItInfoMap;
+	protected LatLng coordinate;
 	
 	
 	public AbstractPlaceIt(long id, String title, String description,
@@ -72,6 +75,12 @@ public abstract class AbstractPlaceIt {
 		placeItInfoMap.put(Constant.PI.CREATE_DATE, schedule.getCreateDate().toString());
 		placeItInfoMap.put(Constant.PI.POST_DATE, schedule.getPostDate().toString());
 		schedule.fillUpScheduleInfo(placeItInfoMap);
+	}
+	public LatLng getCoordinate() {
+		return coordinate;
+	}
+	public void setCoordinate(LatLng coordinate) {
+		this.coordinate = coordinate;
 	}
 	public long getId() {
 		return id;
@@ -106,6 +115,7 @@ public abstract class AbstractPlaceIt {
 	public Map<String, String> getPlaceItInfoMap(){
 		return this.placeItInfoMap;
 	}
+	
 	
 	public abstract boolean trigger(LatLng currentLocation);
 	

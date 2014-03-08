@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.fifteen.placeit.R;
-import com.fifteen.placeit.PlaceIt.NumOfWeekRepeat;
+import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.os.AsyncTask;
@@ -160,7 +160,9 @@ public class CreatePlaceItActivity extends Activity {
 	// when user click on create button, then call this method to create a Place-it
 	public void create(View view){
 		if(validate()){
-			boolean s = service.createPlaceIt(title, description, repeatByMinute, repeatedMinute, repeatByWeek, repeatedDayInWeek, numOfWeekRepeat, createDate, postDate, coordinate);
+			boolean s = service.createPlaceIt(title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat, createDate,
+					postDate, coordinate.latitude, coordinate.longitude, AbstractPlaceIt.Status.ACTIVE, null);
+			
 			Log.wtf("create", "repeatedMinute: " + repeatedMinute + " repeatbyMinute: " + repeatByMinute);
 			if(s){
 				Toast.makeText(this, "New Place-it Created", Toast.LENGTH_SHORT).show();
@@ -289,16 +291,16 @@ public class CreatePlaceItActivity extends Activity {
 			repeatedMinute = 0;
 		
 		repeatedDayInWeek = 0;
-		numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.ONE;
+		numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.ONE;
 		if(repeatByWeek){
 			if(((RadioButton)findViewById(R.id.radioButtonEveryWeek)).isChecked())
-				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.ONE;
+				numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.ONE;
 			if(((RadioButton)findViewById(R.id.radioButtonEveryOtherWeek)).isChecked())
-				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.TWO;
+				numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.TWO;
 			if(((RadioButton)findViewById(R.id.radioButtonEveryThreeWeek)).isChecked())
-				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.THREE;
+				numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.THREE;
 			if(((RadioButton)findViewById(R.id.radioButtonEveryFourWeek)).isChecked())
-				numOfWeekRepeat = PlaceIt.NumOfWeekRepeat.FOUR;
+				numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.FOUR;
 			
 			if(checkBoxWeekDay[1].isChecked())
 				repeatedDayInWeek += PlaceIt.MON;

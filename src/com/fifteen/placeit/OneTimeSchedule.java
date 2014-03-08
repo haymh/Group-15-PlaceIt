@@ -4,6 +4,10 @@ import java.util.Date;
 import java.util.Map;
 
 public class OneTimeSchedule extends AbstractSchedule {
+	
+	public OneTimeSchedule(String type, Date createDate, Date postDate){
+		super(type, createDate, postDate);
+	}
 
 	@Override
 	public Date nextPostDate() throws ContradictoryScheduleException {

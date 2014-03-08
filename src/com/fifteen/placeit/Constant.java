@@ -36,5 +36,7 @@ public class Constant {
 		public static final String CATEGORY_ONE = "CATEGORY_ONE";
 		public static final String CATEGORY_TWO = "CATEGORY_TWO";
 		public static final String CATEGORY_THREE = "CATEGORY_THREE";
+		public static final String REPEATED = "REPEATED";
+		public static final String ONE_TIME = "ONE_TIME";
 	}
 }

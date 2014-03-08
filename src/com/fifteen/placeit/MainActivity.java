@@ -331,17 +331,18 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// Fill the map with placeits
 	// Only gets called when service is successfully bound
 	private void fillMapWithPlaceIts() {
-		ArrayList<PlaceIt> list = new ArrayList<PlaceIt>( service.getOnMapList() );
+		ArrayList<AbstractPlaceIt> list = new ArrayList<AbstractPlaceIt>( service.getOnMapList() );
 
 		// Refreshes the map with new data
 		mMarkers.clear();
 		markerIdContainer.clear();
 		map.clear();
 
-		Iterator<PlaceIt> it = list.iterator();
+		Iterator<AbstractPlaceIt> it = list.iterator();
 		while(it.hasNext()) {
-			PlaceIt object = it.next();
-
+			AbstractPlaceIt object = it.next();
+			if(object.getCoordinate() == null)
+				continue;
 			putMarkerOnMap(object.getId(), object.getCoordinate());
 		}
 	}

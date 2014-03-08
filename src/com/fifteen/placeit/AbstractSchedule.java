@@ -6,6 +6,7 @@ import java.util.Map;
 
 
 public abstract class AbstractSchedule {
+	protected String type;
 	protected Date createDate;
 	protected Date postDate;
 	
@@ -13,7 +14,15 @@ public abstract class AbstractSchedule {
 	public abstract String toString();
 	public abstract void fillUpScheduleInfo(Map<String, String> map);
 	
+	public AbstractSchedule(String type, Date createDate, Date postDate){
+		this.type = type;
+		this.createDate = createDate;
+		this.postDate = postDate;
+	}
 	
+	public String getType(){
+		return type;
+	}
 	public Date getCreateDate() {
 		return createDate;
 	}

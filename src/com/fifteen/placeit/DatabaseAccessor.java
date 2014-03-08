@@ -20,12 +20,12 @@ public class DatabaseAccessor {
 	private SQLiteDatabase database;
 	private MySQLiteHelper dbHelper;
 	private String[] allColumns = {MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_TITLE,
-			MySQLiteHelper.COLUMN_DESCRIPTION, MySQLiteHelper.COLUMN_REPEAT_BY_MIN,
-			MySQLiteHelper.COLUMN_REPEATED_MIN, MySQLiteHelper.COLUMN_REPEAT_BY_WEEK,
-			MySQLiteHelper.COLUMN_REPEATED_DAY_IN_WEEK, MySQLiteHelper.COLUMN_NUM_OF_WEEK_REPEAT,
-			MySQLiteHelper.COLUMN_CREATE_DATE, MySQLiteHelper.COLUMN_POST_DATE,
-			MySQLiteHelper.COLUMN_STATUS,
-			MySQLiteHelper.COLUMN_LATITUDE, MySQLiteHelper.COLUMN_LONGITUDE
+			MySQLiteHelper.COLUMN_DESCRIPTION, MySQLiteHelper.COLUMN_REPEATED_DAY_IN_WEEK,
+			MySQLiteHelper.COLUMN_REPEATED_MIN, MySQLiteHelper.COLUMN_NUM_OF_WEEK_REPEAT,
+			MySQLiteHelper.COLUMN_CREATE_DATE, MySQLiteHelper.COLUMN_POST_DATE,	
+			MySQLiteHelper.COLUMN_LATITUDE, MySQLiteHelper.COLUMN_LONGITUDE,
+			MySQLiteHelper.COLUMN_STATUS, MySQLiteHelper.COLUMN_CATEGORY_ONE,
+			MySQLiteHelper.COLUMN_CATEGORY_TWO, MySQLiteHelper.COLUMN_CATEGORY_THREE
 	};
 	public DatabaseAccessor(Context context){
 		dbHelper = new MySQLiteHelper(context);
@@ -40,7 +40,7 @@ public class DatabaseAccessor {
 	}
 	
 	// a helper method to search Place-its by status, parameter and means it AND or OR conjuction, status is a array of where conditions
-	private Map<Long, PlaceIt> searchPlaceItByStatus(boolean and, PlaceIt.Status[] status){
+	private Map<Long, AbstractPlaceIt> searchPlaceItByStatus(boolean and, AbstractPlaceIt.Status[] status){
 		String where = null;
 		if(status != null && status.length >= 1){
 			String conjunction = " or ";
@@ -54,9 +54,9 @@ public class DatabaseAccessor {
 				allColumns, where, null, null, null, null);
 		int count = cursor.getCount();
 		cursor.moveToFirst();
-		Map<Long, PlaceIt> map = new HashMap<Long, PlaceIt>();
+		Map<Long, AbstractPlaceIt> map = new HashMap<Long, AbstractPlaceIt>();
 		for(int i = 0; i < count; i++){
-			PlaceIt pi = cursorToPlaceIt(cursor);
+			AbstractPlaceIt pi = cursorToPlaceIt(cursor);
 			map.put(pi.getId(), pi);
 			cursor.moveToNext();
 		}
@@ -64,47 +64,56 @@ public class DatabaseAccessor {
 	}
 	
 	// user friendly method to get active list
-	public Map<Long, PlaceIt> activePlaceIt(){
-		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ACTIVE, PlaceIt.Status.ON_MAP});
+	public Map<Long, AbstractPlaceIt> activePlaceIt(){
+		return searchPlaceItByStatus(false, new AbstractPlaceIt.Status[] {AbstractPlaceIt.Status.ACTIVE, AbstractPlaceIt.Status.ON_MAP});
 	}
 	
 	// user friendly method to get pull down list
-	public Map<Long, PlaceIt> pulldownPlaceIt(){
-		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.PULL_DOWN});
+	public Map<Long, AbstractPlaceIt> pulldownPlaceIt(){
+		return searchPlaceItByStatus(false, new AbstractPlaceIt.Status[] {AbstractPlaceIt.Status.PULL_DOWN});
 	}
 	
 	// user friendly method to get on map list
-	public Map<Long, PlaceIt> onMapPlaceIt(){
-		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ON_MAP});
+	public Map<Long, AbstractPlaceIt> onMapPlaceIt(){
+		return searchPlaceItByStatus(false, new AbstractPlaceIt.Status[] {AbstractPlaceIt.Status.ON_MAP});
 	}
 	
 	// user friendly method to get prepost list
-	public Map<Long, PlaceIt> prepostPlaceIt(){
-		return searchPlaceItByStatus(false, new PlaceIt.Status[] {PlaceIt.Status.ACTIVE});
+	public Map<Long, AbstractPlaceIt> prepostPlaceIt(){
+		return searchPlaceItByStatus(false, new AbstractPlaceIt.Status[] {AbstractPlaceIt.Status.ACTIVE});
 	}
 	
 	// insert a new place-it into database
-	public PlaceIt insertPlaceIt(String title, String description, boolean repeatByMinute,
-			int repeatedMinute, boolean repeatByWeek,
-			int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat,
-			Date createDate, Date postDate, double latitude, double longitude){
+	public AbstractPlaceIt insertPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
+			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, double latitude,
+			double longitude, AbstractPlaceIt.Status status, String[] categories){
 		Log.v("database accessor","enter insert method");
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_TITLE, title);
 		values.put(MySQLiteHelper.COLUMN_DESCRIPTION, description);
-		values.put(MySQLiteHelper.COLUMN_REPEAT_BY_MIN, repeatByMinute);
 		values.put(MySQLiteHelper.COLUMN_REPEATED_MIN, repeatedMinute);
-		values.put(MySQLiteHelper.COLUMN_REPEAT_BY_WEEK, repeatByWeek);
 		values.put(MySQLiteHelper.COLUMN_REPEATED_DAY_IN_WEEK, repeatedDayInWeek);
 		Log.v("database accessor","before numOfWeekRepeat.getValue()");
 		values.put(MySQLiteHelper.COLUMN_NUM_OF_WEEK_REPEAT, numOfWeekRepeat.getValue());
 		Log.v("database accessor","numOfWeekRepeat.getValue()");
 		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, dateFormat.format(createDate));
 		values.put(MySQLiteHelper.COLUMN_POST_DATE, dateFormat.format(postDate));
-		values.put(MySQLiteHelper.COLUMN_STATUS, PlaceIt.Status.ACTIVE.getValue());
+		values.put(MySQLiteHelper.COLUMN_STATUS, AbstractPlaceIt.Status.ACTIVE.getValue());
 		values.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
 		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
+		if(categories != null)
+		{
+			switch(categories.length){
+			case 3:
+				values.put(MySQLiteHelper.COLUMN_CATEGORY_THREE, categories[2]);
+			case 2:
+				values.put(MySQLiteHelper.COLUMN_CATEGORY_TWO, categories[1]);
+			case 1:
+				values.put(MySQLiteHelper.COLUMN_CATEGORY_ONE, categories[0]);
+			default:
+			}
+		}
 		Log.v("database accessor","ready to insert");
 		long insertId = database.insert(MySQLiteHelper.TABLE_PLACE_IT, null, values);
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
@@ -115,11 +124,11 @@ public class DatabaseAccessor {
 	}
 	
 	// repost a place-it 
-	public boolean repostPlaceIt(PlaceIt pi){
+	public boolean repostPlaceIt(AbstractPlaceIt pi){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		ContentValues values = new ContentValues();
-		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, dateFormat.format(pi.getCreateDate()));
-		values.put(MySQLiteHelper.COLUMN_POST_DATE, dateFormat.format(pi.getPostDate()));
+		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, dateFormat.format(pi.schedule.getCreateDate()));
+		values.put(MySQLiteHelper.COLUMN_POST_DATE, dateFormat.format(pi.schedule.getPostDate()));
 		int row = database.update(MySQLiteHelper.TABLE_PLACE_IT, values, 
 				MySQLiteHelper.COLUMN_ID + " = " + pi.getId(), null);
 		return row == 1;
@@ -127,12 +136,17 @@ public class DatabaseAccessor {
 	
 	// pull down a place-it
 	public boolean pullDown(long id){ 
-		return updatePlaceItStatus(id, PlaceIt.Status.PULL_DOWN);
+		return updatePlaceItStatus(id, AbstractPlaceIt.Status.PULL_DOWN);
 	}
 	
 	// change a place-it status to on map
 	public boolean onMap(long id){ 
-		return updatePlaceItStatus(id, PlaceIt.Status.ON_MAP);
+		return updatePlaceItStatus(id, AbstractPlaceIt.Status.ON_MAP);
+	}
+	
+	// change a place-it status to active
+	public boolean active(long id){
+		return updatePlaceItStatus(id, AbstractPlaceIt.Status.ACTIVE);
 	}
 	
 	// delete a place-it in database
@@ -144,15 +158,15 @@ public class DatabaseAccessor {
 	
 	
 	// check a place-it's status
-	public PlaceIt.Status checkStatus(long id){
+	public AbstractPlaceIt.Status checkStatus(long id){
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
 				new String[] { MySQLiteHelper.COLUMN_STATUS }, MySQLiteHelper.COLUMN_ID + " = " + id , null, null, null, null);
 		cursor.moveToFirst();
-		return PlaceIt.Status.genStatus(cursor.getInt(0));
+		return AbstractPlaceIt.Status.genStatus(cursor.getInt(0));
 	}
 	
 	// find a place-it by id
-	public PlaceIt findPlaceIt(long id){
+	public AbstractPlaceIt findPlaceIt(long id){
 		String where = MySQLiteHelper.COLUMN_ID+ " = " + id;
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_PLACE_IT,
 				allColumns, where, null, null, null, null);
@@ -165,7 +179,7 @@ public class DatabaseAccessor {
 	
 	
 	// update place-it status in database
-	private boolean updatePlaceItStatus(long id, PlaceIt.Status status){
+	private boolean updatePlaceItStatus(long id, AbstractPlaceIt.Status status){
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_STATUS, status.getValue());
 		int row = database.update(MySQLiteHelper.TABLE_PLACE_IT, values, 
@@ -175,16 +189,41 @@ public class DatabaseAccessor {
 	
 	
 	//helper method that turns each row into a PlaceIt object
-	private PlaceIt cursorToPlaceIt(Cursor cursor){
+	private AbstractPlaceIt cursorToPlaceIt(Cursor cursor){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		try {
-			return new PlaceIt(cursor.getLong(0), cursor.getString(1), cursor.getString(2),
-					cursor.getInt(3) == 1, cursor.getInt(4), cursor.getInt(5) == 1, cursor.getInt(6),
-					PlaceIt.NumOfWeekRepeat.genNumOfWeekRepeat(cursor.getInt(7)), 
-					dateFormat.parse(cursor.getString(8)), dateFormat.parse(cursor.getString(9)),
-					cursor.getDouble(11),cursor.getDouble(12),
-					PlaceIt.Status.genStatus(cursor.getInt(10))
-					);
+			long id = cursor.getLong(0);
+			String title = cursor.getString(1);
+			String description = cursor.getString(2);
+			int repeatedDayInWeek = cursor.getInt(3);
+			int repeatedMinute = cursor.getInt(4);
+			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.genNumOfWeekRepeat(cursor.getInt(5));
+			Date createDate = dateFormat.parse(cursor.getString(6));
+			Date postDate = dateFormat.parse(cursor.getString(7));
+			double latitude = cursor.getDouble(8);
+			double longitude = cursor.getDouble(9);
+			AbstractPlaceIt.Status status = AbstractPlaceIt.Status.genStatus(cursor.getInt(10));
+			String categoryOne = cursor.getString(11);
+			String categoryTwo = cursor.getString(12);
+			String categoryThree = cursor.getString(13);
+			String[] categories;
+			if(categoryThree != null && !categoryThree.equals("")){
+				categories = new String[3];
+				categories[0] = categoryOne;
+				categories[1] = categoryTwo;
+				categories[2] = categoryThree;
+			}else if(categoryTwo != null && !categoryTwo.equals("")){
+				categories = new String[2];
+				categories[0] = categoryOne;
+				categories[1] = categoryTwo;
+			}else if(categoryOne != null && !categoryOne.equals("")){
+				categories = new String[1];
+				categories[0] = categoryOne;
+			}else
+				categories = null;
+			
+			return PlaceItFactory.createPlaceIt(id, title, description, repeatedDayInWeek, repeatedMinute,
+					numOfWeekRepeat, createDate, postDate, latitude, longitude, status, categories);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

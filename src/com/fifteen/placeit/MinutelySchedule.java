@@ -8,9 +8,9 @@ public class MinutelySchedule extends AbstractSchedule{
 
 	private int repeatedMinute;
 	
-	public MinutelySchedule(int repeatedMinute, Date postDate){
+	public MinutelySchedule(String type, Date createDate, Date postDate, int repeatedMinute){
+		super(type, createDate, postDate);
 		this.repeatedMinute = repeatedMinute;
-		this.postDate = postDate;
 	}
 	@Override
 	public Date nextPostDate() throws ContradictoryScheduleException {

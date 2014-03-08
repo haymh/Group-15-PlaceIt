@@ -13,14 +13,15 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 	public static final String COLUMN_ID = "id";
 	public static final String COLUMN_TITLE = "title";
 	public static final String COLUMN_DESCRIPTION = "description";
-	public static final String COLUMN_REPEAT_BY_WEEK = "repeatByWeek";
-	public static final String COLUMN_REPEAT_BY_MIN = "repeatByMinute";
 	public static final String COLUMN_REPEATED_MIN = "repeatedMinute";
 	public static final String COLUMN_REPEATED_DAY_IN_WEEK = "repeatedDayInWeek";
 	public static final String COLUMN_NUM_OF_WEEK_REPEAT = "numOfWeekRepeat";
 	public static final String COLUMN_CREATE_DATE = "createDate";
 	public static final String COLUMN_POST_DATE = "postDate";
 	public static final String COLUMN_STATUS = "status";
+	public static final String COLUMN_CATEGORY_ONE = "categoryOne";
+	public static final String COLUMN_CATEGORY_TWO = "categoryTwo";
+	public static final String COLUMN_CATEGORY_THREE = "categoryThree";
 	public static final String COLUMN_LATITUDE = "latitude";
 	public static final String COLUMN_LONGITUDE = "longitude";
 	
@@ -34,16 +35,17 @@ public class MySQLiteHelper extends SQLiteOpenHelper{
 			+ " integer primary key autoincrement, "
 			+ COLUMN_TITLE + " text not null, "
 			+ COLUMN_DESCRIPTION + " text, "
-			+ COLUMN_REPEAT_BY_MIN + " boolean not null, "
-			+ COLUMN_REPEATED_MIN + " integer, "
-			+ COLUMN_REPEAT_BY_WEEK + " boolean not null, "
 			+ COLUMN_REPEATED_DAY_IN_WEEK + " integer, "
+			+ COLUMN_REPEATED_MIN + " integer, "
 			+ COLUMN_NUM_OF_WEEK_REPEAT + " integer, "
 			+ COLUMN_CREATE_DATE + " datetime not null, "
-			+ COLUMN_POST_DATE + " datetime, "
+			+ COLUMN_POST_DATE + " datetime, "	
+			+ COLUMN_LATITUDE + " double, "
+			+ COLUMN_LONGITUDE + " double ,"
 			+ COLUMN_STATUS + " integer not null, "
-			+ COLUMN_LATITUDE + " double not null, "
-			+ COLUMN_LONGITUDE + " double not null);";
+			+ COLUMN_CATEGORY_ONE + " text, "
+			+ COLUMN_CATEGORY_TWO + " text,"
+			+ COLUMN_CATEGORY_THREE + " text);";
 	public MySQLiteHelper(Context context){
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
