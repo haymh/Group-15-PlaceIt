@@ -14,6 +14,7 @@ import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.os.Binder;
 import android.os.Bundle;
@@ -36,6 +37,11 @@ public class MyService extends Service {
 	private Map<Long, AbstractPlaceIt> prePost;
 	private NotifyPostThread nThread;
 	private int counter = 0; // id for notification
+	
+	// TODO ZOO Location variables
+	private SharedPreferences preference;
+	private double latitude;
+	private double longitude;
 
 	public class LocalBinder extends Binder{
 		public MyService getService(){
@@ -208,9 +214,15 @@ public class MyService extends Service {
 	}
 
 	// to repost a place-it from pulldown list
-	public boolean repostPlaceIt(long id, LatLng currentLocation){
+	// TODO ZOO Changed this
+	//public boolean repostPlaceIt(long id, LatLng currentLocation){
+	public boolean repostPlaceIt(long id){
 		AbstractPlaceIt pi = pulldown.get(id);
 		if(pi.getCoordinate() != null){
+			
+			// TODO ZOO Pass current location
+			LatLng currentLocation = fetchCurrentLocation();
+			
 			if(pi.trigger(currentLocation)){
 				pi.schedule.extendPostDate(Calendar.MINUTE, 45);
 				pi.schedule.setCreateDate(new Date());
@@ -221,6 +233,16 @@ public class MyService extends Service {
 		pulldown.remove(id);
 		prePost.put(id, pi);
 		return true;
+	}
+	
+	// TODO ZOO Get current location
+	private LatLng fetchCurrentLocation() {
+		// Gotten as string to prevent precision lost
+		preference = getSharedPreferences(Constant.SP.SAVE, Context.MODE_PRIVATE);
+		double latitude = Double.parseDouble(preference.getString(Constant.SP.LAT, "32.7150"));
+		double longitude = Double.parseDouble(preference.getString(Constant.SP.LNG, "-117.1625"));
+		
+		return new LatLng(latitude, longitude);
 	}
 	
 	// call to make service check every place_it in onMap, try to fire place_it

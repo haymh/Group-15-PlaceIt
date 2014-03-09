@@ -311,6 +311,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		locationRequest.setSmallestDisplacement(UPDATE_DISPLACEMENT);
 
 		// Initialize location client
+		// TODO Stopped
 		locationClient = new LocationClient(MainActivity.this, this, this);
 	}
 	
@@ -376,7 +377,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 
 	@Override 
 	public void onConnected(Bundle dataBundle) { 
-		locationClient.requestLocationUpdates(locationRequest, this); 
+		//locationClient.requestLocationUpdates(locationRequest, this); 
 	} 
 
 	// Handles location changes
@@ -385,6 +386,16 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		// Saves current location
 		latitude = location.getLatitude();
 		longitude = location.getLongitude();
+		
+		// TODO Temporary location passing solution
+		if( service != null){
+			String latitudeString = String.valueOf(latitude);
+			String longitudeString = String.valueOf(longitude);
+			
+			// Saves current location, prevents precision lost of putFloat()
+			preference.edit().putString(Constant.SP.LAT, latitudeString).commit();
+			preference.edit().putString(Constant.SP.LNG, longitudeString).commit();
+		}
 		
 		goToLocation(latitude, longitude);
 	} 

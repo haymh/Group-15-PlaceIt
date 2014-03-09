@@ -32,7 +32,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	private MyService service; 
 	private ServiceManager manager; 
 	
-	private PlaceIt placeIt;
+	private AbstractPlaceIt placeIt;
 	private long placeItId;
 	private int statusType;
 	private boolean listIsFilled = false;
@@ -122,6 +122,7 @@ public class PlaceItDetailActivity extends ListActivity {
 		if( !description.isEmpty() ) 
 			list.add(new DetailContent("DESCRIPTION", description, MEDIUMFONT));
 				
+		/* TODO
 		Date dateCreated = placeIt.getCreateDate();
 		Date dateToBePosted = placeIt.getPostDate();
 		
@@ -139,10 +140,12 @@ public class PlaceItDetailActivity extends ListActivity {
 		
 		if( placeIt.isRepeatByWeek() == true )
 			weekParser();
+		*/
 		
 		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
 	}
 	
+	/* TODO
 	// Parses date string
 	private String dateParser(Date date) {
 		DateFormat day = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
@@ -199,6 +202,7 @@ public class PlaceItDetailActivity extends ListActivity {
 			return "";
 		}
 	}
+	*/
 
 //BUTTON HANDLERS 
 	

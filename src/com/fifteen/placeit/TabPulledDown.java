@@ -17,7 +17,7 @@ public class TabPulledDown extends TabListFragment {
 	@Override
 	public void fillList() {
 		try {
-			list = new ArrayList<PlaceIt>(service.getPulldownList());
+			list = new ArrayList<AbstractPlaceIt>(service.getPulldownList());
 		} catch(Exception e) {
 			Log.wtf(tag, e);
 			return;

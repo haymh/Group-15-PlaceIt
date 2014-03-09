@@ -17,7 +17,7 @@ public class PlaceItFactory {
 			schedule = new MinutelySchedule(Constant.PI.REPEATED, createDate, postDate, repeatedMinute);
 		else
 			schedule = new OneTimeSchedule(Constant.PI.ONE_TIME, createDate, postDate);
-		if(categories == null || categories.length > 0)
+		if(categories != null && categories.length > 0)
 			pi = new CategoryPlaceIt(id, title, description, schedule, status, categories);
 		else
 			pi = new LocationPlaceIt(id, title, description, schedule, status, latitude, longitude);

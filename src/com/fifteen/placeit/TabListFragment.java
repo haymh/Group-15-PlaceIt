@@ -24,7 +24,7 @@ public abstract class TabListFragment extends ListFragment {
 	protected ServiceManager manager;
 	protected MyService service;
 	
-	protected List<PlaceIt> list;
+	protected List<AbstractPlaceIt> list;
 	
 	protected int imageResource;
 	protected String tag;
@@ -82,9 +82,9 @@ public abstract class TabListFragment extends ListFragment {
     }
 
 //UI DEFINITIONS
-	public class Adapter extends ArrayAdapter<PlaceIt> {
+	public class Adapter extends ArrayAdapter<AbstractPlaceIt> {
 		
-		public Adapter(Context context, int textResource, List<PlaceIt> objects) {
+		public Adapter(Context context, int textResource, List<AbstractPlaceIt> objects) {
 			super(context, textResource, objects);
 		}
 
@@ -98,7 +98,7 @@ public abstract class TabListFragment extends ListFragment {
 				row = inflater.inflate(imageResource, null);
 			}
 
-			PlaceIt item = getItem(position);
+			AbstractPlaceIt item = getItem(position);
 
 			// Sets text into respective TextView
 			if(item != null) {
@@ -122,7 +122,8 @@ public abstract class TabListFragment extends ListFragment {
 						message = "TO BE POSTED";
 						break;
 					case 3:
-						message = dateParser(item.getCreateDate());
+						message = "*CREATE DATE";
+						// TODO message = dateParser(item.getCreateDate());
 						break;
 					default:
 						Log.wtf(tag, "Bad Place It Status " + status);

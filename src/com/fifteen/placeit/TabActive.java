@@ -18,7 +18,7 @@ public class TabActive extends TabListFragment {
 	public void fillList() {
 	
 		try {
-			list = new ArrayList<PlaceIt>(service.getPrepostList());
+			list = new ArrayList<AbstractPlaceIt>(service.getPrepostList());
 		} catch(Exception e) {
 			Log.wtf(tag, e);
 		}
@@ -27,7 +27,7 @@ public class TabActive extends TabListFragment {
 			list.addAll(service.getOnMapList());
 		} catch(Exception e) {
 			try {
-				list = new ArrayList<PlaceIt>(service.getOnMapList());
+				list = new ArrayList<AbstractPlaceIt>(service.getOnMapList());
 			} catch(Exception e2) {
 				Log.wtf(tag + " inner", e2);
 				return;
