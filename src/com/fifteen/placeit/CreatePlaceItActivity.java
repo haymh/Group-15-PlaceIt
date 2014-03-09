@@ -303,19 +303,19 @@ public class CreatePlaceItActivity extends Activity {
 				numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.FOUR;
 			
 			if(checkBoxWeekDay[1].isChecked())
-				repeatedDayInWeek += PlaceIt.MON;
+				repeatedDayInWeek += WeeklySchedule.MON;
 			if(checkBoxWeekDay[2].isChecked())
-				repeatedDayInWeek += PlaceIt.TUE;
+				repeatedDayInWeek += WeeklySchedule.TUE;
 			if(checkBoxWeekDay[3].isChecked())
-				repeatedDayInWeek += PlaceIt.WED;
+				repeatedDayInWeek += WeeklySchedule.WED;
 			if(checkBoxWeekDay[4].isChecked())
-				repeatedDayInWeek += PlaceIt.THURS;
+				repeatedDayInWeek += WeeklySchedule.THURS;
 			if(checkBoxWeekDay[5].isChecked())
-				repeatedDayInWeek += PlaceIt.FRI;
+				repeatedDayInWeek += WeeklySchedule.FRI;
 			if(checkBoxWeekDay[6].isChecked())
-				repeatedDayInWeek += PlaceIt.SAT;
+				repeatedDayInWeek += WeeklySchedule.SAT;
 			if(checkBoxWeekDay[0].isChecked())
-				repeatedDayInWeek += PlaceIt.SUN;
+				repeatedDayInWeek += WeeklySchedule.SUN;
 			
 			if(repeatedDayInWeek == 0){
 				Toast.makeText(this, "Please pick the day you want to repeat", Toast.LENGTH_SHORT).show();

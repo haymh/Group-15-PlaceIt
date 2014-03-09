@@ -2,8 +2,7 @@ package com.fifteen.placeit;
 
 import java.util.Date;
 
-import com.fifteen.placeit.PlaceIt.NumOfWeekRepeat;
-import com.fifteen.placeit.PlaceIt.Status;
+
 import com.google.android.gms.maps.model.LatLng;
 
 public class Constant {

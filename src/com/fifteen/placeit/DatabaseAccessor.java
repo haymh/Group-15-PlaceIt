@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.fifteen.placeit.PlaceIt.NumOfWeekRepeat;
+
 
 import android.content.ContentValues;
 import android.content.Context;
