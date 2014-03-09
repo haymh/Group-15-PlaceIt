@@ -177,6 +177,16 @@ public class DatabaseAccessor {
 		return cursorToPlaceIt(cursor);
 	}
 	
+	// drop the placeIt table
+	public void dropTable(){
+		database.execSQL("DROP TABLE IF EXISTS " + MySQLiteHelper.TABLE_PLACE_IT);
+	}
+	
+	// create the placeIt table
+	public void createTable(){
+		database.execSQL(MySQLiteHelper.DATABASE_CREATE);
+	}
+	
 	
 	// update place-it status in database
 	private boolean updatePlaceItStatus(long id, AbstractPlaceIt.Status status){
@@ -229,4 +239,7 @@ public class DatabaseAccessor {
 		}
 		return null;
 	}
+	
+	
+	
 }
