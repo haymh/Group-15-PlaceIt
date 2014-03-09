@@ -262,6 +262,9 @@ public class MyService extends Service {
 					pulldown.put(pi.getId(), pi);
 					notify(pi);
 				}
+				// category and location placeit have different notification
+				// when category gets triggered, pull down all category place it has the same category
+				// so, pull down by category in database, database accessor return me list of pulled down categories ids
 			}			
 		}
 	}

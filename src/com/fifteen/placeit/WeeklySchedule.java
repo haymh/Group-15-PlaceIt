@@ -45,6 +45,7 @@ public class WeeklySchedule extends AbstractSchedule {
 
 	public WeeklySchedule(String type, Date createDate, Date postDate, int repeatedDayInWeek, NumOfWeekRepeat numOfWeekRepeat){
 		super(type, createDate, postDate);
+		repeatedDay = new boolean[7];
 		setRepeatedDayInWeek(repeatedDayInWeek);
 		this.numOfWeekRepeat = numOfWeekRepeat;
 	}

@@ -29,7 +29,8 @@ public class CategoryPlaceIt extends AbstractPlaceIt {
 
 	@Override
 	public boolean trigger(LatLng currentLocation) {
-		// TODO Auto-generated method stub
+		// checking if any category matched
+		// store the address into map
 		return false;
 	}
 
