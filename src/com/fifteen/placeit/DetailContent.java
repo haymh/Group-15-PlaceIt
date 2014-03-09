@@ -27,13 +27,6 @@ public class DetailContent {
 		this.content = content;
 	}
 	
-	public DetailContent(CharSequence content, int contentFontSize, int contentAlignment){
-		setDefault();
-		this.content = content;
-		this.contentFontSize = contentFontSize;
-		this.contentAlignment = contentAlignment;
-	}
-	
 	public DetailContent() {
 		setDefault();
 	}

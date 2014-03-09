@@ -60,5 +60,6 @@ public final class Constant {
 		public static final String REPEATED = "REPEATED";
 		public static final String ONE_TIME = "ONE_TIME";
 		public static final String ADDRESS = "ADDRESS";
+		public static final int NUM_OF_CATEGORIES = 3;
 	}
 }

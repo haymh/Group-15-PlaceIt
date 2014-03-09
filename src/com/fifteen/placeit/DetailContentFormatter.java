@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 
 import android.text.Html;
@@ -46,6 +47,7 @@ public class DetailContentFormatter {
 		formatLocation();
 		formatDates();
 		formatRepeat();
+		formatCategory();
 
 		return list;
 	}
@@ -190,44 +192,38 @@ public class DetailContentFormatter {
 			return "";
 		}
 	}
-
+	
+	// Format the categories of categorical place its
+	private void formatCategory() {
+		ArrayList<String> category = new ArrayList<String>();
+		
+		String single;
+		single = info.get(Constant.PI.CATEGORY_ONE);
+		if( single != null && !single.isEmpty() ) {
+			category.add(single);
+		}
+		
+		single = info.get(Constant.PI.CATEGORY_TWO);
+		if( single != null && !single.isEmpty() ) {
+			category.add(single);
+		}
+		
+		single = info.get(Constant.PI.CATEGORY_THREE);
+		if( single != null && !single.isEmpty() ) {
+			category.add(single);
+		}
+		
+		if( category.size() > 0 ) {
+			String categories = "";
+			for(int i = 0; i < category.size(); ++i) {
+				categories += categories;
+				
+				if( i+1 < category.size() ) {
+					categories += "\n";
+				}
+			}
+			
+			list.add(new DetailContent("CATEGORIES", categories, SMALL_FONT));
+		}
+	}
 }
-
-/*
-
-/* TODO
-if( placeIt.isRepeatByMinute() == true )
-	list.add(new DetailContent("MINUTES to be POSTED", String.valueOf(placeIt.getRepeatedMinute()) + " minutes", SMALLFONT));
-
-if( placeIt.isRepeatByWeek() == true )
-	weekParser();
-
-setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
-}
-
-// Parses weekly information
-private void weekParser() {
-int weeklyRepeat = placeIt.getNumOfWeekRepeat().getValue();
-String week = "";
-if(weeklyRepeat > 1)
-	week = "REPEAT EVERY " + weeklyRepeat + " WEEKS";
-else
-	week = "REPEAT WEEKLY";
-
-boolean[] days = placeIt.getRepeatedDay();
-String daysPosted = "";
-int dayNumbers[] = {6, 0, 1, 2, 3, 4, 5};
-
-for( int i : dayNumbers ) {
-	if(days[i] == true) 
-		daysPosted += "<B>" + getDayOfWeek(i) + "</B> ";
-	else
-		daysPosted += "<font color=#D8D8D8 >" + getDayOfWeek(i) + "</font> ";		
-}
-
-if( !daysPosted.isEmpty() )
-	list.add(new DetailContent(week, daysPosted, MEDIUMFONT));
-}
-
-}
- */
