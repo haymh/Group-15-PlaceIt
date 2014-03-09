@@ -20,4 +20,6 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     
+    <string name="API_KEY">AIzaSyCOvV2bqQh_FkXFLB_-DfcgBJZ4J4jyM58</string>
+    
 </resources>

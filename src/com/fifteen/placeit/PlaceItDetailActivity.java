@@ -39,7 +39,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	
 	private String tag = PlaceItDetailActivity.class.getSimpleName();
 	
-	private List<DetailContent> list = new ArrayList<DetailContent>();
+	private List<DetailContent> list;
 	
 	private final int SMALLFONT = 16;
 	private final int MEDIUMFONT = 20;
@@ -101,6 +101,10 @@ public class PlaceItDetailActivity extends ListActivity {
 	private void fillDetailPage() {
 		placeIt = service.findPlaceIt(placeItId);
 		
+		list = new ArrayList<DetailContent>(new DetailContentFormatter(placeIt).getDetailsArray());
+		
+		/* TODO
+		
 		String status = "";
 		statusType = placeIt.getStatus().getValue();
 		switch(statusType) {
@@ -122,7 +126,6 @@ public class PlaceItDetailActivity extends ListActivity {
 		if( !description.isEmpty() ) 
 			list.add(new DetailContent("DESCRIPTION", description, MEDIUMFONT));
 				
-		/* TODO
 		Date dateCreated = placeIt.getCreateDate();
 		Date dateToBePosted = placeIt.getPostDate();
 		
@@ -228,13 +231,6 @@ public class PlaceItDetailActivity extends ListActivity {
 	
 	// Handles periodic placeits pull down behavior
 	public void pullDownHandler() {
-		/*
-		if( placeIt.isRepeated() ) {
-			Toast toast = Toast.makeText(this, "Repeated Place-It's stays active on pull down", Toast.LENGTH_SHORT);
-			toast.show();
-		}
-		*/
-			
 		service.pulldownPlaceIt(placeItId);
 		this.finish();
 	}
@@ -252,6 +248,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	public void setUpOmniButton() {
 		Button omniButton = (Button) findViewById(R.id.detailOmniBtn);
 		switch(statusType) {
+		case 0:
 		case 1:
 		case 2:
 			omniButton.setText("Pull Down");
@@ -286,18 +283,17 @@ public class PlaceItDetailActivity extends ListActivity {
 			// Sets text into respective TextView
 			if(item != null) {
 				TextView description = (TextView) row.findViewById(R.id.detailListDescription);
-				if(description != null)
+				if(description != null) {
 					description.setText(item.description);
+					description.setTextSize(item.descriptionFontSize);
+					description.setGravity(item.descriptionAlignment);
+				}
 				
 				TextView content = (TextView) row.findViewById(R.id.detailListContent);
 				if(content != null) {
-					if(item.contentFontSize > 0)
-						content.setTextSize(item.contentFontSize);
-					if(item.contentAlignment > 0)
-						content.setGravity(item.contentAlignment);
-					
-					Spanned stringHTML = Html.fromHtml(item.content);
-					content.setText(stringHTML);
+					content.setText(item.content);
+					content.setTextSize(item.contentFontSize);
+					content.setGravity(item.contentAlignment);
 				}
 			}
 			return row;

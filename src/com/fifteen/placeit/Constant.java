@@ -1,11 +1,7 @@
 package com.fifteen.placeit;
 
-import java.util.Date;
-
-
-import com.google.android.gms.maps.model.LatLng;
-
-public class Constant {
+// Constant holding class
+public final class Constant {
 
 	// SharedPreferences
 	public static class SP {
@@ -14,12 +10,38 @@ public class Constant {
 		public static final String LAT = "latitude";
 		public static final String LNG = "longitude";
 	}
-	
+
 	public static final String TITLE = "Fifteen Place-It";
 	public static final String REGISTER = "Register";
 	public static final String LOGIN = "LOGIN";
 	public static final String LOGOUT = "LOGOUT";
+
+	// Places API 
+	public static class PAPI {
+		public static final String BROWSER_API = "AIzaSyAqKT5WOPokmNIKo0qeqGZyOmo76JwnJCg";
+	}
 	
+	// Location
+	public static class L {
+
+		// Half mile in meters
+		public static final int RADIUS = 805;
+		
+		public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000; 
+		
+		// Location update intervals
+		private static final int NORMAL_SECS = 5;
+		private static final int FASTEST_SECS = 5;
+		private static final int MPS = 100;	// Milliseconds per second
+		public static final int NORMAL_INTERVAL = NORMAL_SECS * MPS;
+		public static final int FASTEST_INTERVAL = FASTEST_SECS * MPS;
+		
+		// Location update intervals (distance) in meters
+		public static final float UPDATE_DISTANCE = 0;
+
+	}
+
+	// Place-Its 
 	public static class PI {
 		public static final String ID = "ID";
 		public static final String TITLE = "TITLE";
@@ -37,5 +59,6 @@ public class Constant {
 		public static final String CATEGORY_THREE = "CATEGORY_THREE";
 		public static final String REPEATED = "REPEATED";
 		public static final String ONE_TIME = "ONE_TIME";
+		public static final String ADDRESS = "ADDRESS";
 	}
 }

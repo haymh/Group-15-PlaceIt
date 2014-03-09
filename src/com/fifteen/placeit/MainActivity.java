@@ -53,6 +53,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//Main driver, holds map and location client
 public class MainActivity extends Activity implements OnMapClickListener, OnCameraChangeListener,
 	OnMapLongClickListener, OnMarkerClickListener, ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
 
@@ -72,13 +73,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 
 	// Debug tag
 	private String tag = MainActivity.class.getSimpleName();
-
-	// Location variables
-	private static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000; 
-	private static final int MILLISECONDS_PER_SECOND = 1000; 
-	private static final int UPDATE_INTERVAL_IN_SECONDS = 5; 
-	private static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS; 
-	private static final float UPDATE_DISPLACEMENT = 100;
 
 	private static LocationRequest locationRequest; 
 	private static LocationClient locationClient; 
@@ -303,15 +297,12 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	
 	// Initialize location services
 	private void initializeLocationService() {
-		
 		locationRequest = LocationRequest.create(); 
 		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); 
-		locationRequest.setInterval(UPDATE_INTERVAL); 
-		//locationRequest.setFastestInterval(UPDATE_INTERVAL);
-		locationRequest.setSmallestDisplacement(UPDATE_DISPLACEMENT);
+		locationRequest.setInterval(Constant.L.NORMAL_INTERVAL); 
+		locationRequest.setFastestInterval(Constant.L.FASTEST_INTERVAL);
+		locationRequest.setSmallestDisplacement(Constant.L.UPDATE_DISTANCE);
 
-		// Initialize location client
-		// TODO Stopped
 		locationClient = new LocationClient(MainActivity.this, this, this);
 	}
 	
@@ -365,7 +356,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		if (connectionResult.hasResolution()) { 
 			try { 
 				// Start an Activity that tries to resolve the error 
-				connectionResult.startResolutionForResult( this, CONNECTION_FAILURE_RESOLUTION_REQUEST); 
+				connectionResult.startResolutionForResult( this, Constant.L.CONNECTION_FAILURE_RESOLUTION_REQUEST); 
 			} catch (IntentSender.SendIntentException e) { 
 				// Log the error 
 				e.printStackTrace(); 
@@ -377,6 +368,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 
 	@Override 
 	public void onConnected(Bundle dataBundle) { 
+		// TODO STOPPED THIS ZOMBIE PROCESS!!!
 		//locationClient.requestLocationUpdates(locationRequest, this); 
 	} 
 
@@ -409,7 +401,14 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// List button handler
 	// Sends user to list of place-it activity
 	public void gotoListPage(View view) {
-		gotoListPage();
+		// TODO Doing this
+		if( loggedIn == false ) {
+			new RequestPlacesAPI().update(latitude, longitude);
+			loggedIn = true;
+			return;
+		}
+		
+		Log.wtf("PRINTING", new JSONParser().getAddress("political"));
 	}
 	
 	public void gotoListPage() {
