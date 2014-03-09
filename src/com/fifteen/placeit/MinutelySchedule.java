@@ -31,6 +31,7 @@ public class MinutelySchedule extends AbstractSchedule{
 	}
 	@Override
 	public void fillUpScheduleInfo(Map<String, String> map) {
+		super.fillUpScheduleInfo(map);
 		map.put(Constant.PI.REPEATED_MINUTE, "" + repeatedMinute);
 		
 	}

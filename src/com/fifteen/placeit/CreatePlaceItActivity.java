@@ -161,7 +161,7 @@ public class CreatePlaceItActivity extends Activity {
 	public void create(View view){
 		if(validate()){
 			boolean s = service.createPlaceIt(title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat, createDate,
-					postDate, coordinate.latitude, coordinate.longitude, AbstractPlaceIt.Status.ACTIVE, null);
+					postDate, coordinate.latitude, coordinate.longitude, AbstractPlaceIt.Status.ON_MAP, null);
 			
 			Log.wtf("create", "repeatedMinute: " + repeatedMinute + " repeatbyMinute: " + repeatByMinute);
 			if(s){

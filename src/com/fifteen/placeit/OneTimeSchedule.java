@@ -22,7 +22,7 @@ public class OneTimeSchedule extends AbstractSchedule {
 
 	@Override
 	public void fillUpScheduleInfo(Map<String, String> map) {
-		
+		super.fillUpScheduleInfo(map);
 	}
 
 }

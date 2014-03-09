@@ -58,6 +58,12 @@ public class MyService extends Service {
 					AbstractPlaceIt pi = i.next();
 					try {
 						if(pi.getSchedule().postNowOrNot()){
+							// before connect to the server, make sure user already login
+							// >>>>>>>>add code here
+							if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP) != ServerUtil.OK)
+								continue ;
+							// update last update time to now
+							// >>>>>>>add code here
 							i.remove();
 							database.onMap(pi.getId());
 							pi.status = AbstractPlaceIt.Status.ON_MAP;
@@ -139,10 +145,29 @@ public class MyService extends Service {
 		Log.v("myService createPlaceIt","pi is created");
 		if(pi == null)
 			return false;
+		// before connect to the server, make sure user already login
+		// >>>>>>>>add code here
+		if(ServerUtil.createPlaceIt(pi.getPlaceItInfoMap()) != ServerUtil.OK){
+			database.discard(pi.getId());
+			return false;
+		}
+		// update last update time to now
+		// >>>>>>>add code here
+		
 		//active.put(pi.getId(), pi);
-		prePost.put(pi.getId(),pi);
+		onMap.put(pi.getId(),pi);
+		LatLng coordinate = pi.getCoordinate();
+		if(coordinate != null){
+			Bundle send = new Bundle();
+			send.putParcelable("position", coordinate);
+			send.putLong("id", pi.getId());
+			Intent in = new Intent(NOTIFICATION);
+			in.putExtra("bundle", send);
+			sendBroadcast(in);
+		}
 		return true;
 	}
+	
 	
 	public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
 			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, LatLng coordinate,
@@ -182,6 +207,12 @@ public class MyService extends Service {
 
 	// to pull down a place from active
 	public boolean pulldownPlaceIt(long id){
+		// before connect to the server, make sure user already login
+		// >>>>>>>>add code here
+		if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.PULL_DOWN) != ServerUtil.OK)
+			return false;
+		// update last update time to now
+		// >>>>>>>add code here
 		boolean success = database.pullDown(id);
 		if(success){
 			AbstractPlaceIt pi = onMap.get(id);
@@ -198,6 +229,12 @@ public class MyService extends Service {
 
 	// to discard a place-it from active or pulldown
 	public boolean discardPlaceIt(long id){
+		// before connect to the server, make sure user already login
+		// >>>>>>>>add code here
+		if(ServerUtil.deletePlaceIt(id) != ServerUtil.OK)
+			return false;
+		// update last update time to now
+		// >>>>>>>add code here
 		boolean success = database.discard(id);
 		if(success){
 			AbstractPlaceIt pi = onMap.get(id);
@@ -217,6 +254,12 @@ public class MyService extends Service {
 	// TODO ZOO Changed this
 	//public boolean repostPlaceIt(long id, LatLng currentLocation){
 	public boolean repostPlaceIt(long id){
+		// before connect to the server, make sure user already login
+		// >>>>>>>>add code here
+		if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK)
+			return false;
+		// update last update time to now
+		// >>>>>>>add code here
 		AbstractPlaceIt pi = pulldown.get(id);
 		if(pi.getCoordinate() != null){
 			
@@ -252,11 +295,23 @@ public class MyService extends Service {
 			AbstractPlaceIt pi = onMapIterator.next();
 			if(pi.trigger(currentLocation)){
 				if(pi.status == AbstractPlaceIt.Status.ACTIVE){
+					// before connect to the server, make sure user already login
+					// >>>>>>>>add code here
+					if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK)
+						continue ;
+					// update last update time to now
+					// >>>>>>>add code here
 					onMapIterator.remove();
 					database.active(pi.getId());
 					prePost.put(pi.getId(), pi);
 					notify(pi);
 				}else if(pi.status == AbstractPlaceIt.Status.PULL_DOWN){
+					// before connect to the server, make sure user already login
+					// >>>>>>>>add code here
+					if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.PULL_DOWN) != ServerUtil.OK)
+						continue ;
+					// update last update time to now
+					// >>>>>>>add code here
 					onMapIterator.remove();
 					database.pullDown(pi.getId());
 					pulldown.put(pi.getId(), pi);

@@ -1,4 +1,5 @@
 package com.fifteen.placeit;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -9,10 +10,11 @@ public abstract class AbstractSchedule {
 	protected String type;
 	protected Date createDate;
 	protected Date postDate;
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public abstract Date nextPostDate() throws ContradictoryScheduleException ;
 	public abstract String toString();
-	public abstract void fillUpScheduleInfo(Map<String, String> map);
+	
 	
 	public AbstractSchedule(String type, Date createDate, Date postDate){
 		this.type = type;
@@ -56,5 +58,10 @@ public abstract class AbstractSchedule {
 			return true;
 		else
 			return false;
+	}
+	
+	public void fillUpScheduleInfo(Map<String, String> map){
+		map.put(Constant.PI.CREATE_DATE, dateFormat.format(createDate));
+		map.put(Constant.PI.POST_DATE, dateFormat.format(postDate));
 	}
 }

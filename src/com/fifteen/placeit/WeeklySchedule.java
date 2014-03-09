@@ -173,6 +173,7 @@ public class WeeklySchedule extends AbstractSchedule {
 
 	@Override
 	public void fillUpScheduleInfo(Map<String, String> map) {
+		super.fillUpScheduleInfo(map);
 		map.put(Constant.PI.REPEATED_DAY_IN_WEEK, "" + repeatedDayInWeek);
 		map.put(Constant.PI.NUM_OF_WEEK_REPEAT, "" + numOfWeekRepeat);
 		

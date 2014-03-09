@@ -46,6 +46,11 @@ public final class ServerUtil {
 	public static final String LAST_UPDATE = "lastUpdate";
 	public static final String GCM_ID_KEY = "RegId";
 	
+	public static int OK = 200;
+	public static int CONFLICT = 409;
+	public static int FAIL = 400;
+	public static int NOT_FOUND = 404;
+	
 	// change a placeIt's status, return status code 400---fail 200---success 404---not found
 	public static int login(final String username, final String password, final String regId){
 		Map<String, String> params = new HashMap<String, String>();
@@ -58,19 +63,19 @@ public final class ServerUtil {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 404;
+			return NOT_FOUND;
 		}
 	}
 	
 	//login this account with the server, allow few attempts, return status code 400---fail 200---success 404---not found
 	public static int loginWithMultipleAttempt(final String username, final String password, final String regId){
 		long backoff = BACKOFF_MILLI_SECONDS;
-		int code = 404; //default not found
+		int code = NOT_FOUND; //default not found
 		for(int i = 0; i < MAX_ATTEMPTS; i++){
 			code = login(username, password, regId);
-			if(code == 409) // conflict, username exists
+			if(code == CONFLICT) // conflict, username exists
 				return code;
-			if(code != 200){ // did not succeed
+			if(code != OK){ // did not succeed
 				try {
                     Thread.sleep(backoff);
                 } catch (InterruptedException e1) {
@@ -101,19 +106,19 @@ public final class ServerUtil {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 404;
+			return NOT_FOUND;
 		}
 	}
 	
 	//register this account with the server, allow few attempts
 	public static int registerWithMultipleAttempt(final String username, final String password, final String regId){
 		long backoff = BACKOFF_MILLI_SECONDS;
-		int code = 404; //default not found
+		int code = NOT_FOUND; //default not found
 		for(int i = 0; i < MAX_ATTEMPTS; i++){
 			code = register(username, password, regId);
-			if(code == 409) // conflict, username exists
+			if(code == CONFLICT) // conflict, username exists
 				return code;
-			if(code != 200){ // did not succeed
+			if(code != OK){ // did not succeed
 				try {
                     Thread.sleep(backoff);
                 } catch (InterruptedException e1) {
@@ -141,17 +146,17 @@ public final class ServerUtil {
 	}
 	
 	// change a placeIt's status, return status code 400---fail 200---success 404---not found
-	public static int changeStatus(long id, int status){
+	public static int changeStatus(long id, AbstractPlaceIt.Status status){
 		Map<String, String> params = new HashMap<String, String>();
 		params.put(ACTION, UPDATE);
 		params.put(Constant.PI.ID, "" + id);
-		params.put(Constant.PI.STATUS, "" + status);
+		params.put(Constant.PI.STATUS, "" + status.getValue());
 		try {
 			return postExpectStatus(PLACE_IT_URL, params);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return 404;
+			return NOT_FOUND;
 		}
 	}
 	
@@ -162,7 +167,7 @@ public final class ServerUtil {
 			return postExpectStatus(PLACE_IT_URL, params);
 		} catch(IOException e){
 			e.printStackTrace();
-			return 404;
+			return NOT_FOUND;
 		}
 	}
 	
@@ -175,7 +180,7 @@ public final class ServerUtil {
 			return postExpectStatus(PLACE_IT_URL, params);
 		} catch(IOException e){
 			e.printStackTrace();
-			return 404;
+			return NOT_FOUND;
 		}
 	}
 
