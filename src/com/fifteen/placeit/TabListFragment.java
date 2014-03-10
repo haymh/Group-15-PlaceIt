@@ -122,8 +122,7 @@ public abstract class TabListFragment extends ListFragment {
 						message = "TO BE POSTED";
 						break;
 					case 3:
-						message = "*CREATE DATE";
-						// TODO message = dateParser(item.getCreateDate());
+						message = dateParser(item.getSchedule().getCreateDate());
 						break;
 					default:
 						Log.wtf(tag, "Bad Place It Status " + status);
