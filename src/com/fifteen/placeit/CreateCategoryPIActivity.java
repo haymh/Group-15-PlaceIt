@@ -1,5 +1,10 @@
 package com.fifteen.placeit;
 
+import java.util.Date;
+
+import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
+import com.google.android.gms.maps.model.LatLng;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,31 +15,54 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class CreateCategoryPIActivity extends Activity implements AdapterView.OnItemSelectedListener {
+
+public class CreateCategoryPIActivity extends Activity implements AdapterView.OnItemClickListener {
 	
 	private Button cancel = null;
-	private static String cat[] = {"accounting", "airport", "amusement_park", "aquarium", 
-									"art_gallery", "atm","testing","testing","testing","testing"
-									,"testing","testing","testing","testing","testing","testing"
-									,"testing","testing","testing","testing","testing","testing"};
+	private static String cat[] = {"accounting", "airport", "amusement_park","aquarium","art_gallery","atm","bakery",
+									"bank","bar","beauty_salon”,“bicycle_store","book_store","bowling_alley","bus_station",
+									"cafe","campground","car_dealer","car_rental”,“car_repair","car_wash","casino","cemetery",
+									"church","city_hall","clothing_store","convenience_store”,“courthouse","dentist","department_store",
+									"doctor","electrician","electronics_store","embassy","establishment”,“finance","fire_station",
+									"florist","food","funeral_home","furniture_store","gas_station","general_contractor",
+		                            "grocery_or_supermarket","gym","hair_care","hardware_store","health","hindu_temple","home_goods_store",
+		                            "hospital","insurance_agency","jewelry_store","laundry","lawyer","library","liquor_store",
+		                            "local_government_office”,“locksmith","lodging","meal_delivery","meal_takeaway","mosque",
+		                            "movie_rental","movie_theater”,“moving_company","museum","night_club","painter","park",
+		                            "parking","pet_store","pharmacy","physiotherapist”,“place_of_worship","plumber","police",
+		                            "post_office","real_estate_agency","restaurant","roofing_contractor”,“rv_park","school",
+		                            "shoe_store","shopping_mall","spa","stadium","storage","store","subway_station","synagogue",
+		                            "taxi_stand","train_station","travel_agency","university","veterinary_care","zoo"};
 	private ListView listview = null;
 	private CheckBox checkbox = null;
+	static int index = 0;
+	private MyService service;
+	private Date createDate = new Date();
+	private Date postDate = new Date();
+	private NumOfWeekRepeat numOfWeekRepea;
+	// temp
+	static private String[] tempArray = new String[1];
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_create_category_pi);
 	    
 		// listview adapter 
+		
 		listview = (ListView)findViewById(R.id.cat_listview);
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.cat_single_row, R.id.checkbox, cat);
+		//listview = getListView();
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.cat_single_row, R.id.catView, cat);
 		listview.setAdapter(adapter);
 		
-		listview.setItemsCanFocus(false);
-		listview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		//listview.setItemsCanFocus(false);
+		//this.getListView().setSelector(R.drawable.selector);
 		
-		listview.setOnItemSelectedListener(this);
+		listview.setOnItemClickListener(this);
+		
+		
 		
 		// cancel button
 		cancel = (Button)findViewById(R.id.buttonCancel);
@@ -51,6 +79,20 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 		}		
 	}
 	
+
+	
+	public void create(View view){
+		// only for testing
+		tempArray[0] = cat[index];
+		boolean s = service.createPlaceIt(cat[index], null, 0, 0, null, createDate,
+				postDate, 0, 0, AbstractPlaceIt.Status.ON_MAP, tempArray);
+			
+		if(s){
+			Toast.makeText(this, "New Place-it Created", Toast.LENGTH_SHORT).show();
+			this.finish();
+		}else
+			Toast.makeText(this, "New Place-it was not Created", Toast.LENGTH_SHORT).show();
+		}
 	/*
 	public void onclick(View view) {
 		
@@ -71,7 +113,7 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 	{
 		int count=0;
 		
-	}*/
+	}
 
 
 	@Override
@@ -89,4 +131,15 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 	public void onNothingSelected(AdapterView<?> arg0) {
 		// TODO Auto-generated method stub
 		
-	}}
+	}*/
+
+	@Override
+	public void onItemClick(AdapterView<?> l, View v, int i, long arg3) {
+
+		//TextView temp = (TextView) v;
+		Toast.makeText(this, "number "+ i+" is selected which is "+cat[i], Toast.LENGTH_SHORT).show();
+		index = i;
+		this.create(v);
+		finish();
+	}
+}
