@@ -6,6 +6,7 @@ import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,28 +24,31 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 	
 	private Button cancel = null;
 	private static String cat[] = {"accounting", "airport", "amusement_park","aquarium","art_gallery","atm","bakery",
-									"bank","bar","beauty_salon”,“bicycle_store","book_store","bowling_alley","bus_station",
-									"cafe","campground","car_dealer","car_rental”,“car_repair","car_wash","casino","cemetery",
-									"church","city_hall","clothing_store","convenience_store”,“courthouse","dentist","department_store",
-									"doctor","electrician","electronics_store","embassy","establishment”,“finance","fire_station",
+									"bank","bar","beauty_salon","bicycle_store","book_store","bowling_alley","bus_station",
+									"cafe","campground","car_dealer","car_rental","car_repair","car_wash","casino","cemetery",
+									"church","city_hall","clothing_store","convenience_store","courthouse","dentist","department_store",
+									"doctor","electrician","electronics_store","embassy","establishment","finance","fire_station",
 									"florist","food","funeral_home","furniture_store","gas_station","general_contractor",
 		                            "grocery_or_supermarket","gym","hair_care","hardware_store","health","hindu_temple","home_goods_store",
 		                            "hospital","insurance_agency","jewelry_store","laundry","lawyer","library","liquor_store",
-		                            "local_government_office”,“locksmith","lodging","meal_delivery","meal_takeaway","mosque",
-		                            "movie_rental","movie_theater”,“moving_company","museum","night_club","painter","park",
-		                            "parking","pet_store","pharmacy","physiotherapist”,“place_of_worship","plumber","police",
-		                            "post_office","real_estate_agency","restaurant","roofing_contractor”,“rv_park","school",
+		                            "local_government_office","locksmith","lodging","meal_delivery","meal_takeaway","mosque",
+		                            "movie_rental","movie_theater","moving_company","museum","night_club","painter","park",
+		                            "parking","pet_store","pharmacy","physiotherapist","place_of_worship","plumber","police",
+		                            "post_office","real_estate_agency","restaurant","roofing_contractor","rv_park","school",
 		                            "shoe_store","shopping_mall","spa","stadium","storage","store","subway_station","synagogue",
 		                            "taxi_stand","train_station","travel_agency","university","veterinary_care","zoo"};
 	private ListView listview = null;
 	private CheckBox checkbox = null;
 	static int index = 0;
-	private MyService service;
+	
 	private Date createDate = new Date();
 	private Date postDate = new Date();
 	private NumOfWeekRepeat numOfWeekRepea;
 	// temp
 	static private String[] tempArray = new String[1];
+	
+	private ServiceManager serviceManager;
+	private MyService service;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,23 +74,58 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 		
 		// check box
 		//checkbox = (CheckBox)findViewById(R.id.checkbox);
+		
+		// Instantiate service manager
+		serviceManager = new ServiceManager(this);
+	}
+	
+	// Resume & bind service
+	public void onResume() {
+		super.onResume();
+		// ensure service is not null, also not block the UI, so launch a AsyncTask
+		new AsyncTask<Void, Void, Integer>() {
+	        protected void onPreExecute() {}
+
+	        protected Integer doInBackground(Void... params) {
+	            while(service == null)
+	            	service = serviceManager.bindService();
+	            return Integer.valueOf(1);
+	        }
+	        
+	        protected void onPostExecute(Integer result) { }
+	    }.execute();
+	}
+	
+	// Unbind service
+	public void onDestroy(){
+		service = serviceManager.unBindService();
+		super.onDestroy();
 	}
 	
 	class cancelListener implements OnClickListener{
-
 		public void onClick(View v) {			
 			finish();
 		}		
 	}
-	
 
-	
+	// FIXME Working on this
 	public void create(View view){
 		// only for testing
 		tempArray[0] = cat[index];
+		/*
 		boolean s = service.createPlaceIt(cat[index], null, 0, 0, null, createDate,
 				postDate, 0, 0, AbstractPlaceIt.Status.ON_MAP, tempArray);
-			
+		*/
+
+		boolean s = service.createPlaceIt(cat[index], "Testing Categories", 0, 0, 
+				null, createDate, postDate, new LatLng(0, 0), AbstractPlaceIt.Status.ON_MAP, tempArray );
+		
+		/* 
+		public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
+				WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, LatLng coordinate,
+				AbstractPlaceIt.Status status, String[] categories){
+		*/
+		
 		if(s){
 			Toast.makeText(this, "New Place-it Created", Toast.LENGTH_SHORT).show();
 			this.finish();
@@ -103,7 +142,6 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 	}
 	
 	private void myFancyMethod(View view) {
-		// TODO Auto-generated method stub
 		ListView temp = (ListView) findViewById(R.id.cat_listview);
 		Toast.makeText(this, temp.getCount(), Toast.LENGTH_SHORT).show();
 	}*/
@@ -119,7 +157,6 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int i,
 			long l) {
-		// TODO Auto-generated method stub
 		Log.wtf("Something", "It works");
 		//Checkable child = (Checkable) parent.getChildAt(i);
 		//child.toggle();
@@ -129,7 +166,6 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {
-		// TODO Auto-generated method stub
 		
 	}*/
 
