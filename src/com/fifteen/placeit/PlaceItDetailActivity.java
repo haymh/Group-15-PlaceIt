@@ -27,7 +27,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	
 	private AbstractPlaceIt placeIt;
 	private long placeItId;
-	private int statusType;
+	private int status;
 	private boolean listIsFilled = false;
 	
 	private String tag = PlaceItDetailActivity.class.getSimpleName();
@@ -89,6 +89,8 @@ public class PlaceItDetailActivity extends ListActivity {
 	// Calls service to obtain Place It referenced by ID from MainActivity
 	private void fillDetailPage() {
 		placeIt = service.findPlaceIt(placeItId);
+
+		
 		list = new ArrayList<DetailContent>(new DetailContentFormatter(placeIt).getDetailsArray());
 		
 		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
@@ -101,7 +103,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	public void omniPlaceItHandler(View view) {	
 		// Type 1 and 2: On Map Place It, To Be Posted Place It
 		// Type 3: Pulled Down Place It
-		switch(statusType) {
+		switch(status) {
 		case 1:
 		case 2:
 			pullDownHandler();
@@ -111,7 +113,7 @@ public class PlaceItDetailActivity extends ListActivity {
 			this.finish();
 			break;
 		default:
-			Log.wtf(tag, "Status " + statusType + " not supported");
+			Log.wtf(tag, "Status " + status + " not supported");
 			this.finish();
 		}
 	}
@@ -134,8 +136,8 @@ public class PlaceItDetailActivity extends ListActivity {
 	// Set ups button for either Pull Down or Repost depending on Place It type
 	public void setUpOmniButton() {
 		Button omniButton = (Button) findViewById(R.id.detailOmniBtn);
-		switch(statusType) {
-		case 0:
+		status = placeIt.getStatus().getValue();
+		switch(status) {
 		case 1:
 		case 2:
 			omniButton.setText("Pull Down");
@@ -144,7 +146,7 @@ public class PlaceItDetailActivity extends ListActivity {
 			omniButton.setText("Repost");
 			return;
 		default:
-			Log.wtf(tag, "Button of " + statusType + " could not be set");
+			Log.wtf(tag, "Button of " + status + " could not be set");
 		}
 	}
 	

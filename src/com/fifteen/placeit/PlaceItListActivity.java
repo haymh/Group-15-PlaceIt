@@ -100,15 +100,6 @@ public class PlaceItListActivity extends Activity {
     public void pullDownPlaceIt(View view) {
     	View parent = (View) view.getParent();
     	
-    	// Specially handles the place its that are periodic
-    	/*
-    	if( service.findPlaceIt(placeItId).isRepeated() ) {
-			Toast toast = Toast.makeText(this, "Repeated Place-It's stays active on pull down", Toast.LENGTH_SHORT);
-			toast.show();
-    	}
-    	*/
-    		
-    	
     	getPlaceItId(parent);
     	service.pulldownPlaceIt(placeItId);
     	fragmentRefresh();

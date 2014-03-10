@@ -73,8 +73,8 @@ public class RequestPlacesAPI {
 		float[] results = new float[3];
 		Location.distanceBetween(latitude, longitude, location.latitude, location.longitude, results);
 		// TODO Debug mode
-		Log.wtf(tag, String.valueOf(results[0]));
 		if(results[0] > Constant.L.REQUEST_DISTANCE_INTERVAL) {
+			Log.wtf(tag, "Request made with" + String.valueOf(results[0]));
 			setLocation(location);
 			requestPlacesAPI();
 		}
@@ -84,13 +84,12 @@ public class RequestPlacesAPI {
 		float[] results = new float[3];
 		Location.distanceBetween(RequestPlacesAPI.latitude, RequestPlacesAPI.longitude, latitude, longitude, results);
 		// TODO Debug mode
-		Log.wtf(tag, String.valueOf(results[0]));
 		if(results[0] > Constant.L.REQUEST_DISTANCE_INTERVAL) {
+			Log.wtf(tag, "Request made with " + String.valueOf(results[0]));
 			setLocation(latitude, longitude);
 			requestPlacesAPI();
 		}
 	}
-	
 	
 	// Request data from the Places API
 	private void requestPlacesAPI() {

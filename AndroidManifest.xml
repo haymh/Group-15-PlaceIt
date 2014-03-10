@@ -63,6 +63,7 @@
         <activity
             android:name="com.fifteen.placeit.PlaceItListActivity"
             android:label="@string/title_activity_list"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait" >
         </activity>
 
@@ -76,10 +77,18 @@
         <!-- DETAIL PAGE -->
         <activity
             android:name="com.fifteen.placeit.PlaceItDetailActivity"
+            android:launchMode="singleInstance"
             android:label="@string/title_activity_place_it_detail"
             android:screenOrientation="portrait" >
         </activity>
-
+        
+        <!-- CREATE CATEGORY PAGE -->
+        <activity
+            android:name="com.fifteen.placeit.CreateCategoryPIActivity"
+            android:label="@string/title_activity_create_category_pi"
+            android:screenOrientation="portrait" >
+        </activity>
+        
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/API_KEY" />
@@ -92,11 +101,6 @@
             android:enabled="true"
             android:exported="true" >
         </service>
-
-        <activity
-            android:name="com.fifteen.placeit.CreateCategoryPIActivity"
-            android:label="@string/title_activity_create_category_pi" >
-        </activity>
     </application>
 
 </manifest>
