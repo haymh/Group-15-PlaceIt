@@ -2,7 +2,6 @@ package com.fifteen.placeit;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -63,6 +62,11 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 
 	private Map<String, Long> markerIdContainer;
 
+	private double latitude;
+	private double longitude;
+	
+	private float zoom;
+
 	// Service definitions
 	private MyService service;
 	private ServiceManager serviceManager;
@@ -75,11 +79,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	
 	// Preference variables
 	private SharedPreferences preference;
-	private double latitude;
-	private double longitude;
-	private float zoom;
-	
-	LocationListener locationListener;
 	
 	private static boolean loggedIn = false;
 
@@ -220,7 +219,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
 		case R.id.mainCreateBtn:
-			createCategoryPlaceIt();
+			createPlaceIt();
 			break;
 		case R.id.mainListBtn:
 			gotoListPage();
@@ -231,8 +230,14 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	}
 
 	// Handles create a place it action bar button
-	private void createCategoryPlaceIt() {
-		Intent i = new Intent(this, CreateCategoryPIActivity.class);
+	private void createPlaceIt() {
+		LatLng position = new LatLng(0, 0);
+
+		Bundle send = new Bundle();
+		send.putParcelable("position", position);
+
+		Intent i = new Intent(this, CreatePlaceItActivity.class);
+		i.putExtra("bundle", send);
 		startActivity(i);
 	}
 
@@ -272,10 +277,18 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		// Saves zoom level
 		preference.edit().putFloat(Constant.SP.ZOOM, zoom).commit();
 		
+		
+		String latitudeString = String.valueOf(latitude);
+		String longitudeString = String.valueOf(longitude);
+		
+		// Saves current location, prevents precision lost of putFloat()
+		preference.edit().putString(Constant.SP.LAT, latitudeString).commit();
+		preference.edit().putString(Constant.SP.LNG, longitudeString).commit();
+		
 		super.onDestroy();
 	}
 
-//ACTIVITY SUPPORT DEFINITIONS
+//ACTIVITY SUPPORT DEFINITIONS	
 
 	// Change MyLocation button position
 	private void changeMyLocationButton() {
@@ -302,7 +315,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); 
 		locationRequest.setInterval(Constant.L.NORMAL_INTERVAL); 
 		locationRequest.setFastestInterval(Constant.L.FASTEST_INTERVAL);
-		locationRequest.setSmallestDisplacement(Constant.L.SMALLEST_DISTANCE_INTERVAL);
+		locationRequest.setSmallestDisplacement(Constant.L.UPDATE_DISTANCE);
 
 		locationClient = new LocationClient(MainActivity.this, this, this);
 	}
@@ -310,7 +323,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// Initialize camera position
 	private void initializeCamera() {
 		// Get saved zoom
-		zoom = preference.getFloat(Constant.SP.ZOOM, 15);
+		zoom = preference.getFloat(Constant.SP.ZOOM, 18);
 		
 		// SharedPreferences has no getDouble(), prevents precision lost of getFloat()
 		// Defaults at San Diego
@@ -369,8 +382,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 
 	@Override 
 	public void onConnected(Bundle dataBundle) { 
-		// TODO STOPP THIS ZOMBIE PROCESS!!!
-		locationClient.requestLocationUpdates(locationRequest, this); 
+		// TODO STOPPED THIS ZOMBIE PROCESS!!!
+		//locationClient.requestLocationUpdates(locationRequest, this); 
 	} 
 
 	// Handles location changes
@@ -403,7 +416,13 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// Sends user to list of place-it activity
 	public void gotoListPage(View view) {
 		// TODO Doing this
-		new RequestPlacesAPI().update(latitude, longitude);
+		if( loggedIn == false ) {
+			new RequestPlacesAPI().update(latitude, longitude);
+			loggedIn = true;
+			return;
+		}
+		
+		Log.wtf("PRINTING", new JSONParser().getAddress("political"));
 	}
 	
 	public void gotoListPage() {
@@ -444,23 +463,20 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		Toast.makeText(this, mapClickMessage, Toast.LENGTH_SHORT).show();
 	}
 	
-//LOGIN ALERT FRAGMENT DEFINITION
 	void showDialog() {
 	    DialogFragment newFragment = LoginFragment.newInstance();
 	    //newFragment.setCancelable(false);
 	    newFragment.show(getFragmentManager(), "dialog");
 	}
 
-	// TODO Work here
-	// Login handler
 	public void doPositiveClick() {
-		preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
+	    // Do stuff here.
+	    Log.i("FragmentAlertDialog", "Positive click!");
 	}
 
-	// TODO Work here
-	// Logout handle
 	public void doNegativeClick() {
-		preference.edit().putBoolean(Constant.SP.U.LOGIN, false).commit();
+	    // Do stuff here.
+	    Log.i("FragmentAlertDialog", "Negative click!");
 	}
 	
 	public void dialogCancel() {
@@ -469,14 +485,13 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	}
 	
 	private void disconnect() {
-		// FIXME Zombie client won't die
 		Log.wtf(tag, "Dialog cancelled, shutting down EVERYTHING!");
 
 		locationClient.removeLocationUpdates(this);
 		locationClient.disconnect();
 	}
 
-//EVENT HANDLERS SUPPORT	
+	//EVENT HANDLERS SUPPORT	
 	// Goes to location
 	private void goToLocation(double latitude, double longitude) {
 		updateCamera(new LatLng(latitude, longitude));

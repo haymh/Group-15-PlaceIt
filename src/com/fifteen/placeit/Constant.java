@@ -9,6 +9,14 @@ public final class Constant {
 		public static final String ZOOM = "zoom";
 		public static final String LAT = "latitude";
 		public static final String LNG = "longitude";
+		public static final String TIME = "time";
+		
+		// User information
+		public static class U {
+			public static final String LOGIN = "logged";
+			public static final String USERNAME = "username";
+			public static final String PASSWORD = "password";
+		}
 	}
 
 	public static final String TITLE = "Fifteen Place-It";
@@ -32,13 +40,13 @@ public final class Constant {
 		// Location update intervals
 		private static final int NORMAL_SECS = 5;
 		private static final int FASTEST_SECS = 5;
-		private static final int MPS = 100;	// Milliseconds per second
+		private static final int MPS = 1000;	// Milliseconds per second
 		public static final int NORMAL_INTERVAL = NORMAL_SECS * MPS;
 		public static final int FASTEST_INTERVAL = FASTEST_SECS * MPS;
 		
 		// Location update intervals (distance) in meters
-		public static final float UPDATE_DISTANCE = 0;
-
+		public static final float SMALLEST_DISTANCE_INTERVAL = 0;
+		public static final float REQUEST_DISTANCE_INTERVAL = 50;
 	}
 
 	// Place-Its 

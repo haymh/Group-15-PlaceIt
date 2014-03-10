@@ -1,5 +1,6 @@
 package com.fifteen.placeit;
 
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -48,10 +49,12 @@ public class RequestPlacesAPI {
 	
 	public RequestPlacesAPI(LatLng location) {
 		setLocation(location);
+		requestPlacesAPI();
 	}
 	
 	public RequestPlacesAPI(double latitude, double longitude) {
 		setLocation(latitude, longitude);
+		requestPlacesAPI();
 	}
 
 	// Set current location
@@ -67,12 +70,30 @@ public class RequestPlacesAPI {
 	
 	// Update location & get new JSON from Google Places API
 	public void update(LatLng location) {
-		setLocation(location);
-		new accessPlacesAPI().execute();
+		float[] results = new float[3];
+		Location.distanceBetween(latitude, longitude, location.latitude, location.longitude, results);
+		// TODO Debug mode
+		Log.wtf(tag, String.valueOf(results[0]));
+		if(results[0] > Constant.L.REQUEST_DISTANCE_INTERVAL) {
+			setLocation(location);
+			requestPlacesAPI();
+		}
 	}
 	
 	public void update(double latitude, double longitude) {
-		setLocation(latitude, longitude);
+		float[] results = new float[3];
+		Location.distanceBetween(RequestPlacesAPI.latitude, RequestPlacesAPI.longitude, latitude, longitude, results);
+		// TODO Debug mode
+		Log.wtf(tag, String.valueOf(results[0]));
+		if(results[0] > Constant.L.REQUEST_DISTANCE_INTERVAL) {
+			setLocation(latitude, longitude);
+			requestPlacesAPI();
+		}
+	}
+	
+	
+	// Request data from the Places API
+	private void requestPlacesAPI() {
 		new accessPlacesAPI().execute();
 	}
 
