@@ -70,4 +70,12 @@ public final class Constant {
 		public static final String ADDRESS = "ADDRESS";
 		public static final int NUM_OF_CATEGORIES = 3;
 	}
+	
+	// GCM constants
+	public static class GCM{
+		/**
+	     * Google API project id registered to use GCM.
+	     */
+	    public static final String SENDER_ID = "592230020068";
+	}
 }

@@ -15,7 +15,7 @@ public class WeeklySchedule extends AbstractSchedule {
 	public static final int SUN = 1;
 
 	public enum NumOfWeekRepeat{
-		ONE(1),TWO(2),THREE(3),FOUR(4);
+		ZERO(0),ONE(1),TWO(2),THREE(3),FOUR(4);
 		private int value;
 		private NumOfWeekRepeat(int value){
 			this.value = value;
@@ -25,6 +25,8 @@ public class WeeklySchedule extends AbstractSchedule {
 		}
 		public static NumOfWeekRepeat genNumOfWeekRepeat(int value){
 			switch(value){
+			case 0:
+				return ZERO;
 			case 1:
 				return ONE;
 			case 2:

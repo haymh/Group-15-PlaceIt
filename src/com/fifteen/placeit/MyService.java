@@ -7,6 +7,7 @@ import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -25,6 +26,9 @@ import android.util.Log;
 import java.util.*;
 
 public class MyService extends Service {
+	public MyService() {
+	}
+
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
 	private final static double RANGE = 0.8;
 	private final static long POST_TIME_LAG = 20000;
@@ -93,7 +97,6 @@ public class MyService extends Service {
 		}
 	}
 
-	public MyService() {}
 
 	@Override
 	public void onCreate() {
@@ -147,6 +150,8 @@ public class MyService extends Service {
 	public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
 			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, double latitude,
 			double longitude, AbstractPlaceIt.Status status, String[] categories){
+		if(numOfWeekRepeat == null)
+			numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.ZERO;
 		AbstractPlaceIt pi = database.insertPlaceIt(title, description, repeatedDayInWeek, repeatedMinute,
 				numOfWeekRepeat, createDate, postDate, latitude, longitude, status, categories);
 		Log.v("myService createPlaceIt","pi is created");
@@ -380,4 +385,5 @@ public class MyService extends Service {
 	public void updateLocation(double latitude, double longitude) {
 		location = new LatLng(latitude, longitude);
 	}
+
 }
