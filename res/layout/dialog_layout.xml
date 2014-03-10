@@ -16,6 +16,8 @@
             android:layout_height="wrap_content"
             android:gravity="right"
             android:text="@string/register"
+            android:clickable="true"
+            android:onClick="dialogRegister"
             android:layout_weight="1" />
     </TableRow>
 

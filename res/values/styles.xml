@@ -25,7 +25,7 @@
     <!--  Uncomment to change action bar color -->
     
     <style name="ActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#b3000000</item>
+        <item name="android:background">#00000000</item>
     </style>
     
     <!--

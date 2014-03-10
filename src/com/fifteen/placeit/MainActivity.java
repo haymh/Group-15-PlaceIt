@@ -1,8 +1,6 @@
 package com.fifteen.placeit;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +32,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -47,6 +46,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
@@ -78,10 +78,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	private double latitude;
 	private double longitude;
 	private float zoom;
-	
-	LocationListener locationListener;
-	
-	private static boolean loggedIn = false;
+		
+	private DialogFragment loginDialog;
+	private MenuItem menuSearch;
 
 //BROADCAST HANDLER
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
@@ -105,36 +104,41 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		@Override 
 		public boolean onQueryTextSubmit(String address) { 
 			locate(address);
-			return true; 
+			menuSearch.collapseActionView();
+			return false;
 		}
 	}; 
 
 	// Finds location of search bar query
 	private void locate(String query) {		
-		new AsyncTask<String, Void, Void>() {
+		new AsyncTask<String, Void, Address>() {
+			Geocoder geocoder = new Geocoder(MainActivity.this);
+			
+			@Override
 			protected void onPreExecute() {
-				Toast.makeText(MainActivity.this, "Search query", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainActivity.this, "Searching query", Toast.LENGTH_SHORT).show();
 			}
 			
 			@Override
-			protected Void doInBackground(String... data) {
-				Geocoder gc = new Geocoder(MainActivity.this);
-				
+			protected Address doInBackground(String... data) {				
 				try {
-					List<Address> list = gc.getFromLocationName(data[0], 1);
-					Address address = list.get(0);
-					goToLocation(address.getLatitude(), address.getLongitude());
-					String locality = address.getLocality();
-					Toast.makeText(MainActivity.this, locality, Toast.LENGTH_LONG).show();
-				} catch( IOException e ) {
-					Log.wtf(tag, "At locate()");
-					Log.wtf(tag, e.toString());
-					Toast.makeText(MainActivity.this, "Service down", Toast.LENGTH_LONG).show();
-				}
+					List<Address> list = geocoder.getFromLocationName(data[0], 1);
+					if(!list.isEmpty()) {
+						Address address = list.get(0);
+						return address;
+					}
+				} catch( Exception e ) {}
 				return null;
 			}
-			protected void onPostExecute(Void results) {
-				
+			protected void onPostExecute(Address result) {
+				if(result != null) {
+					goToLocation(result.getLatitude(), result.getLongitude());
+					String locality = result.getLocality();
+					Toast.makeText(MainActivity.this, locality, Toast.LENGTH_LONG).show();
+				}
+				else {
+					Toast.makeText(MainActivity.this, "Query not found", Toast.LENGTH_LONG).show();	
+				}
 			}
 			
 		}.execute(query);
@@ -182,15 +186,15 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		showDialog();
 	}
 
-
+	// TODO Working on this
 	// Initializes search bar and its support functions
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 
 		// Initialize search bar
-		MenuItem menuItem = menu.findItem(R.id.mainSearchBar);
-		SearchView searchView = (SearchView) menuItem.getActionView();
+		menuSearch = menu.findItem(R.id.mainSearchBar);
+		SearchView searchView = (SearchView) menuSearch.getActionView();
 		searchView.setQueryHint("Search");
 
 		// Changes search bar icon
@@ -369,29 +373,34 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 
 	@Override 
 	public void onConnected(Bundle dataBundle) { 
-		// TODO STOPP THIS ZOMBIE PROCESS!!!
+		// FIXME CAN KILL ZOMBIE HERE, comment out
 		locationClient.requestLocationUpdates(locationRequest, this); 
 	} 
 
+	// TODO WORKING ON THIS
 	// Handles location changes
 	@Override 
 	public void onLocationChanged(Location location) { 
 		// Saves current location
 		latitude = location.getLatitude();
 		longitude = location.getLongitude();
+		saveLocation();
 		
-		// TODO Temporary location passing solution
-		if( service != null){
-			String latitudeString = String.valueOf(latitude);
-			String longitudeString = String.valueOf(longitude);
-			
-			// Saves current location, prevents precision lost of putFloat()
-			preference.edit().putString(Constant.SP.LAT, latitudeString).commit();
-			preference.edit().putString(Constant.SP.LNG, longitudeString).commit();
+		if(service != null) {
+			service.checkPlaceIts(new LatLng(latitude, longitude));
 		}
-		
-		goToLocation(latitude, longitude);
 	} 
+	
+	// Saves current location
+	private void saveLocation() {
+		// Next viable option is putFloat() but will lose precision
+		String latitudeString = String.valueOf(latitude);
+		String longitudeString = String.valueOf(longitude);
+		
+		// Saves current location in String to prevent precision lost of putFloat()
+		preference.edit().putString(Constant.SP.LAT, latitudeString).commit();
+		preference.edit().putString(Constant.SP.LNG, longitudeString).commit();
+	}
 
 	@Override 
 	public void onDisconnected() { 
@@ -399,6 +408,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	} 
 
 //EVENT HANDLERS
+	// TODO This is going to be deleted since we have an action bar button
 	// List button handler
 	// Sends user to list of place-it activity
 	public void gotoListPage(View view) {
@@ -446,26 +456,43 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	
 //LOGIN ALERT FRAGMENT DEFINITION
 	void showDialog() {
-	    DialogFragment newFragment = LoginFragment.newInstance();
+	    loginDialog = LoginFragment.newInstance();
 	    //newFragment.setCancelable(false);
-	    newFragment.show(getFragmentManager(), "dialog");
+	    loginDialog.show(getFragmentManager(), "dialog");
 	}
 
 	// TODO Work here
 	// Login handler
 	public void doPositiveClick() {
 		preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
+		
+		Dialog view = loginDialog.getDialog();
+		
+		EditText username = (EditText) view.findViewById(R.id.loginUsername);
+		EditText password = (EditText) view.findViewById(R.id.loginPassword);
+		
+		try {
+		Log.wtf(tag, "LOG IN INFO " + username.getText() + " & " + password.getText());
+		} catch (Exception e) {
+			Log.wtf(tag, e.toString());
+		}
 	}
 
 	// TODO Work here
 	// Logout handle
 	public void doNegativeClick() {
 		preference.edit().putBoolean(Constant.SP.U.LOGIN, false).commit();
+		preference.edit().remove(Constant.SP.U.USERNAME);
+		preference.edit().remove(Constant.SP.U.PASSWORD);
 	}
 	
 	public void dialogCancel() {
 		disconnect();
 		finish();
+	}
+	
+	public void dialogRegister(View view) {
+		Log.wtf(tag, "Register");
 	}
 	
 	private void disconnect() {
