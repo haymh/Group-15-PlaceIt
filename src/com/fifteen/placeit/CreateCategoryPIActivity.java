@@ -118,8 +118,9 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 		*/
 
 		boolean s = service.createPlaceIt(cat[index], "Testing Categories", 0, 0, 
-				null, createDate, postDate, new LatLng(0, 0), AbstractPlaceIt.Status.ON_MAP, tempArray );
-		
+				WeeklySchedule.NumOfWeekRepeat.ZERO, createDate, postDate, new LatLng(0,0), AbstractPlaceIt.Status.ON_MAP, tempArray );
+		//		null, createDate, postDate, new LatLng(0, 0), AbstractPlaceIt.Status.ON_MAP, tempArray );
+		// TODO REPLACE THIS TOP
 		/* 
 		public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
 				WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, LatLng coordinate,

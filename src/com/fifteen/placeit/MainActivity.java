@@ -2,6 +2,7 @@ package com.fifteen.placeit;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -432,8 +433,52 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// List button handler
 	// Sends user to list of place-it activity
 	public void gotoListPage(View view) {
-		// TODO Doing this
-		new RequestPlacesAPI().update(latitude, longitude);
+		// TODO TESTTEST
+
+		// login this account with server, return status code 400---fail 200---success 404---not found
+		// register this account with server,return status code 400---fail 200---success 404---not found
+		
+		if(service != null) {
+			new AsyncTask<Void, Void, Void>() {
+				long time;
+				String name = "Rolando";
+				String password = "Awesome";
+				String id = "Yes";
+				
+				protected void onPreExecute() {
+					Log.wtf("GCM!?", "Connecting");
+					time = new Date().getTime();
+				}
+
+				@Override
+				protected Void doInBackground(Void... arg0) {
+					try {
+						int serviceRegister = service.login(name, password, id);
+						long temp = new Date().getTime() - time;
+						Log.wtf("REGISTER YES!", "TOOK " + String.valueOf(temp) + "\n" + String.valueOf(serviceRegister));
+					} catch(Exception e) {
+						Log.wtf("REGISTER NO", e.toString());
+					}
+						
+					try {
+						int serviceLogin = service.login(name, password, id);
+						long temp = new Date().getTime() - time;
+						Log.wtf("LOGIN YES!", "TOOK " + String.valueOf(temp) + "\n" + String.valueOf(serviceLogin));
+					} catch(Exception e) {
+						Log.wtf("LOGIN NO", e.toString());
+					}
+
+					return null;
+				}
+				
+				@Override
+				protected void onPostExecute(Void results) {
+					long temp = new Date().getTime() - time;
+					Log.wtf("GCM!?", "Done with " + String.valueOf(temp));
+				}
+				
+			}.execute();
+		}
 	}
 	
 	public void gotoListPage() {

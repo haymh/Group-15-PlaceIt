@@ -287,6 +287,8 @@ public class MyService extends Service {
 			}
 		}
 		pi.setStatus(AbstractPlaceIt.Status.ACTIVE);
+		// XXX Added address refresh on for category repost
+		pi.removeKeyFromInfoMap(Constant.PI.ADDRESS);
 		database.repostPlaceIt(pi);
 		pulldown.remove(id);
 		prePost.put(id, pi);
