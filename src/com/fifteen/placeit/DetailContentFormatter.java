@@ -216,7 +216,7 @@ public class DetailContentFormatter {
 		if( category.size() > 0 ) {
 			String categories = "";
 			for(int i = 0; i < category.size(); ++i) {
-				categories += categories;
+				categories += category.get(i);
 				
 				if( i+1 < category.size() ) {
 					categories += "\n";

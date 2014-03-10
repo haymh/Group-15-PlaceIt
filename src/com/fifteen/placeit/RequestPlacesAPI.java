@@ -74,7 +74,7 @@ public class RequestPlacesAPI {
 		Location.distanceBetween(latitude, longitude, location.latitude, location.longitude, results);
 		// TODO Debug mode
 		if(results[0] > Constant.L.REQUEST_DISTANCE_INTERVAL) {
-			Log.wtf(tag, "Request made with" + String.valueOf(results[0]));
+			Log.wtf(tag, "Places API request @ " + String.valueOf(results[0]) + " meters difference");
 			setLocation(location);
 			requestPlacesAPI();
 		}

@@ -116,6 +116,10 @@ public abstract class AbstractPlaceIt {
 		return this.placeItInfoMap;
 	}
 	
+	public void removeKeyFromInfoMap(String key) {
+		placeItInfoMap.remove(key);
+	}
+	
 	
 	public abstract boolean trigger(LatLng currentLocation);
 	

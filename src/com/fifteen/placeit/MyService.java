@@ -7,7 +7,6 @@ import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,9 +27,6 @@ import android.util.Log;
 import java.util.*;
 
 public class MyService extends Service {
-	public MyService() {
-	}
-
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
@@ -55,7 +51,7 @@ public class MyService extends Service {
 	private Map<Long, AbstractPlaceIt> prePost;
 	private NotifyPostThread nThread;
 	private int counter = 0; // id for notification
-	
+
 	// TODO ZOO Location variables
 	private SharedPreferences preference;
 	private RequestPlacesAPI requestPlacesAPI;
@@ -111,6 +107,7 @@ public class MyService extends Service {
 		}
 	}
 
+	public MyService() {}
 
 	@Override
 	public void onCreate() {
@@ -123,10 +120,10 @@ public class MyService extends Service {
 		prePost = database.prepostPlaceIt();
 		// launch the thread
 		(nThread = new NotifyPostThread()).start(); 
-		
+
 		// XXX Get universal data
 		preference = getSharedPreferences(Constant.SP.SAVE, Context.MODE_PRIVATE);
-		
+
 		// XXX Request Places API data
 		requestPlacesAPI = new RequestPlacesAPI(fetchCurrentLocation());
 		// TODO: change it to intentService
@@ -166,8 +163,6 @@ public class MyService extends Service {
 	public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
 			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, double latitude,
 			double longitude, AbstractPlaceIt.Status status, String[] categories){
-		if(numOfWeekRepeat == null)
-			numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.ZERO;
 		AbstractPlaceIt pi = database.insertPlaceIt(title, description, repeatedDayInWeek, repeatedMinute,
 				numOfWeekRepeat, createDate, postDate, latitude, longitude, status, categories);
 		Log.v("myService createPlaceIt","pi is created");
@@ -182,7 +177,7 @@ public class MyService extends Service {
 			// <<<< add code here
 			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
 		}
-		
+
 		//active.put(pi.getId(), pi);
 		onMap.put(pi.getId(),pi);
 		LatLng coordinate = pi.getCoordinate();
@@ -196,8 +191,8 @@ public class MyService extends Service {
 		}
 		return true;
 	}
-	
-	
+
+
 	public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
 			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, LatLng coordinate,
 			AbstractPlaceIt.Status status, String[] categories){
@@ -243,7 +238,7 @@ public class MyService extends Service {
 			// <<<< add code here
 			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
 		}
-		
+
 		boolean success = database.pullDown(id);
 		if(success){
 			AbstractPlaceIt pi = onMap.get(id);
@@ -294,10 +289,10 @@ public class MyService extends Service {
 			// <<<<< add code here
 			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
 		}
-	
+
 		AbstractPlaceIt pi = pulldown.get(id);
 		if(pi.getCoordinate() != null){
-			
+
 			// TODO ZOO Pass current location
 			LatLng currentLocation = fetchCurrentLocation();
 			if(pi.getCoordinate() != null){
@@ -308,48 +303,56 @@ public class MyService extends Service {
 			}
 		}
 		pi.setStatus(AbstractPlaceIt.Status.ACTIVE);
+		// XXX Added address refresh on for category repost
+		pi.removeKeyFromInfoMap(Constant.PI.ADDRESS);
 		database.repostPlaceIt(pi);
 		pulldown.remove(id);
 		prePost.put(id, pi);
 		return true;
 	}
-	
+
 	// TODO ZOO Get current location
 	private LatLng fetchCurrentLocation() {
 		// Gotten as string to prevent precision lost
 		double latitude = Double.parseDouble(preference.getString(Constant.SP.LAT, "32.7150"));
 		double longitude = Double.parseDouble(preference.getString(Constant.SP.LNG, "-117.1625"));
-		
+
 		return new LatLng(latitude, longitude);
 	}
-	
+
 	// call to make service check every place_it in onMap, try to fire place_it
 	public void checkPlaceIts(LatLng currentLocation){
 		// TODO Grabs updates from Places API
 		requestPlacesAPI.update(currentLocation);
-		
+
 		Iterator<AbstractPlaceIt> onMapIterator = onMap.values().iterator();
 		while(onMapIterator.hasNext()){
 			AbstractPlaceIt pi = onMapIterator.next();
 			if(pi.trigger(currentLocation)){
 				if(pi.status == AbstractPlaceIt.Status.ACTIVE){
-					if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK)
-						continue ;
+					if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+						if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK) {
+							continue;
+						}
+					}
 					// update last update time to now
 					// <<< add code here
 					preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
-					
+
 					onMapIterator.remove();
 					database.active(pi.getId());
 					prePost.put(pi.getId(), pi);
 					notify(pi);
 				}else if(pi.status == AbstractPlaceIt.Status.PULL_DOWN){
-					if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.PULL_DOWN) != ServerUtil.OK)
-						continue ;
+					if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+						if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK) {
+							continue;
+						}
+					}
 					// update last update time to now
 					// <<<<add code here
 					preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
-					
+
 					onMapIterator.remove();
 					database.pullDown(pi.getId());
 					pulldown.put(pi.getId(), pi);
@@ -361,7 +364,7 @@ public class MyService extends Service {
 			}			
 		}
 	}
-	
+
 	private void notify(AbstractPlaceIt pi){
 		Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 		intent.putExtra("id", pi.getId());
@@ -369,12 +372,12 @@ public class MyService extends Service {
 				PendingIntent.getActivity(MyService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(MyService.this)
-				.setSmallIcon(R.drawable.note)
-				.setContentTitle(pi.getTitle())
-				.setContentText(pi.getDescription())
-				.setContentIntent(resultPendingIntent)
-				.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-				.setAutoCancel(true);
+		.setSmallIcon(R.drawable.note)
+		.setContentTitle(pi.getTitle())
+		.setContentText(pi.getDescription())
+		.setContentIntent(resultPendingIntent)
+		.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+		.setAutoCancel(true);
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(MyService.this);
 		stackBuilder.addParentStack(PlaceItDetailActivity.class);
 		stackBuilder.addNextIntent(intent);
@@ -382,24 +385,23 @@ public class MyService extends Service {
 				(NotificationManager) MyService.this.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.notify(counter++, mBuilder.build());
 	}
-	
+
 	// login this account with server, return status code 400---fail 200---success 404---not found
 	public int login(String username, String password, String regId){
 		return ServerUtil.loginWithMultipleAttempt(username, password, regId);
 	}
-	
+
 	// register this account with server,return status code 400---fail 200---success 404---not found
 	public int register(String username, String password, String regId){
 		return ServerUtil.registerWithMultipleAttempt(username, password, regId);
 	}
-	
+
 	// Update location
 	public void updateLocation(LatLng location) {
 		this.location = location;
 	}
-	
+
 	public void updateLocation(double latitude, double longitude) {
 		location = new LatLng(latitude, longitude);
 	}
-
 }
