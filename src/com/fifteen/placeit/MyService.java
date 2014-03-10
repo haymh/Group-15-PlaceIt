@@ -60,12 +60,11 @@ public class MyService extends Service {
 					AbstractPlaceIt pi = i.next();
 					try {
 						if(pi.getSchedule().postNowOrNot()){
-							if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP) != ServerUtil.OK)
-								continue ;
-							// update last update time to now
-							// <<<< add code here
-							preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
-							
+							if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+								if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP) != ServerUtil.OK)
+									continue ;
+								preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+							}
 							i.remove();
 							database.onMap(pi.getId());
 							pi.status = AbstractPlaceIt.Status.ON_MAP;
@@ -153,13 +152,15 @@ public class MyService extends Service {
 		Log.v("myService createPlaceIt","pi is created");
 		if(pi == null)
 			return false;
-		if(ServerUtil.createPlaceIt(pi.getPlaceItInfoMap()) != ServerUtil.OK){
-			database.discard(pi.getId());
-			return false;
+		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+			if(ServerUtil.createPlaceIt(pi.getPlaceItInfoMap()) != ServerUtil.OK){
+				database.discard(pi.getId());
+				return false;
+			}
+			// update last update time to now
+			// <<<< add code here
+			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
 		}
-		// update last update time to now
-		// <<<< add code here
-		preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
 		
 		//active.put(pi.getId(), pi);
 		onMap.put(pi.getId(),pi);
@@ -214,11 +215,13 @@ public class MyService extends Service {
 
 	// to pull down a place from active
 	public boolean pulldownPlaceIt(long id){
-		if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.PULL_DOWN) != ServerUtil.OK)
-			return false;
-		// update last update time to now
-		// <<<< add code here
-		preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+			if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.PULL_DOWN) != ServerUtil.OK)
+				return false;
+			// update last update time to now
+			// <<<< add code here
+			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+		}
 		
 		boolean success = database.pullDown(id);
 		if(success){
@@ -236,11 +239,13 @@ public class MyService extends Service {
 
 	// to discard a place-it from active or pulldown
 	public boolean discardPlaceIt(long id){
-		if(ServerUtil.deletePlaceIt(id) != ServerUtil.OK)
-			return false;
-		// update last update time to now
-		// <<<< add code here
-		preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+			if(ServerUtil.deletePlaceIt(id) != ServerUtil.OK)
+				return false;
+			// update last update time to now
+			// <<<< add code here
+			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+		}
 
 		boolean success = database.discard(id);
 		if(success){
@@ -261,11 +266,13 @@ public class MyService extends Service {
 	// TODO ZOO Changed this
 	//public boolean repostPlaceIt(long id, LatLng currentLocation){
 	public boolean repostPlaceIt(long id){
-		if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK)
-			return false;
-		// update last update time to now new Date().getTime()
-		// <<<<< add code here
-		preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+			if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK)
+				return false;
+			// update last update time to now new Date().getTime()
+			// <<<<< add code here
+			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+		}
 	
 		AbstractPlaceIt pi = pulldown.get(id);
 		if(pi.getCoordinate() != null){
@@ -334,7 +341,7 @@ public class MyService extends Service {
 		}
 	}
 	
-	public void notify(AbstractPlaceIt pi){
+	private void notify(AbstractPlaceIt pi){
 		Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 		intent.putExtra("id", pi.getId());
 		PendingIntent resultPendingIntent = 
@@ -353,6 +360,16 @@ public class MyService extends Service {
 		NotificationManager mNotificationManager =
 				(NotificationManager) MyService.this.getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.notify(counter++, mBuilder.build());
+	}
+	
+	// login this account with server, return status code 400---fail 200---success 404---not found
+	public int login(String username, String password, String regId){
+		return ServerUtil.loginWithMultipleAttempt(username, password, regId);
+	}
+	
+	// register this account with server,return status code 400---fail 200---success 404---not found
+	public int register(String username, String password, String regId){
+		return ServerUtil.registerWithMultipleAttempt(username, password, regId);
 	}
 	
 	// Update location
