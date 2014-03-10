@@ -192,14 +192,17 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
         GCMRegistrar.checkDevice(this);
         // Make sure the manifest was properly set - comment out this line
         // while developing the app, then uncomment it when it's ready.
-        /*GCMRegistrar.checkManifest(this);
-        //final String regId = GCMRegistrar.getRegistrationId(this);
+        //GCMRegistrar.checkManifest(this);
+        final String regId = GCMRegistrar.getRegistrationId(this);
         if (regId.equals("")) {
             // Automatically registers application on startup.
             GCMRegistrar.register(this, Constant.GCM.SENDER_ID);
         }
 		Log.wtf("GCM Reg Id", regId);
-		*/
+		if(regId.equals("") || regId == null)
+			Log.wtf("GCM", "cannot get it fucker work");
+		Log.wtf("MAIN", "say something");
+		
 		showDialog();
 	}
 

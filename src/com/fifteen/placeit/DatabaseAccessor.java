@@ -99,7 +99,7 @@ public class DatabaseAccessor {
 		Log.v("database accessor","numOfWeekRepeat.getValue()");
 		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, dateFormat.format(createDate));
 		values.put(MySQLiteHelper.COLUMN_POST_DATE, dateFormat.format(postDate));
-		values.put(MySQLiteHelper.COLUMN_STATUS, AbstractPlaceIt.Status.ACTIVE.getValue());
+		values.put(MySQLiteHelper.COLUMN_STATUS, status.getValue());
 		values.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
 		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
 		if(categories != null)
