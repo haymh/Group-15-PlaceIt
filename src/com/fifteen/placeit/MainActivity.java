@@ -371,7 +371,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	private void putMarkerOnMap(long placeItId, LatLng placeItLocation) {
 		Marker addMarker = map.addMarker(new MarkerOptions()
 		.position(placeItLocation)
-		.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));
+		.icon(BitmapDescriptorFactory.fromResource(R.drawable.rsz_note)));
 		mMarkers.add(addMarker);
 
 		// Store placeit ID with marker ID in a hashmap for easy tracking
