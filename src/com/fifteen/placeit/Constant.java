@@ -18,11 +18,16 @@ public final class Constant {
 			public static final String PASSWORD = "password";
 		}
 	}
-
-	public static final String TITLE = "Fifteen Place-It";
-	public static final String REGISTER = "Register";
-	public static final String LOGIN = "LOGIN";
-	public static final String LOGOUT = "LOGOUT";
+	
+	public static class LOGIN {
+		public static final String TITLE = "Fifteen Place-It";
+		public static final boolean LOGIN = true;
+		public static final boolean REGISTER = false;
+		public static final int OK = 200;
+		public static final int CONFLICT = 409;
+		public static final int FAIL = 400;
+		public static final int NOT_FOUND = 404;
+	}
 
 	// Places API 
 	public static class PAPI {

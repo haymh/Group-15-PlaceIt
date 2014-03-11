@@ -47,7 +47,7 @@ public class LoginFragment extends DialogFragment {
     	
     	alert = new AlertDialog.Builder(getActivity());
     
-    	alert.setTitle(Constant.TITLE);
+    	alert.setTitle(Constant.LOGIN.TITLE);
     	
     	initializeLogin();
     	initializeLogout();
@@ -60,7 +60,7 @@ public class LoginFragment extends DialogFragment {
     
     // Initialize login button
     private void initializeLogin() {
-    	alert.setPositiveButton(Constant.LOGIN, new DialogInterface.OnClickListener() {
+    	alert.setPositiveButton("LOGIN", new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -71,7 +71,7 @@ public class LoginFragment extends DialogFragment {
     
     // Initialize logout button
     private void initializeLogout() {
-    	alert.setNegativeButton(Constant.LOGOUT, new DialogInterface.OnClickListener() {
+    	alert.setNegativeButton("LOGOUT", new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -92,10 +92,10 @@ public class LoginFragment extends DialogFragment {
     
     // Initialize register link
     private void initializeRegister() {
-    	TextView register = (TextView) layout.findViewById(R.id.loginRegister);
+    	TextView register = (TextView) layout.findViewById(R.id.loginSpecial);
     	
     	// String format
-    	SpannableString format = new SpannableString(Constant.REGISTER);
+    	SpannableString format = new SpannableString("Register");
         format.setSpan(new UnderlineSpan(), 0, format.length(), 0);
         register.setText(format);
     }
