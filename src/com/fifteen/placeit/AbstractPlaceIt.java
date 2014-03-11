@@ -71,7 +71,8 @@ public abstract class AbstractPlaceIt {
 		placeItInfoMap.put(Constant.PI.ID, "" + id);
 		placeItInfoMap.put(Constant.PI.TITLE, title);
 		placeItInfoMap.put(Constant.PI.DESCRIPTION, description);
-		placeItInfoMap.put(Constant.PI.STATUS, status.toString());
+		placeItInfoMap.put(Constant.PI.STATUS, "" + status.getValue());
+		placeItInfoMap.put(Constant.PI.STATUS_NAME, status.toString());
 		placeItInfoMap.put(Constant.PI.CREATE_DATE, schedule.getCreateDate().toString());
 		placeItInfoMap.put(Constant.PI.POST_DATE, schedule.getPostDate().toString());
 		schedule.fillUpScheduleInfo(placeItInfoMap);

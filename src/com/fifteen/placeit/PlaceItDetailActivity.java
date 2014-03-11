@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fifteen.placeit.R;
+import com.google.android.gms.maps.model.LatLng;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 // Displays the details of a place it
 // Also handles details on notification
@@ -109,8 +112,7 @@ public class PlaceItDetailActivity extends ListActivity {
 			pullDownHandler();
 			break;
 		case 3:
-			service.repostPlaceIt(placeItId);
-			this.finish();
+			repostHandler();
 			break;
 		default:
 			Log.wtf(tag, "Status " + status + " not supported");
@@ -119,18 +121,96 @@ public class PlaceItDetailActivity extends ListActivity {
 	}
 	
 	// Handles periodic placeits pull down behavior
-	public void pullDownHandler() {
-		service.pulldownPlaceIt(placeItId);
-		this.finish();
+	private void pullDownHandler() {
+		
+		if(service != null) {
+			final ProgressDialog dialog = ProgressDialog.show(this,
+					"Pulling Down...", "Please wait...", false);
+			new AsyncTask<Void,Void,Boolean>(){
+
+				@Override
+				protected Boolean doInBackground(Void... arg0) {
+					return service.pulldownPlaceIt(placeItId);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean params) {
+					dialog.dismiss();
+					if(params){
+						Toast.makeText(PlaceItDetailActivity.this, "Place-it has been pulled down", Toast.LENGTH_SHORT).show();
+						PlaceItDetailActivity.this.finish();
+					}else
+						Toast.makeText(PlaceItDetailActivity.this, "cannot access server, place-it was not pulled down", Toast.LENGTH_SHORT).show();
+				}
+				
+			}.execute();
+			dialog.show();		
+		}else{
+			Toast.makeText(PlaceItDetailActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
+		}
+		
 	}
+	
+	private void repostHandler(){
+		if(service != null) {
+			final ProgressDialog dialog = ProgressDialog.show(this,
+					"reposting...", "Please wait...", false);
+			new AsyncTask<Void,Void,Boolean>(){
+
+				@Override
+				protected Boolean doInBackground(Void... arg0) {
+					return service.repostPlaceIt(placeItId);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean params) {
+					dialog.dismiss();
+					if(params){
+						Toast.makeText(PlaceItDetailActivity.this, "Place-it has been reposted", Toast.LENGTH_SHORT).show();
+						PlaceItDetailActivity.this.finish();
+					}else
+						Toast.makeText(PlaceItDetailActivity.this, "cannot access server, place-it was not reposted", Toast.LENGTH_SHORT).show();
+				}
+				
+			}.execute();
+			dialog.show();		
+		}else{
+			Toast.makeText(PlaceItDetailActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
 	
 	public void goBack(View view) {
 		this.finish();
 	}
 	
 	public void discardPlaceIt(View view) {
-		service.discardPlaceIt(placeItId);
-		this.finish();
+		if(service != null) {
+			final ProgressDialog dialog = ProgressDialog.show(this,
+					"discarding...", "Please wait...", false);
+			new AsyncTask<Void,Void,Boolean>(){
+
+				@Override
+				protected Boolean doInBackground(Void... arg0) {
+					return service.discardPlaceIt(placeItId);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean params) {
+					dialog.dismiss();
+					if(params){
+						Toast.makeText(PlaceItDetailActivity.this, "Place-it has been discarded", Toast.LENGTH_SHORT).show();
+						PlaceItDetailActivity.this.finish();
+					}else
+						Toast.makeText(PlaceItDetailActivity.this, "cannot access server, place-it was not discarded", Toast.LENGTH_SHORT).show();
+				}
+				
+			}.execute();
+			dialog.show();		
+		}else{
+			Toast.makeText(PlaceItDetailActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
+		}
+
 	}
 	
 	// Set ups button for either Pull Down or Repost depending on Place It type

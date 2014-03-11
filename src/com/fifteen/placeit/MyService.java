@@ -1,6 +1,7 @@
 package com.fifteen.placeit;
 
 import java.util.Date;
+import java.util.Map.Entry;
 
 import com.fifteen.placeit.R;
 import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
@@ -169,7 +170,10 @@ public class MyService extends Service {
 		if(pi == null)
 			return false;
 		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-			if(ServerUtil.createPlaceIt(pi.getPlaceItInfoMap()) != ServerUtil.OK){
+			int code = 0;
+			if((code = ServerUtil.createPlaceIt(pi.getPlaceItInfoMap())) != ServerUtil.OK){
+				
+				Log.wtf("create status", "" + code);
 				database.discard(pi.getId());
 				return false;
 			}

@@ -85,6 +85,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		
 	private DialogFragment loginDialog;
 	private MenuItem menuSearch;
+	
+	private String regId;
 
 //BROADCAST HANDLER
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
@@ -194,7 +196,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
         // Make sure the manifest was properly set - comment out this line
         // while developing the app, then uncomment it when it's ready.
         GCMRegistrar.checkManifest(this);
-        final String regId = GCMRegistrar.getRegistrationId(this);
+        regId = GCMRegistrar.getRegistrationId(this);
         if (regId.equals("")) {
             // Automatically registers application on startup.
             GCMRegistrar.register(this, Constant.GCM.SENDER_ID);
@@ -408,7 +410,16 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		saveLocation();
 		
 		if(service != null) {
-			service.checkPlaceIts(new LatLng(latitude, longitude));
+			new AsyncTask<Void,Void,Void>(){
+
+				@Override
+				protected Void doInBackground(Void... arg0) {
+					service.checkPlaceIts(new LatLng(latitude, longitude));
+					return null;
+				}
+				
+			}.execute();
+			
 		}
 	} 
 	
@@ -441,9 +452,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		if(service != null) {
 			new AsyncTask<Void, Void, Void>() {
 				long time;
-				String name = "Rolando";
-				String password = "Awesome";
-				String id = "Yes";
+				String name = "123";
+				String password = "123";
 				
 				protected void onPreExecute() {
 					Log.wtf("GCM!?", "Connecting");
@@ -453,13 +463,13 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 				@Override
 				protected Void doInBackground(Void... arg0) {
 					try {
-						int serviceRegister = service.login(name, password, id);
+						int serviceRegister = service.login(name, password, regId);
 						long temp = new Date().getTime() - time;
 						Log.wtf("REGISTER YES!", "TOOK " + String.valueOf(temp) + "\n" + String.valueOf(serviceRegister));
 					} catch(Exception e) {
 						Log.wtf("REGISTER NO", e.toString());
 					}
-						
+					/*	
 					try {
 						int serviceLogin = service.login(name, password, id);
 						long temp = new Date().getTime() - time;
@@ -467,7 +477,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 					} catch(Exception e) {
 						Log.wtf("LOGIN NO", e.toString());
 					}
-
+					*/
 					return null;
 				}
 				

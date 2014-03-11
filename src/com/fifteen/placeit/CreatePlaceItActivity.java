@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -159,16 +160,30 @@ public class CreatePlaceItActivity extends Activity {
 	
 	// when user click on create button, then call this method to create a Place-it
 	public void create(View view){
+		final ProgressDialog dialog = ProgressDialog.show(this,
+				"Posting Data...", "Please wait...", false);
 		if(validate()){
-			boolean s = service.createPlaceIt(title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat, createDate,
-					postDate, coordinate.latitude, coordinate.longitude, AbstractPlaceIt.Status.ON_MAP, null);
-			
-			Log.wtf("create", "repeatedMinute: " + repeatedMinute + " repeatbyMinute: " + repeatByMinute);
-			if(s){
-				Toast.makeText(this, "New Place-it Created", Toast.LENGTH_SHORT).show();
-				this.finish();
-			}else
-				Toast.makeText(this, "New Place-it was not Created", Toast.LENGTH_SHORT).show();
+			new AsyncTask<Void, Void, Boolean>(){
+
+				@Override
+				protected Boolean doInBackground(Void... params) {
+					// TODO Auto-generated method stub
+					return service.createPlaceIt(title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat, createDate,
+							postDate, coordinate.latitude, coordinate.longitude, AbstractPlaceIt.Status.ON_MAP, null);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean params) {
+					dialog.dismiss();
+					if(params){
+						Toast.makeText(CreatePlaceItActivity.this, "New Place-it Created", Toast.LENGTH_SHORT).show();
+						CreatePlaceItActivity.this.finish();
+					}else
+						Toast.makeText(CreatePlaceItActivity.this, "New Place-it was not Created", Toast.LENGTH_SHORT).show();
+				}
+				
+			}.execute();
+			dialog.show();
 		}
 	}
 	

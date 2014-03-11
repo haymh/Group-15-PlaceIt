@@ -62,6 +62,7 @@ public final class Constant {
 		public static final String LATITUDE = "LATITUDE";
 		public static final String LONGITUDE = "LONGITUDE";
 		public static final String STATUS = "STATUS";
+		public static final String STATUS_NAME = "STATUS_NAME";
 		public static final String CATEGORY_ONE = "CATEGORY_ONE";
 		public static final String CATEGORY_TWO = "CATEGORY_TWO";
 		public static final String CATEGORY_THREE = "CATEGORY_THREE";
