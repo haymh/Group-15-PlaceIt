@@ -1,6 +1,7 @@
 package com.fifteen.placeit;
 
 import java.util.Date;
+import java.util.Map.Entry;
 
 import com.fifteen.placeit.R;
 import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
@@ -12,8 +13,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.os.Binder;
@@ -26,6 +29,18 @@ import java.util.*;
 
 public class MyService extends Service {
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
+	
+	private BroadcastReceiver receiver = new BroadcastReceiver(){
+
+		// Receives broadcast from intent service
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			//TODO: get data from database
+			Log.wtf("Service", "I got something from gcm");
+		}
+	};
+	
 	private final static double RANGE = 0.8;
 	private final static long POST_TIME_LAG = 20000;
 	private final IBinder mBinder = new LocalBinder();
@@ -112,6 +127,8 @@ public class MyService extends Service {
 
 		// XXX Request Places API data
 		requestPlacesAPI = new RequestPlacesAPI(fetchCurrentLocation());
+		// TODO: change it to intentService
+		registerReceiver(receiver, new IntentFilter(GCMIntentService.FROM_GCM_SERVICE));
 	}
 
 	@Override
@@ -153,7 +170,10 @@ public class MyService extends Service {
 		if(pi == null)
 			return false;
 		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-			if(ServerUtil.createPlaceIt(pi.getPlaceItInfoMap()) != ServerUtil.OK){
+			int code = 0;
+			if((code = ServerUtil.createPlaceIt(pi.getPlaceItInfoMap())) != ServerUtil.OK){
+				
+				Log.wtf("create status", "" + code);
 				database.discard(pi.getId());
 				return false;
 			}

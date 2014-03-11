@@ -61,7 +61,7 @@ public class DetailContentFormatter {
 			locationBased = false;
 		}
 
-		String status = info.get(Constant.PI.STATUS).toUpperCase(Locale.US);
+		String status = info.get(Constant.PI.STATUS_NAME).toUpperCase(Locale.US);
 
 		DetailContent detail = new DetailContent(type, status);
 		detail.contentFontSize = STATUS_FONT;

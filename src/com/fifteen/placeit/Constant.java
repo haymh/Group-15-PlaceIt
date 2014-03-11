@@ -18,11 +18,16 @@ public final class Constant {
 			public static final String PASSWORD = "password";
 		}
 	}
-
-	public static final String TITLE = "Fifteen Place-It";
-	public static final String REGISTER = "Register";
-	public static final String LOGIN = "LOGIN";
-	public static final String LOGOUT = "LOGOUT";
+	
+	public static class LOGIN {
+		public static final String TITLE = "Fifteen Place-It";
+		public static final boolean LOGIN = true;
+		public static final boolean REGISTER = false;
+		public static final int OK = 200;
+		public static final int CONFLICT = 409;
+		public static final int FAIL = 400;
+		public static final int NOT_FOUND = 404;
+	}
 
 	// Places API 
 	public static class PAPI {
@@ -62,6 +67,7 @@ public final class Constant {
 		public static final String LATITUDE = "LATITUDE";
 		public static final String LONGITUDE = "LONGITUDE";
 		public static final String STATUS = "STATUS";
+		public static final String STATUS_NAME = "STATUS_NAME";
 		public static final String CATEGORY_ONE = "CATEGORY_ONE";
 		public static final String CATEGORY_TWO = "CATEGORY_TWO";
 		public static final String CATEGORY_THREE = "CATEGORY_THREE";

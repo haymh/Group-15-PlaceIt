@@ -43,6 +43,8 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -83,8 +85,13 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	private double longitude;
 	private float zoom;
 		
+	// Login 
 	private DialogFragment loginDialog;
+	private boolean loginType;
+	
 	private MenuItem menuSearch;
+	
+	private String regId;
 
 //BROADCAST HANDLER
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
@@ -193,8 +200,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
         GCMRegistrar.checkDevice(this);
         // Make sure the manifest was properly set - comment out this line
         // while developing the app, then uncomment it when it's ready.
-        //GCMRegistrar.checkManifest(this);
-        final String regId = GCMRegistrar.getRegistrationId(this);
+        GCMRegistrar.checkManifest(this);
+        regId = GCMRegistrar.getRegistrationId(this);
         if (regId.equals("")) {
             // Automatically registers application on startup.
             GCMRegistrar.register(this, Constant.GCM.SENDER_ID);
@@ -203,6 +210,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		if(regId.equals("") || regId == null)
 			Log.wtf("GCM", "cannot get it fucker work");
 		Log.wtf("MAIN", "say something");
+		
+		loginType = Constant.LOGIN.LOGIN;
 		
 		showDialog();
 	}
@@ -408,7 +417,16 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		saveLocation();
 		
 		if(service != null) {
-			service.checkPlaceIts(new LatLng(latitude, longitude));
+			new AsyncTask<Void,Void,Void>(){
+
+				@Override
+				protected Void doInBackground(Void... arg0) {
+					service.checkPlaceIts(new LatLng(latitude, longitude));
+					return null;
+				}
+				
+			}.execute();
+			
 		}
 	} 
 	
@@ -438,47 +456,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		// login this account with server, return status code 400---fail 200---success 404---not found
 		// register this account with server,return status code 400---fail 200---success 404---not found
 		
-		if(service != null) {
-			new AsyncTask<Void, Void, Void>() {
-				long time;
-				String name = "Rolando";
-				String password = "Awesome";
-				String id = "Yes";
-				
-				protected void onPreExecute() {
-					Log.wtf("GCM!?", "Connecting");
-					time = new Date().getTime();
-				}
 
-				@Override
-				protected Void doInBackground(Void... arg0) {
-					try {
-						int serviceRegister = service.login(name, password, id);
-						long temp = new Date().getTime() - time;
-						Log.wtf("REGISTER YES!", "TOOK " + String.valueOf(temp) + "\n" + String.valueOf(serviceRegister));
-					} catch(Exception e) {
-						Log.wtf("REGISTER NO", e.toString());
-					}
-						
-					try {
-						int serviceLogin = service.login(name, password, id);
-						long temp = new Date().getTime() - time;
-						Log.wtf("LOGIN YES!", "TOOK " + String.valueOf(temp) + "\n" + String.valueOf(serviceLogin));
-					} catch(Exception e) {
-						Log.wtf("LOGIN NO", e.toString());
-					}
-
-					return null;
-				}
-				
-				@Override
-				protected void onPostExecute(Void results) {
-					long temp = new Date().getTime() - time;
-					Log.wtf("GCM!?", "Done with " + String.valueOf(temp));
-				}
-				
-			}.execute();
-		}
 	}
 	
 	public void gotoListPage() {
@@ -529,20 +507,65 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// TODO Work here
 	// Login handler
 	public void doPositiveClick() {
-		preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
-		
-		Dialog view = loginDialog.getDialog();
-		
-		EditText username = (EditText) view.findViewById(R.id.loginUsername);
-		EditText password = (EditText) view.findViewById(R.id.loginPassword);
-		
-		try {
-		Log.wtf(tag, "LOG IN INFO " + username.getText() + " & " + password.getText());
-		} catch (Exception e) {
-			Log.wtf(tag, e.toString());
-		}
+		//preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
+		login();
 	}
 
+	private void login() {
+		Dialog view = loginDialog.getDialog();
+		
+		EditText usernameText = (EditText) view.findViewById(R.id.loginUsername);
+		EditText passwordText = (EditText) view.findViewById(R.id.loginPassword);
+		final String username = usernameText.getText().toString();
+		final String password = passwordText.getText().toString();
+
+		if(service != null) {
+			new AsyncTask<String, Void, Integer>() {
+				long time;
+				boolean type;
+				
+				protected void onPreExecute() {
+					time = new Date().getTime();
+					type = loginType;
+				}
+
+				@Override
+				protected Integer doInBackground(String... argv) {
+					int request = 0;
+					try {
+						if(type == Constant.LOGIN.LOGIN) {
+							request = service.login(argv[0], argv[1], regId);
+						}
+						else {
+							request = service.register(argv[0], argv[1], regId);
+						}
+					} catch(Exception e) {
+						Log.wtf(tag, "At login() " + e.toString());
+					}
+					return request;
+				}
+				
+				@Override
+				protected void onPostExecute(Integer results) {
+					long temp = new Date().getTime() - time;
+					Log.wtf("GCM!?", results.toString() + " in " + String.valueOf(temp) + " milliseconds");
+					switch(results) {
+					case Constant.LOGIN.OK:
+						preference.edit().putString(Constant.SP.U.USERNAME, username).commit();
+						preference.edit().putString(Constant.SP.U.PASSWORD, password).commit();
+						preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
+						break;
+					case Constant.LOGIN.CONFLICT:
+					case Constant.LOGIN.FAIL:
+					case Constant.LOGIN.NOT_FOUND:
+					default:
+						break;
+					}
+				}
+			}.execute(username, password);
+		}
+	}
+		
 	// TODO Work here
 	// Logout handle
 	public void doNegativeClick() {
@@ -556,8 +579,25 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		finish();
 	}
 	
+	// TODO Working on this
 	public void dialogRegister(View view) {
-		Log.wtf(tag, "Register");
+		loginType = !loginType;
+		
+		String text;
+		
+		if(loginType == Constant.LOGIN.LOGIN) {
+			Log.wtf(tag, "Register request");
+			text = "Register";
+		}
+		else {
+			Log.wtf(tag, "Login request");
+			text = "Sign in";
+		}
+		
+		TextView special = (TextView) view.findViewById(R.id.loginSpecial);
+    	SpannableString format = new SpannableString(text);
+        format.setSpan(new UnderlineSpan(), 0, format.length(), 0);
+        special.setText(format);		
 	}
 	
 	private void disconnect() {

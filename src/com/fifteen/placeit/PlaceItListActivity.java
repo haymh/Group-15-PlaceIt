@@ -11,6 +11,7 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -92,8 +93,33 @@ public class PlaceItListActivity extends Activity {
     	View parent = (View) view.getParent();
     	
     	getPlaceItId(parent);
-    	service.repostPlaceIt(placeItId);
-    	fragmentRefresh();
+    	if(service != null) {
+			final ProgressDialog dialog = ProgressDialog.show(this,
+					"reposting...", "Please wait...", false);
+			new AsyncTask<Void,Void,Boolean>(){
+
+				@Override
+				protected Boolean doInBackground(Void... arg0) {
+					return service.repostPlaceIt(placeItId);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean params) {
+					dialog.dismiss();
+					if(params){
+						Toast.makeText(PlaceItListActivity.this, "Place-it has been reposted", Toast.LENGTH_SHORT).show();
+						fragmentRefresh();
+					}else
+						Toast.makeText(PlaceItListActivity.this, "cannot access server, place-it was not reposted", Toast.LENGTH_SHORT).show();
+				}
+				
+			}.execute();
+			dialog.show();		
+		}else{
+			Toast.makeText(PlaceItListActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
+		}
+    	
+    	
     }
     
     // Pull down button clicked, pull down placeit
@@ -101,8 +127,34 @@ public class PlaceItListActivity extends Activity {
     	View parent = (View) view.getParent();
     	
     	getPlaceItId(parent);
-    	service.pulldownPlaceIt(placeItId);
-    	fragmentRefresh();
+    	
+    	if(service != null) {
+			final ProgressDialog dialog = ProgressDialog.show(this,
+					"Pulling Down...", "Please wait...", false);
+			new AsyncTask<Void,Void,Boolean>(){
+
+				@Override
+				protected Boolean doInBackground(Void... arg0) {
+					return service.pulldownPlaceIt(placeItId);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean params) {
+					dialog.dismiss();
+					if(params){
+						Toast.makeText(PlaceItListActivity.this, "Place-it has been pulled down", Toast.LENGTH_SHORT).show();
+						fragmentRefresh();
+					}else
+						Toast.makeText(PlaceItListActivity.this, "cannot access server, place-it was not pulled down", Toast.LENGTH_SHORT).show();
+				}
+				
+			}.execute();
+			dialog.show();		
+		}else{
+			Toast.makeText(PlaceItListActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
+		}
+    	
+    	
     }
     
     // Discard button clicked, discards placeit
@@ -111,8 +163,33 @@ public class PlaceItListActivity extends Activity {
     	View parent = (View) view.getParent();
     	
     	getPlaceItId(parent);
-    	service.discardPlaceIt(placeItId);
-    	fragmentRefresh();
+    	if(service != null) {
+			final ProgressDialog dialog = ProgressDialog.show(this,
+					"discarding...", "Please wait...", false);
+			new AsyncTask<Void,Void,Boolean>(){
+
+				@Override
+				protected Boolean doInBackground(Void... arg0) {
+					return service.discardPlaceIt(placeItId);
+				}
+				
+				@Override
+				protected void onPostExecute(Boolean params) {
+					dialog.dismiss();
+					if(params){
+						Toast.makeText(PlaceItListActivity.this, "Place-it has been discarded", Toast.LENGTH_SHORT).show();
+						fragmentRefresh();
+					}else
+						Toast.makeText(PlaceItListActivity.this, "cannot access server, place-it was not discarded", Toast.LENGTH_SHORT).show();
+				}
+				
+			}.execute();
+			dialog.show();		
+		}else{
+			Toast.makeText(PlaceItListActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
+		}
+    	
+    	
     }
     
 //HANDLERS SUPPORT methods
