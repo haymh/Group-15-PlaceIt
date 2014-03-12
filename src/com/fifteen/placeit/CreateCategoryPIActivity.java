@@ -6,6 +6,7 @@ import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -117,8 +118,7 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 				postDate, 0, 0, AbstractPlaceIt.Status.ON_MAP, tempArray);
 		*/
 
-		boolean s = service.createPlaceIt(cat[index], "Testing Categories", 0, 0, 
-				WeeklySchedule.NumOfWeekRepeat.ZERO, createDate, postDate, new LatLng(0,0), AbstractPlaceIt.Status.ON_MAP, tempArray );
+		
 		//		null, createDate, postDate, new LatLng(0, 0), AbstractPlaceIt.Status.ON_MAP, tempArray );
 		// TODO REPLACE THIS TOP
 		/* 
@@ -126,13 +126,31 @@ public class CreateCategoryPIActivity extends Activity implements AdapterView.On
 				WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, LatLng coordinate,
 				AbstractPlaceIt.Status status, String[] categories){
 		*/
+		final ProgressDialog dialog = ProgressDialog.show(this,
+				"Posting Data...", "Please wait...", false);
 		
-		if(s){
-			Toast.makeText(this, "New Place-it Created", Toast.LENGTH_SHORT).show();
-			this.finish();
-		}else
-			Toast.makeText(this, "New Place-it was not Created", Toast.LENGTH_SHORT).show();
-		}
+		new AsyncTask<Void, Void, Boolean>(){
+
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				// TODO Auto-generated method stub
+				return service.createPlaceIt(cat[index], "Testing Categories", 0, 0, 
+						WeeklySchedule.NumOfWeekRepeat.ZERO, createDate, postDate, new LatLng(0,0), AbstractPlaceIt.Status.ON_MAP, tempArray );
+			}
+			
+			@Override
+			protected void onPostExecute(Boolean params) {
+				dialog.dismiss();
+				if(params){
+					Toast.makeText(CreateCategoryPIActivity.this, "New Category Place-it Created", Toast.LENGTH_SHORT).show();
+					CreateCategoryPIActivity.this.finish();
+				}else
+					Toast.makeText(CreateCategoryPIActivity.this, "New Category Place-it was not Created", Toast.LENGTH_SHORT).show();
+			}
+			
+		}.execute();
+		dialog.show();
+	}
 	/*
 	public void onclick(View view) {
 		

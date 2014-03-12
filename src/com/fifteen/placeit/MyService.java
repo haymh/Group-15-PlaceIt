@@ -1,5 +1,6 @@
 package com.fifteen.placeit;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Map.Entry;
 
@@ -395,7 +396,7 @@ public class MyService extends Service {
 		return ServerUtil.loginWithMultipleAttempt(username, password, regId);
 	}
 
-	// register this account with server,return status code 400---fail 200---success 404---not found
+	// register this account with server,return status code 400---fail 200---success 404---not found 409----username exists
 	public int register(String username, String password, String regId){
 		return ServerUtil.registerWithMultipleAttempt(username, password, regId);
 	}
@@ -407,5 +408,19 @@ public class MyService extends Service {
 
 	public void updateLocation(double latitude, double longitude) {
 		location = new LatLng(latitude, longitude);
+	}
+	
+	// pull latest data from server
+	
+	public String pull(long lastUpdate){
+		Map<String, String> params = new HashMap<String, String>();
+		params.put(ServerUtil.LAST_UPDATE, "" + lastUpdate);
+		try {
+			return ServerUtil.pull(params);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
