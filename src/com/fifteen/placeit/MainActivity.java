@@ -525,10 +525,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		Toast.makeText(this, mapClickMessage, Toast.LENGTH_SHORT).show();
 	}
 	
+	
 //LOGIN ALERT FRAGMENT DEFINITION
-	void showDialog() {
-		
-		
+	 void showDialog() {
 	    loginDialog = LoginFragment.newInstance();
 	    loginDialog.show(getFragmentManager(), "dialog");
 	}
@@ -536,7 +535,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// TODO Work here
 	// Login handler
 	public void doPositiveClick() {
-		//preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
 		login();
 	}
 
@@ -597,10 +595,12 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		
 	// TODO Work here
 	// Logout handle
-	public void doNegativeClick() {
+	public void doNegativeClick() {		
 		preference.edit().putBoolean(Constant.SP.U.LOGIN, false).commit();
-		preference.edit().remove(Constant.SP.U.USERNAME);
-		preference.edit().remove(Constant.SP.U.PASSWORD);
+		/* TODO Turn these back on after debugging
+		preference.edit().remove(Constant.SP.U.USERNAME).commit();
+		preference.edit().remove(Constant.SP.U.PASSWORD).commit();
+		*/
 	}
 	
 	public void dialogCancel() {
@@ -630,9 +630,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	}
 	
 	private void disconnect() {
-		// FIXME Zombie client won't die
-		Log.wtf(tag, "Dialog cancelled, shutting down EVERYTHING!");
-
+		// FIXME Zombie client won't die. WOULD NOT DIE!
 		locationClient.removeLocationUpdates(this);
 		locationClient.disconnect();
 	}

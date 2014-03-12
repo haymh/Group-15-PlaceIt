@@ -41,10 +41,9 @@ public class LoginFragment extends DialogFragment {
         
         return frag;
     }
-
+    
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-    	
     	// Get saved credentials
     	preference = getActivity().getSharedPreferences(Constant.SP.SAVE, Context.MODE_PRIVATE);
     	
@@ -87,6 +86,12 @@ public class LoginFragment extends DialogFragment {
     private void initializeLayout() {
 		LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		layout = inflater.inflate(R.layout.dialog_layout, null);
+		
+		EditText text = (EditText) layout.findViewById(R.id.loginUsername);
+		text.setText(preference.getString(Constant.SP.U.USERNAME, ""));
+		
+		text = (EditText) layout.findViewById(R.id.loginPassword);
+		text.setText(preference.getString(Constant.SP.U.PASSWORD, ""));
     
     	initializeRegister();
     	
@@ -106,21 +111,6 @@ public class LoginFragment extends DialogFragment {
     @Override
     public void onCancel(DialogInterface dialog) {
     	((MainActivity) getActivity()).dialogCancel();
-    	
     	super.onCancel(dialog);
-    }
-    
-    // TODO do this
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-       
-        /* TODO THIS THIS!
-	    View view = (View) layout.get
-	    
-	    EditText text = (EditText) view.findViewById(R.id.loginUsername);
-	    */
-        
-        //Log.wtf(tag, "Attached!");
     }
 }

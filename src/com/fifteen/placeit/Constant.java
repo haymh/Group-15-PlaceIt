@@ -38,7 +38,7 @@ public final class Constant {
 	public static class L {
 
 		// Half mile in meters
-		public static final int RADIUS = 805;
+		public static final int RADIUS = 800;
 		
 		public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000; 
 		
@@ -51,7 +51,7 @@ public final class Constant {
 		
 		// Location update intervals (distance) in meters
 		public static final float SMALLEST_DISTANCE_INTERVAL = 0;
-		public static final float REQUEST_DISTANCE_INTERVAL = 50;
+		public static final float REQUEST_DISTANCE_INTERVAL = 400;
 	}
 
 	// Place-Its 
