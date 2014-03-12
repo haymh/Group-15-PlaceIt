@@ -153,8 +153,6 @@ public class PlaceItListActivity extends Activity {
 		}else{
 			Toast.makeText(PlaceItListActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
 		}
-    	
-    	
     }
     
     // Discard button clicked, discards placeit

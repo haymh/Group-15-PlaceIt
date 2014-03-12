@@ -1,5 +1,6 @@
 package com.fifteen.placeit;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -30,6 +31,8 @@ public class LoginFragment extends DialogFragment {
 	private EditText username;
 	private EditText password;
 	
+	private static final String tag = LoginFragment.class.getSimpleName();
+	
 	// Creates new login fragment
     public static LoginFragment newInstance() {
         LoginFragment frag = new LoginFragment();
@@ -48,7 +51,7 @@ public class LoginFragment extends DialogFragment {
     	alert = new AlertDialog.Builder(getActivity());
     
     	alert.setTitle(Constant.LOGIN.TITLE);
-    	
+    	    	
     	initializeLogin();
     	initializeLogout();
     	
@@ -105,5 +108,19 @@ public class LoginFragment extends DialogFragment {
     	((MainActivity) getActivity()).dialogCancel();
     	
     	super.onCancel(dialog);
+    }
+    
+    // TODO do this
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+       
+        /* TODO THIS THIS!
+	    View view = (View) layout.get
+	    
+	    EditText text = (EditText) view.findViewById(R.id.loginUsername);
+	    */
+        
+        //Log.wtf(tag, "Attached!");
     }
 }

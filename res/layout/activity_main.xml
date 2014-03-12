@@ -15,15 +15,15 @@
         android:gravity="bottom" >
 
         <Button
-            android:id="@+id/mainListBtn"
+            android:id="@+id/mainTestBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
             android:layout_marginLeft="5dp"
             android:layout_marginBottom="5dp"
-            android:onClick="gotoListPage"
-            android:text="@string/list" />
+            android:onClick="debugHandler"
+            android:text="TEST" />
         
     </RelativeLayout>
     

@@ -36,6 +36,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -206,10 +207,12 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
             // Automatically registers application on startup.
             GCMRegistrar.register(this, Constant.GCM.SENDER_ID);
         }
+        /* FIXME wtf is this!?
 		Log.wtf("GCM Reg Id", regId);
 		if(regId.equals("") || regId == null)
 			Log.wtf("GCM", "cannot get it fucker work");
 		Log.wtf("MAIN", "say something");
+		*/
 		
 		loginType = Constant.LOGIN.LOGIN;
 		
@@ -378,7 +381,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	private void putMarkerOnMap(long placeItId, LatLng placeItLocation) {
 		Marker addMarker = map.addMarker(new MarkerOptions()
 		.position(placeItLocation)
-		.icon(BitmapDescriptorFactory.fromResource(R.drawable.note)));
+		.icon(BitmapDescriptorFactory.fromResource(R.drawable.rsz_note)));
 		mMarkers.add(addMarker);
 
 		// Store placeit ID with marker ID in a hashmap for easy tracking
@@ -407,7 +410,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		locationClient.requestLocationUpdates(locationRequest, this); 
 	} 
 
-	// TODO WORKING ON THIS
 	// Handles location changes
 	@Override 
 	public void onLocationChanged(Location location) { 
@@ -419,6 +421,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		if(service != null) {
 			new AsyncTask<Void,Void,Void>(){
 
+				// Calls service to check if Place Its are ready to trigger
 				@Override
 				protected Void doInBackground(Void... arg0) {
 					service.checkPlaceIts(new LatLng(latitude, longitude));
@@ -426,7 +429,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 				}
 				
 			}.execute();
-			
 		}
 	} 
 	
@@ -447,16 +449,42 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	} 
 
 //EVENT HANDLERS
-	// TODO This is going to be deleted since we have an action bar button
-	// List button handler
-	// Sends user to list of place-it activity
-	public void gotoListPage(View view) {
+	public void debugHandler(View view) {
 		// TODO TESTTEST
-
-		// login this account with server, return status code 400---fail 200---success 404---not found
-		// register this account with server,return status code 400---fail 200---success 404---not found
+		// To be removed, TEST ONLY!
 		
+		if(service != null) {
+			new AsyncTask<Void, Void, String>() {
 
+				@Override
+				protected String doInBackground(Void... arg0) {
+					String data;
+					
+					data = service.pull(preference.getLong(Constant.SP.TIME, 0));
+					return data;
+				}
+				
+				@Override
+				protected void onPostExecute(String results) {
+					JSONParser parser = new JSONParser(results);
+					
+					parser.parsePlaceItServer();
+					
+					// Validity test
+					List<Map<String, String>> info = new ArrayList<Map<String, String>>(parser.getPlaceItInfoList());
+					for( int i = 0; i < info.size(); ++i ) {
+						Log.wtf("INFO", info.get(i).get(Constant.PI.ID) + " & " + info.get(i).get(Constant.PI.TITLE));
+					}
+					
+					List<Long> id = new ArrayList<Long>(parser.getPlaceItIdList());
+					Map<Long, Integer> status = new HashMap<Long, Integer>(parser.getPlaceItIdStatusMap());
+					for( int i = 0; i < id.size(); ++i ) {
+						Log.wtf("ID", "ID: " + id.get(i).toString() + " STATUS " + status.get(id.get(i)));
+					}
+				}
+			}.execute();
+		}
+		// To be removed, TEST ONLY!
 	}
 	
 	public void gotoListPage() {
@@ -499,8 +527,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	
 //LOGIN ALERT FRAGMENT DEFINITION
 	void showDialog() {
+		
+		
 	    loginDialog = LoginFragment.newInstance();
-	    //newFragment.setCancelable(false);
 	    loginDialog.show(getFragmentManager(), "dialog");
 	}
 
