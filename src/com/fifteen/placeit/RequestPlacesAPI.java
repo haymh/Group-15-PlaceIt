@@ -39,8 +39,9 @@ public class RequestPlacesAPI {
 
 		@Override
 		protected void onPostExecute(String result) {
-			if(result != null)
-				new JSONParser(result).parsePlacesAPI();
+			if(result != null) {
+				JSONParser.parsePlacesAPI(result);
+			}
 		}
 	}
 
@@ -70,17 +71,15 @@ public class RequestPlacesAPI {
 	
 	// Update location & get new JSON from Google Places API
 	public void update(LatLng location) {
-		float[] results = new float[3];
-		Location.distanceBetween(latitude, longitude, location.latitude, location.longitude, results);
-		// TODO Debug mode
-		if(results[0] > Constant.L.REQUEST_DISTANCE_INTERVAL) {
-			Log.wtf(tag, "Places API request @ " + String.valueOf(results[0]) + " meters difference");
-			setLocation(location);
-			requestPlacesAPI();
-		}
+		validate(location.latitude, location.longitude);
 	}
 	
 	public void update(double latitude, double longitude) {
+		validate(latitude, longitude);
+	}
+	
+	// Validate distance and request accordingly
+	private void validate(double latitude, double longitude) {
 		float[] results = new float[3];
 		Location.distanceBetween(RequestPlacesAPI.latitude, RequestPlacesAPI.longitude, latitude, longitude, results);
 		// TODO Debug mode

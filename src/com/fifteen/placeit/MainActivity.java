@@ -466,18 +466,19 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 				
 				@Override
 				protected void onPostExecute(String results) {
-					JSONParser parser = new JSONParser(results);
 					
-					parser.parsePlaceItServer();
+					JSONParser.parsePlaceItServer(results);
+					
+					Log.wtf("TIME", JSONParser.getTime().toString());
 					
 					// Validity test
-					List<Map<String, String>> info = new ArrayList<Map<String, String>>(parser.getPlaceItInfoList());
+					List<Map<String, String>> info = new ArrayList<Map<String, String>>(JSONParser.getPlaceItInfoList());
 					for( int i = 0; i < info.size(); ++i ) {
 						Log.wtf("INFO", info.get(i).get(Constant.PI.ID) + " & " + info.get(i).get(Constant.PI.TITLE));
 					}
 					
-					List<Long> id = new ArrayList<Long>(parser.getPlaceItIdList());
-					Map<Long, Integer> status = new HashMap<Long, Integer>(parser.getPlaceItIdStatusMap());
+					List<Long> id = new ArrayList<Long>(JSONParser.getPlaceItIdList());
+					Map<Long, Integer> status = new HashMap<Long, Integer>(JSONParser.getPlaceItIdStatusMap());
 					for( int i = 0; i < id.size(); ++i ) {
 						Log.wtf("ID", "ID: " + id.get(i).toString() + " STATUS " + status.get(id.get(i)));
 					}
@@ -575,7 +576,9 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 				@Override
 				protected void onPostExecute(Integer results) {
 					long temp = new Date().getTime() - time;
-					Log.wtf("GCM!?", results.toString() + " in " + String.valueOf(temp) + " milliseconds");
+					Toast.makeText(MainActivity.this, results.toString() + " in " + String.valueOf(temp) + " ms", Toast.LENGTH_LONG).show();
+					Log.wtf("LOGGED", results.toString() + " in " + String.valueOf(temp) + " ms");
+					
 					switch(results) {
 					case Constant.LOGIN.OK:
 						preference.edit().putString(Constant.SP.U.USERNAME, username).commit();

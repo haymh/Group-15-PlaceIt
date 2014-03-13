@@ -15,43 +15,28 @@ import android.util.Log;
 public class JSONParser {
 	private static final String tag = JSONParser.class.getSimpleName();
 
-	private String string;
-
 	// Places API map. <Type, Address>
 	private static HashMap<String, String> placesAPIMap = new HashMap<String, String>();
 
 	// Place It info map. List<Places Its>
 	// Map<field, content>
-	private List<Map<String, String>> placeItInfoList = new ArrayList<Map<String, String>>();
+	private static List<Map<String, String>> placeItInfoList = new ArrayList<Map<String, String>>();
 
 	// Place It id and status map. Map<id, Status>
-	private Map<Long, Integer> placeItIdStatusMap = new HashMap<Long, Integer>();
+	private static Map<Long, Integer> placeItIdStatusMap = new HashMap<Long, Integer>();
 
 	// Places It id list List<id>
-	private List<Long> placeItIdList = new ArrayList<Long>();
+	private static List<Long> placeItIdList = new ArrayList<Long>();
 
-	private Long time;
-
-//CLASS DEFINITION
-	// Used as accessor
-	public JSONParser() {}
-
-	public JSONParser(String data) {
-		setString(data);
-	}
-
-	// Set request string
-	public void setString(String data) {
-		string = data;
-	}
+	private static Long time;
 
 //PLACES API PARSE & SUPPORT
 	// Parses JSON by Places API format
-	public void parsePlacesAPI() {
-		placesAPIMap.clear();
+	public static void parsePlacesAPI(String data) {
+		placesAPIMap = new HashMap<String, String>();
 
 		try {
-			JSONObject object = new JSONObject(string);
+			JSONObject object = new JSONObject(data);
 			JSONArray array = new JSONArray(object.getString("results"));
 			setupPlacesAPIMap(array);
 		} catch (Exception e) {
@@ -59,13 +44,8 @@ public class JSONParser {
 		}
 	}
 
-	public void parsePlacesAPI(String data) {
-		setString(data);
-		parsePlacesAPI();
-	}
-
 	// Set ups places access map
-	private void setupPlacesAPIMap(JSONArray array) {
+	private static void setupPlacesAPIMap(JSONArray array) {
 		String address;
 
 		for(int i = 0; i < array.length(); ++i) {
@@ -90,11 +70,15 @@ public class JSONParser {
 
 // PLACES IT SERVER PARSE + SUPPORT
 	// Parse Place It server 
-	public void parsePlaceItServer() {
+	public static void parsePlaceItServer(String data) {
+		placeItInfoList = new ArrayList<Map<String, String>>();
+		placeItIdStatusMap = new HashMap<Long, Integer>();
+		placeItIdList = new ArrayList<Long>();
+		
+		Log.wtf("O JSON string", data);
+		
 		try {
-			JSONObject object = new JSONObject(new JSONObject(string).getString("operation"));
-
-			Log.wtf("O J string", new JSONObject(string).getString("operation"));
+			JSONObject object = new JSONObject(new JSONObject(data).getString("operation"));
 
 			try {
 				time = new JSONObject(object.getString("time")).getLong("time");
@@ -112,7 +96,7 @@ public class JSONParser {
 	}
 
 	// Parses place it list
-	private void setupPlaceItInfoList(String data) {		
+	private static void setupPlaceItInfoList(String data) {		
 		JSONArray array;
 
 		try {
@@ -166,7 +150,7 @@ public class JSONParser {
 	}
 
 	// Parses id + status map
-	private void setupPlaceItIdStatusMap(String data) {
+	private static void setupPlaceItIdStatusMap(String data) {
 		try {
 			JSONArray array = new JSONArray(new JSONObject(data).getString("placeit"));
 
@@ -180,7 +164,7 @@ public class JSONParser {
 	}
 
 	// Parses id list
-	private void setupPlaceItIdList(String data) {
+	private static void setupPlaceItIdList(String data) {
 		try {
 			JSONArray ids = new JSONArray(new JSONObject(data).optString("placeit"));
 
@@ -194,22 +178,22 @@ public class JSONParser {
 	}
 
 	// Pass place it info map (list of place its)
-	public List<Map<String, String>> getPlaceItInfoList() {
+	public static List<Map<String, String>> getPlaceItInfoList() {
 		return placeItInfoList;
 	}
 
 	// Pass place it id and status
-	public Map<Long, Integer> getPlaceItIdStatusMap() {
+	public static Map<Long, Integer> getPlaceItIdStatusMap() {
 		return placeItIdStatusMap;
 	}
 
 	// Pass place it id lists
-	public List<Long> getPlaceItIdList() {
+	public static List<Long> getPlaceItIdList() {
 		return placeItIdList;
 	}
 	
 	// Pass back time
-	public Long getTime() {
+	public static Long getTime() {
 		return time;
 	}
 }
