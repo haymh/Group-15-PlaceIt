@@ -35,8 +35,8 @@ import org.apache.http.message.BasicNameValuePair;
  * Helper class used to communicate with the PlaceItserver.
  */
 public final class ServerUtil {
-	//private static final String SERVER_URL = "http://1-dot-airy-dialect-514.appspot.com";
-	private static final String SERVER_URL = "http://192.168.1.112:8888";
+	private static final String SERVER_URL = "http://1-dot-airy-dialect-514.appspot.com";
+	//private static final String SERVER_URL = "http://192.168.1.112:8888";
 	private static final int MAX_ATTEMPTS = 5;
 	private static final int BACKOFF_MILLI_SECONDS = 2000;
 	private static final Random random = new Random();
@@ -59,11 +59,22 @@ public final class ServerUtil {
 	public static final String GCM_ID_KEY = "RegId";
 	
 	private static HttpClient client = new DefaultHttpClient();
+	private static ServerUtil serverUtil = new ServerUtil();
 
 	public static int OK = 200;
 	public static int CONFLICT = 409;
 	public static int FAIL = 400;
 	public static int NOT_FOUND = 404;
+	
+	
+	public class TimeAndStatus{
+		public TimeAndStatus(){
+			time = 0;
+			status = 0;
+		}
+		public long time;
+		public int status;
+	}
 	
 	public static void startNewSession(){
 		client = new DefaultHttpClient();
@@ -139,13 +150,10 @@ public final class ServerUtil {
 	}
 
 	// synchronize data with server
-	public static String pull(Map<String, String> params) throws IOException{
+	public static String pull(long lastUpdate) throws IOException{
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair(ACTION,PULL));
-		Set<Entry<String, String>> keyValue = params.entrySet();
-		for(Entry<String, String> e:keyValue){
-			list.add(new BasicNameValuePair(e.getKey(),e.getValue()));
-		}
+		list.add(new BasicNameValuePair(LAST_UPDATE,"" + lastUpdate));
 		return postExpectString(PLACE_IT_URL, list);
 	}
 
@@ -157,32 +165,52 @@ public final class ServerUtil {
 	}
 
 	// change a placeIt's status, return status code 400---fail 200---success 404---not found
-	public static int changeStatus(long id, AbstractPlaceIt.Status status){
+	public static TimeAndStatus changeStatus(long id, AbstractPlaceIt.Status status){
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair(ACTION,UPDATE));
 		list.add(new BasicNameValuePair(Constant.PI.ID, "" + id));
 		list.add(new BasicNameValuePair(Constant.PI.STATUS, "" + status.getValue()));
-		return postExpectStatus(PLACE_IT_URL, list);
+		return postExpectTimeAndStatus(PLACE_IT_URL, list);
 	}
 
 	// create a placeIt on server, return status code 400---fail 200---success 404---not found
-	public static int createPlaceIt(Map<String, String> params){
+	public static TimeAndStatus createPlaceIt(Map<String, String> params){
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair(ACTION,CREATE));
 		Set<Entry<String, String>> keyValue = params.entrySet();
 		for(Entry<String, String> e:keyValue){
 			list.add(new BasicNameValuePair(e.getKey(),e.getValue()));
 		}
-		return postExpectStatus(PLACE_IT_URL, list);
+		return postExpectTimeAndStatus(PLACE_IT_URL, list);
 		
 	}
 
 	// delete a placeIt on server, return status code 400---fail 200---success 404---not found
-	public static int deletePlaceIt(long id){
+	public static TimeAndStatus deletePlaceIt(long id){
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair(ACTION,DELETE));
 		list.add(new BasicNameValuePair(Constant.PI.ID, "" + id));
-		return postExpectStatus(PLACE_IT_URL, list);
+		return postExpectTimeAndStatus(PLACE_IT_URL, list);
+	}
+	
+	private static TimeAndStatus postExpectTimeAndStatus(String url, List<NameValuePair> nameValuePairs){
+		TimeAndStatus ts = serverUtil.new TimeAndStatus();
+		HttpPost post = new HttpPost(url);
+
+		try {
+			String line = null;
+			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			HttpResponse response = client.execute(post);
+			BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			line = rd.readLine();
+			ts.time = Long.parseLong(line);
+			line = rd.readLine();
+			ts.status = Integer.parseInt(line);
+			return ts;
+		}catch(IOException e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	

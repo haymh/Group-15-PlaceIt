@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Map.Entry;
 
 import com.fifteen.placeit.R;
+import com.fifteen.placeit.ServerUtil.TimeAndStatus;
 import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -77,9 +78,12 @@ public class MyService extends Service {
 					try {
 						if(pi.getSchedule().postNowOrNot()){
 							if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-								if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP) != ServerUtil.OK)
+								TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP);
+								if(ts == null)
 									continue ;
-								preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+								if(ts.status != ServerUtil.OK)
+									continue ;
+								preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 							}
 							i.remove();
 							database.onMap(pi.getId());
@@ -171,16 +175,18 @@ public class MyService extends Service {
 		if(pi == null)
 			return false;
 		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-			int code = 0;
-			if((code = ServerUtil.createPlaceIt(pi.getPlaceItInfoMap())) != ServerUtil.OK){
+			TimeAndStatus ts = ServerUtil.createPlaceIt(pi.getPlaceItInfoMap());
+			if(ts == null)
+				return false;
+			if(ts.status != ServerUtil.OK){
 				
-				Log.wtf("create status", "" + code);
+				Log.wtf("create status", "" + ts.status);
 				database.discard(pi.getId());
 				return false;
 			}
 			// update last update time to now
 			// <<<< add code here
-			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+			preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 		}
 
 		//active.put(pi.getId(), pi);
@@ -237,11 +243,14 @@ public class MyService extends Service {
 	// to pull down a place from active
 	public boolean pulldownPlaceIt(long id){
 		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-			if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.PULL_DOWN) != ServerUtil.OK)
+			TimeAndStatus ts = ServerUtil.changeStatus(id, AbstractPlaceIt.Status.PULL_DOWN);
+			if(ts == null)
+				return false;
+			if(ts.status != ServerUtil.OK)
 				return false;
 			// update last update time to now
 			// <<<< add code here
-			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+			preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 		}
 
 		boolean success = database.pullDown(id);
@@ -261,11 +270,14 @@ public class MyService extends Service {
 	// to discard a place-it from active or pulldown
 	public boolean discardPlaceIt(long id){
 		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-			if(ServerUtil.deletePlaceIt(id) != ServerUtil.OK)
+			TimeAndStatus ts = ServerUtil.deletePlaceIt(id);
+			if(ts == null)
+				return false;
+			if(ts.status != ServerUtil.OK)
 				return false;
 			// update last update time to now
 			// <<<< add code here
-			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+			preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 		}
 
 		boolean success = database.discard(id);
@@ -288,11 +300,14 @@ public class MyService extends Service {
 	//public boolean repostPlaceIt(long id, LatLng currentLocation){
 	public boolean repostPlaceIt(long id){
 		if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-			if(ServerUtil.changeStatus(id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK)
+			TimeAndStatus ts = ServerUtil.changeStatus(id, AbstractPlaceIt.Status.ACTIVE);
+			if(ts == null)
+				return false;
+			if(ts.status != ServerUtil.OK)
 				return false;
 			// update last update time to now new Date().getTime()
 			// <<<<< add code here
-			preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+			preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 		}
 
 		AbstractPlaceIt pi = pulldown.get(id);
@@ -336,27 +351,30 @@ public class MyService extends Service {
 			if(pi.trigger(currentLocation)){
 				if(pi.status == AbstractPlaceIt.Status.ACTIVE){
 					if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-						if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK) {
+						TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE);
+						if(ts == null)
+							continue;
+						if(ts.status != ServerUtil.OK) {
 							continue;
 						}
+						preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 					}
-					// update last update time to now
-					// <<< add code here
-					preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
-
+					
 					onMapIterator.remove();
 					database.active(pi.getId());
 					prePost.put(pi.getId(), pi);
 					notify(pi);
 				}else if(pi.status == AbstractPlaceIt.Status.PULL_DOWN){
 					if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-						if(ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE) != ServerUtil.OK) {
+						TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE);
+						if(ts == null)
+							continue;
+						if(ts.status != ServerUtil.OK) {
 							continue;
 						}
+						preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 					}
-					// update last update time to now
-					// <<<<add code here
-					preference.edit().putLong(Constant.SP.TIME, new Date().getTime()).commit();
+					
 
 					onMapIterator.remove();
 					database.pullDown(pi.getId());
@@ -413,10 +431,8 @@ public class MyService extends Service {
 	// pull latest data from server
 	
 	public String pull(long lastUpdate){
-		Map<String, String> params = new HashMap<String, String>();
-		params.put(ServerUtil.LAST_UPDATE, "" + lastUpdate);
 		try {
-			return ServerUtil.pull(params);
+			return ServerUtil.pull(lastUpdate);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
