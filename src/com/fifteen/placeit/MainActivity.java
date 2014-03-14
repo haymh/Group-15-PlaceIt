@@ -529,109 +529,15 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	
 //LOGIN ALERT FRAGMENT DEFINITION
 	 void showDialog() {
-	    loginDialog = LoginFragment.newInstance();
+	    loginDialog = LoginFragment.newInstance(regId);
 	    loginDialog.show(getFragmentManager(), "dialog");
 	}
-
-	// TODO Work here
-	// Login handler
-	public void doPositiveClick() {
-		login();
-	}
-
-	private void login() {
-		Dialog view = loginDialog.getDialog();
 		
-		EditText usernameText = (EditText) view.findViewById(R.id.loginUsername);
-		EditText passwordText = (EditText) view.findViewById(R.id.loginPassword);
-		final String username = usernameText.getText().toString();
-		final String password = passwordText.getText().toString();
-
-		if(service != null) {
-			new AsyncTask<String, Void, Integer>() {
-				long time;
-				boolean type;
-				
-				protected void onPreExecute() {
-					time = new Date().getTime();
-					type = loginType;
-				}
-
-				@Override
-				protected Integer doInBackground(String... argv) {
-					int request = 0;
-					try {
-						if(type == Constant.LOGIN.LOGIN) {
-							request = service.login(argv[0], argv[1], regId);
-						}
-						else {
-							request = service.register(argv[0], argv[1], regId);
-						}
-					} catch(Exception e) {
-						Log.wtf(tag, "At login() " + e.toString());
-					}
-					return request;
-				}
-				
-				@Override
-				protected void onPostExecute(Integer results) {
-					long temp = new Date().getTime() - time;
-					Toast.makeText(MainActivity.this, results.toString() + " in " + String.valueOf(temp) + " ms", Toast.LENGTH_LONG).show();
-					Log.wtf("LOGGED", results.toString() + " in " + String.valueOf(temp) + " ms");
-					
-					switch(results) {
-					case Constant.LOGIN.OK:
-						preference.edit().putString(Constant.SP.U.USERNAME, username).commit();
-						preference.edit().putString(Constant.SP.U.PASSWORD, password).commit();
-						preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
-						break;
-					case Constant.LOGIN.CONFLICT:
-					case Constant.LOGIN.FAIL:
-					case Constant.LOGIN.NOT_FOUND:
-					default:
-						break;
-					}
-				}
-			}.execute(username, password);
-		}
-	}
-		
-	// TODO Work here
-	// Logout handle
-	public void doNegativeClick() {		
-		preference.edit().putBoolean(Constant.SP.U.LOGIN, false).commit();
-		/* TODO Turn these back on after debugging
-		preference.edit().remove(Constant.SP.U.USERNAME).commit();
-		preference.edit().remove(Constant.SP.U.PASSWORD).commit();
-		*/
-	}
-	
 	public void dialogCancel() {
 		disconnect();
 		finish();
 	}
-	
-	// TODO Working on this
-	public void dialogRegister(View view) {
-		loginType = !loginType;
 		
-		String text;
-		
-		if(loginType == Constant.LOGIN.LOGIN) {
-			Log.wtf(tag, "Register request");
-			text = "Register";
-		}
-		else {
-			Log.wtf(tag, "Login request");
-			text = "Sign in";
-		}
-		
-		TextView special = (TextView) view.findViewById(R.id.loginSpecial);
-    	SpannableString format = new SpannableString(text);
-        format.setSpan(new UnderlineSpan(), 0, format.length(), 0);
-        special.setText(format);		
-	}
-	
 	private void disconnect() {
 		// FIXME Zombie client won't die. WOULD NOT DIE!
 		locationClient.removeLocationUpdates(this);
