@@ -260,6 +260,7 @@ public class LoginFragment extends DialogFragment {
 	private void handleLogout() {
 		clearText();
 		clearCredentials();
+		service.deleteDatabase();
 	}
 
 	// ON REGISTER. Register button press
@@ -373,6 +374,16 @@ public class LoginFragment extends DialogFragment {
 
 				switch(results) {
 				case Constant.LOGIN.OK:
+					if(!access){
+						// new user, so delete old data
+						service.deleteDatabase();
+						service.createDatabase();
+						
+						// for user login on a new device, request all the information from server
+						if(loginOrRegister == Constant.LOGIN.LOGIN)
+								service.init();
+					}				
+					
 					preference.edit().putString(Constant.SP.U.USERNAME, username).commit();
 					preference.edit().putString(Constant.SP.U.PASSWORD, password).commit();
 					preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
