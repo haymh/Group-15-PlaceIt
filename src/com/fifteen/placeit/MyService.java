@@ -34,6 +34,8 @@ import android.util.Log;
 
 import java.util.*;
 
+// MVC's Controller
+// Handlers everything, every activity has to go through this
 public class MyService extends Service {
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
 	
@@ -52,9 +54,6 @@ public class MyService extends Service {
 	// TODO ZOO Location variables
 	private SharedPreferences preference;
 	private RequestPlacesAPI requestPlacesAPI;
-	private LatLng location;
-	private double latitude;
-	private double longitude;
 	
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
 
@@ -163,13 +162,13 @@ public class MyService extends Service {
 						
 					}
 					
-					
-					Map<Long, Integer> status = JSONParser.getPlaceItIdStatusMap();
-					for(Entry<Long, Integer> e : status.entrySet()) {
+					// TODO
+					List<JSONParser.StatusObject> status = JSONParser.getPlaceItIdStatusList();
+					for(JSONParser.StatusObject e : status) {
 						
-						if(database.updatePlaceItStatus(e.getKey(), AbstractPlaceIt.Status.genStatus(e.getValue()))){
-							Log.wtf("ID: " + e.getKey() + "change status to ", "" + e.getValue());
-							changeStatus(e.getKey(),AbstractPlaceIt.Status.genStatus(e.getValue()));
+						if(database.updatePlaceItStatus(e.id, AbstractPlaceIt.Status.genStatus(e.status))){
+							Log.wtf("ID: " + e.id + "change status to ", "" + e.status);
+							changeStatus(e.id,AbstractPlaceIt.Status.genStatus(e.status));
 						}
 					}
 					
@@ -606,15 +605,6 @@ public class MyService extends Service {
 	// register this account with server,return status code 400---fail 200---success 404---not found 409----username exists
 	public int register(String username, String password, String regId){
 		return ServerUtil.registerWithMultipleAttempt(username, password, regId);
-	}
-
-	// Update location
-	public void updateLocation(LatLng location) {
-		this.location = location;
-	}
-
-	public void updateLocation(double latitude, double longitude) {
-		location = new LatLng(latitude, longitude);
 	}
 	
 	// pull latest data from server

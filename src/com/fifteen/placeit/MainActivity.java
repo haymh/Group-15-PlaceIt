@@ -460,13 +460,31 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 				protected String doInBackground(Void... arg0) {
 					String data;
 					
-					data = service.pull(preference.getLong(Constant.SP.TIME, 0));
+					data = service.init();
+					//data = service.pull(preference.getLong(Constant.SP.TIME, 0));
 					return data;
 				}
 				
 				@Override
 				protected void onPostExecute(String results) {
+					JSONParser.parsePlaceItInit(results);
 					
+					Log.wtf("TIME", JSONParser.getTime().toString());
+					
+					// Validity test
+					List<Map<String, String>> info = new ArrayList<Map<String, String>>(JSONParser.getPlaceItInitList());
+					for( int i = 0; i < info.size(); ++i ) {
+						Log.wtf("INFO", info.get(i).get(Constant.PI.ID) + " & " + 
+								info.get(i).get(Constant.PI.TITLE) + " & " + 
+								info.get(i).get(Constant.PI.NUM_OF_WEEK_REPEAT) + " & " +
+								info.get(i).get(Constant.PI.STATUS) +  " & " + 
+								info.get(i).get(Constant.PI.REPEATED_DAY_IN_WEEK) + " & " + 
+								info.get(i).get(Constant.PI.DESCRIPTION) + " & " + 
+								info.get(i).get(Constant.PI.LONGITUDE)
+								);
+					}
+					
+					/*
 					JSONParser.parsePlaceItServer(results);
 					
 					Log.wtf("TIME", JSONParser.getTime().toString());
@@ -482,6 +500,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 					for( int i = 0; i < id.size(); ++i ) {
 						Log.wtf("ID", "ID: " + id.get(i).toString() + " STATUS " + status.get(id.get(i)));
 					}
+					*/
 				}
 			}.execute();
 		}
