@@ -123,6 +123,47 @@ public class DatabaseAccessor {
 		return cursorToPlaceIt(cursor);
 	}
 	
+	public boolean insertPlaceIt(long id, String title, String description, int repeatedDayInWeek, int repeatedMinute, 
+			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, String createDate, String postDate, double latitude,
+			double longitude, AbstractPlaceIt.Status status, String[] categories){
+		Log.v("database accessor","enter insert method");
+		ContentValues values = new ContentValues();
+		values.put(MySQLiteHelper.COLUMN_ID, id);
+		values.put(MySQLiteHelper.COLUMN_TITLE, title);
+		values.put(MySQLiteHelper.COLUMN_DESCRIPTION, description);
+		values.put(MySQLiteHelper.COLUMN_REPEATED_MIN, repeatedMinute);
+		values.put(MySQLiteHelper.COLUMN_REPEATED_DAY_IN_WEEK, repeatedDayInWeek);
+		Log.v("database accessor","before numOfWeekRepeat.getValue()");
+		values.put(MySQLiteHelper.COLUMN_NUM_OF_WEEK_REPEAT, numOfWeekRepeat.getValue());
+		Log.v("database accessor","numOfWeekRepeat.getValue()");
+		values.put(MySQLiteHelper.COLUMN_CREATE_DATE, createDate);
+		values.put(MySQLiteHelper.COLUMN_POST_DATE, postDate);
+		values.put(MySQLiteHelper.COLUMN_STATUS, status.getValue());
+		values.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
+		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
+		if(categories != null)
+		{
+			switch(categories.length){
+			case 3:
+				values.put(MySQLiteHelper.COLUMN_CATEGORY_THREE, categories[2]);
+			case 2:
+				values.put(MySQLiteHelper.COLUMN_CATEGORY_TWO, categories[1]);
+			case 1:
+				values.put(MySQLiteHelper.COLUMN_CATEGORY_ONE, categories[0]);
+			default:
+			}
+		}
+		Log.v("database accessor","ready to insert");
+		try{
+			database.insert(MySQLiteHelper.TABLE_PLACE_IT, null, values);
+			return true;
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+	
 	// repost a place-it 
 	public boolean repostPlaceIt(AbstractPlaceIt pi){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -189,7 +230,7 @@ public class DatabaseAccessor {
 	
 	
 	// update place-it status in database
-	private boolean updatePlaceItStatus(long id, AbstractPlaceIt.Status status){
+	public boolean updatePlaceItStatus(long id, AbstractPlaceIt.Status status){
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_STATUS, status.getValue());
 		int row = database.update(MySQLiteHelper.TABLE_PLACE_IT, values, 

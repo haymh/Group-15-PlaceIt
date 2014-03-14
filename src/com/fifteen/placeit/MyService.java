@@ -1,7 +1,11 @@
 package com.fifteen.placeit;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import com.fifteen.placeit.R;
@@ -21,6 +25,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.RingtoneManager;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -31,17 +36,6 @@ import java.util.*;
 
 public class MyService extends Service {
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
-	
-	private BroadcastReceiver receiver = new BroadcastReceiver(){
-
-		// Receives broadcast from intent service
-		@Override
-		public void onReceive(Context context, Intent intent) {
-
-			//TODO: get data from database
-			Log.wtf("Service", "I got something from gcm");
-		}
-	};
 	
 	private final static double RANGE = 0.8;
 	private final static long POST_TIME_LAG = 20000;
@@ -61,6 +55,145 @@ public class MyService extends Service {
 	private LatLng location;
 	private double latitude;
 	private double longitude;
+	
+	private BroadcastReceiver receiver = new BroadcastReceiver(){
+
+		// Receives broadcast from intent service
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			//TODO: get data from database
+			Log.wtf("Service", "I got something from gcm");
+			new AsyncTask<Void, Void, String>() {
+
+				@Override
+				protected String doInBackground(Void... arg0) {
+					String data;
+					
+					data = pull(preference.getLong(Constant.SP.TIME, 0));
+					return data;
+				}
+				
+				@Override
+				protected void onPostExecute(String results) {
+					
+					JSONParser.parsePlaceItServer(results);
+					
+					Log.wtf("TIME", JSONParser.getTime().toString());
+					
+					// Validity test
+					List<Map<String, String>> create= JSONParser.getPlaceItInfoList();
+					for( Map<String, String> pi : create ) {
+						long id = Long.parseLong(pi.get(Constant.PI.ID));
+						String title = pi.get(Constant.PI.TITLE);
+						String description = pi.get(Constant.PI.DESCRIPTION);
+						if(description == null)
+							description = "";
+						
+						String rdiw = pi.get(Constant.PI.REPEATED_DAY_IN_WEEK);
+						WeeklySchedule.NumOfWeekRepeat repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.ZERO;
+						if(rdiw != null && !rdiw.equals(""))
+							repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.genNumOfWeekRepeat(Integer.parseInt(rdiw));
+						
+						int repeatedMinute = 0;
+						String rm = pi.get(Constant.PI.REPEATED_MINUTE);
+						if(rm != null && !rm.equals(""))
+							repeatedMinute = Integer.parseInt(rm);
+						
+						int numOfWeekRepeat = 0;
+						String nowr = pi.get(Constant.PI.NUM_OF_WEEK_REPEAT);
+						if(nowr != null && !nowr.equals(""))
+							numOfWeekRepeat = Integer.parseInt(nowr);
+						
+						String createDate = pi.get(Constant.PI.CREATE_DATE);
+						String postDate = pi.get(Constant.PI.POST_DATE);
+						
+						double latitude = -91;
+						String lat = pi.get(Constant.PI.LATITUDE);
+						if(lat != null && !lat.equals(""))
+							latitude = Double.parseDouble(lat);
+						double longitude = -181;
+						String lng = pi.get(Constant.PI.LONGITUDE);
+						if(lng != null && !lng.equals(""))
+							longitude = Double.parseDouble(lng);
+						
+						int s = Integer.parseInt(pi.get(Constant.PI.STATUS));
+						AbstractPlaceIt.Status status = AbstractPlaceIt.Status.genStatus(s);
+						
+						String categoryOne = pi.get(Constant.PI.CATEGORY_ONE);
+						String categoryTwo = pi.get(Constant.PI.CATEGORY_TWO);
+						String categoryThree = pi.get(Constant.PI.CATEGORY_THREE);
+						String[] categories = null;
+						if((categoryOne != null && !categoryOne.equals("")) &&
+								(categoryTwo != null && !categoryTwo.equals("")) && 
+								(categoryThree != null && !categoryThree.equals(""))){
+							categories = new String[3];
+							categories[0] = categoryOne;
+							categories[1] = categoryTwo;
+							categories[2] = categoryThree;
+						}else if ((categoryOne != null && !categoryOne.equals("")) &&
+								(categoryTwo != null && !categoryTwo.equals("")) && 
+								(categoryThree == null || categoryThree.equals(""))){
+							categories = new String[2];
+							categories[0] = categoryOne;
+							categories[1] = categoryTwo;
+						}else if((categoryOne != null && !categoryOne.equals("")) &&
+								(categoryTwo == null || categoryTwo.equals("")) && 
+								(categoryThree == null || categoryThree.equals(""))){
+							categories = new String[1];
+							categories[0] = categoryOne;
+						}
+						
+						if(database.insertPlaceIt(id, title, description, repeatedMinute, numOfWeekRepeat, repeatedDayInWeek,
+								createDate, postDate, latitude, longitude, status, categories)){
+							AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedMinute, 
+									numOfWeekRepeat, repeatedDayInWeek, createDate, postDate, latitude, longitude, status, categories);
+							switch(placeIt.getStatus()){
+							case ON_MAP:
+								onMap.put(placeIt.getId(), placeIt);
+								break;
+							case ACTIVE:
+								prePost.put(placeIt.getId(), placeIt);
+								break;
+							case PULL_DOWN:
+								pulldown.put(placeIt.getId(), placeIt);
+								break;
+							}
+						}
+						
+					}
+					
+					
+					Map<Long, Integer> status = JSONParser.getPlaceItIdStatusMap();
+					for(Entry<Long, Integer> e : status.entrySet()) {
+						
+						if(database.updatePlaceItStatus(e.getKey(), AbstractPlaceIt.Status.genStatus(e.getValue()))){
+							Log.wtf("ID: " + e.getKey() + "change status to ", "" + e.getValue());
+							changeStatus(e.getKey(),AbstractPlaceIt.Status.genStatus(e.getValue()));
+						}
+					}
+					
+					List<Long> delete = JSONParser.getPlaceItIdList();
+					for(long id : delete){
+						Log.wtf("deleting id : ", "" + id);
+						if(database.discard(id)){
+							AbstractPlaceIt pi = onMap.get(id);
+							if(pi == null){
+								pi = prePost.get(id);
+								if(pi == null)
+									pulldown.remove(id);
+								else
+									prePost.remove(id);
+							}else
+								onMap.remove(id);
+						}
+					}
+					
+					preference.edit().putLong(Constant.SP.TIME, JSONParser.getTime()).commit();
+				}
+			}.execute();
+		}
+	};
 
 	public class LocalBinder extends Binder{
 		public MyService getService(){
@@ -330,6 +463,62 @@ public class MyService extends Service {
 		prePost.put(id, pi);
 		return true;
 	}
+	
+	private boolean changeStatus(long id, AbstractPlaceIt.Status status){
+		AbstractPlaceIt pi = onMap.get(id);
+		if(pi != null){
+			switch(status){
+			case ACTIVE:
+				onMap.remove(id);
+				pi.setStatus(status);
+				prePost.put(id, pi);
+				return true;
+			case PULL_DOWN:
+				onMap.remove(id);
+				pi.setStatus(status);
+				pulldown.put(id, pi);
+				return true;
+			default:
+				return false;
+			}
+		}
+		pi = prePost.get(id);
+		if(pi != null){
+			switch(status){
+			case ON_MAP:
+				prePost.remove(id);
+				pi.setStatus(status);
+				onMap.put(id, pi);
+				return true;
+			case PULL_DOWN:
+				prePost.remove(id);
+				pi.setStatus(status);
+				pulldown.put(id, pi);
+				return true;
+			default:
+				return false;
+			}
+		}
+		
+		pi = pulldown.get(id);
+		if(pi != null){
+			switch(status){
+			case ACTIVE:
+				pulldown.remove(id);
+				pi.setStatus(status);
+				prePost.put(id, pi);
+				return true;
+			case ON_MAP:
+				pulldown.remove(id);
+				pi.setStatus(status);
+				onMap.put(id, pi);
+				return true;
+			default:
+				return false;
+			}
+		}
+		return false;
+	}
 
 	// TODO ZOO Get current location
 	private LatLng fetchCurrentLocation() {
@@ -433,6 +622,16 @@ public class MyService extends Service {
 	public String pull(long lastUpdate){
 		try {
 			return ServerUtil.pull(lastUpdate);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public String init(){
+		try {
+			return ServerUtil.init();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

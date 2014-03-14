@@ -1,5 +1,6 @@
 package com.fifteen.placeit;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -22,5 +23,18 @@ public class PlaceItFactory {
 		else
 			pi = new LocationPlaceIt(id, title, description, schedule, status, latitude, longitude);
 		return pi;
+	}
+	
+	public static AbstractPlaceIt createPlaceIt(long id, String title, String description, int repeatedDayInWeek, int repeatedMinute, 
+			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, String createDate, String postDate, double latitude, double longitude,
+			AbstractPlaceIt.Status status, String[] categories){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try{
+			return PlaceItFactory.createPlaceIt(id, title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat,
+					dateFormat.parse(createDate), dateFormat.parse(postDate), latitude, longitude, status, categories);
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

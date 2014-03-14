@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gcm.GCMBaseIntentService;
 import com.google.android.gcm.GCMRegistrar;
@@ -32,7 +33,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
 	@Override
 	protected void onError(Context arg0, String arg1) {
-		
+		Log.wtf("GCM" , "error :" + arg1);
 	}
 
 	@Override
@@ -42,12 +43,13 @@ public class GCMIntentService extends GCMBaseIntentService {
 	}
 
 	@Override
-	protected void onRegistered(Context arg0, String arg1) {
+	protected void onRegistered(Context context, String regId) {
+		Toast.makeText(this, "Registration key :  " + regId, Toast.LENGTH_LONG);
 		
 	}
 
 	@Override
 	protected void onUnregistered(Context arg0, String arg1) {
-		
+		Log.i("ibad", "onUnregistered" + arg1);
 	}
 }

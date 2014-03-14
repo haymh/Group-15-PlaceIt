@@ -116,6 +116,7 @@ public class JSONParser {
 				placeIt.put(Constant.PI.CREATE_DATE, single.getString(Constant.PI.CREATE_DATE));
 				placeIt.put(Constant.PI.POST_DATE, single.getString(Constant.PI.POST_DATE));
 				placeIt.put(Constant.PI.TITLE, single.getString(Constant.PI.TITLE));
+				placeIt.put(Constant.PI.STATUS, single.getString(Constant.PI.STATUS));
 
 				String location = single.optString(Constant.PI.LATITUDE);
 				if( !location.isEmpty() ) {

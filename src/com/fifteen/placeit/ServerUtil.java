@@ -87,7 +87,10 @@ public final class ServerUtil {
 		list.add(new BasicNameValuePair(USER_NAME, username));
 		list.add(new BasicNameValuePair(PASSWORD, password));
 		list.add(new BasicNameValuePair(GCM_ID_KEY, regId));
-		return postExpectStatus(LOGIN_URL, list);
+		String s = postExpectString(LOGIN_URL, list);
+		if(s == null)
+			return NOT_FOUND;
+		return Integer.parseInt(s);
 	}
 
 	//login this account with the server, allow few attempts, return status code 400---fail 200---success 404---not found
@@ -124,7 +127,10 @@ public final class ServerUtil {
 		list.add(new BasicNameValuePair(USER_NAME, username));
 		list.add(new BasicNameValuePair(PASSWORD, password));
 		list.add(new BasicNameValuePair(GCM_ID_KEY, regId));
-		return postExpectStatus(REGISTER_URL, list);
+		String s = postExpectString(LOGIN_URL, list);
+		if(s == null)
+			return NOT_FOUND;
+		return Integer.parseInt(s);
 	}
 
 	//register this account with the server, allow few attempts
@@ -213,25 +219,8 @@ public final class ServerUtil {
 		}
 	}
 
-	
-	private static int postExpectStatus(String url, List<NameValuePair> nameValuePairs){
-		for(NameValuePair a:nameValuePairs){
-			Log.wtf(a.getName(), a.getValue());
-		}
-		HttpPost post = new HttpPost(url);
 
-		try {
-			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-			HttpResponse response = client.execute(post);
-			return response.getStatusLine().getStatusCode();
-		}catch(IOException e){
-			e.printStackTrace();
-			return NOT_FOUND;
-		}
-	}
-
-	private static String postExpectString(String url, List<NameValuePair> nameValuePairs)
-			throws IOException {
+	private static String postExpectString(String url, List<NameValuePair> nameValuePairs){
 		HttpPost post = new HttpPost(url);
 
 		try {
