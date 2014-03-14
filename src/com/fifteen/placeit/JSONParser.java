@@ -108,9 +108,9 @@ public class JSONParser {
 			setupPlaceItIdStatusMap(object.optString("change"));
 			setupPlaceItIdList(object.optString("delete"));
 
-		} catch (Exception e) {
+		}catch (Exception e) {
 			Log.wtf("parsePlaceItServer()", e.toString());
-		}
+		} 
 	}
 
 	// Parses place it list
@@ -144,12 +144,9 @@ public class JSONParser {
 
 			for( int i = 0; i < array.length(); ++i ) {
 				JSONObject single = array.getJSONObject(i);
-				StatusObject status = parser.new StatusObject(single.getLong(Constant.PI.ID), single.getInt("status"));
+				StatusObject status = parser.new StatusObject(single.getLong(Constant.PI.ID), single.getInt(Constant.PI.STATUS));
 				
-				//single.getInt("status")
-				//single.getLong(Constant.PI.ID)
-				
-				//placeItIdStatusList.add();
+				placeItIdStatusList.add(status);
 			}
 		} catch(Exception e) {
 			Log.wtf("setupPlaceItIdStatusMap() ", e.toString());
