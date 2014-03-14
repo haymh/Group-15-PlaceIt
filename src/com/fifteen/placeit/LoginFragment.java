@@ -296,7 +296,7 @@ public class LoginFragment extends DialogFragment {
 	private boolean hasCredentials() {
 		getCredentials();
 
-		if(username != getTextUsername() || password != getTextPassword()) {
+		if(!username.equals(getTextUsername()) || !password.equals(getTextPassword())) {
 			return false;
 		}
 
@@ -322,8 +322,10 @@ public class LoginFragment extends DialogFragment {
 
 		if(hasCredentials()) {
 			// Has localized credentials, access set to true
+			Log.wtf("SET access to be ", " true");
 			access = true;
-		}
+		}else
+			Log.wtf("SET access to be ", " false");
 
 		// Saved to connect to server
 		username = getTextUsername();
@@ -376,6 +378,7 @@ public class LoginFragment extends DialogFragment {
 				case Constant.LOGIN.OK:
 					if(!access){
 						// new user, so delete old data
+						Log.wtf("new user login or register", "here");
 						service.deleteDatabase();
 						service.createDatabase();
 						
