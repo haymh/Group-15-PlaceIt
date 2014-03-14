@@ -99,8 +99,6 @@ public final class ServerUtil {
 		int code = NOT_FOUND; //default not found
 		for(int i = 0; i < MAX_ATTEMPTS; i++){
 			code = login(username, password, regId);
-			if(code == CONFLICT) // conflict, username exists
-				return code;
 			if(code != OK){ // did not succeed
 				try {
 					Thread.sleep(backoff);

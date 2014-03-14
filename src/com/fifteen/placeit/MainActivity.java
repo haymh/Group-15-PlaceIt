@@ -458,15 +458,17 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 
 				@Override
 				protected String doInBackground(Void... arg0) {
-					String data;
+					//String data;
 					
-					data = service.init();
+					//data = service.init();
 					//data = service.pull(preference.getLong(Constant.SP.TIME, 0));
-					return data;
+					//return data;
+					return "";
 				}
 				
 				@Override
 				protected void onPostExecute(String results) {
+					/*
 					JSONParser.parsePlaceItInit(results);
 					
 					Log.wtf("TIME", JSONParser.getTime().toString());
@@ -483,6 +485,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 								info.get(i).get(Constant.PI.LONGITUDE)
 								);
 					}
+					*/
 					
 					/*
 					JSONParser.parsePlaceItServer(results);

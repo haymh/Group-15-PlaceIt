@@ -82,85 +82,7 @@ public class MyService extends Service {
 					
 					// Validity test
 					List<Map<String, String>> create= JSONParser.getPlaceItInfoList();
-					for( Map<String, String> pi : create ) {
-						long id = Long.parseLong(pi.get(Constant.PI.ID));
-						String title = pi.get(Constant.PI.TITLE);
-						String description = pi.get(Constant.PI.DESCRIPTION);
-						if(description == null)
-							description = "";
-						
-						String rdiw = pi.get(Constant.PI.REPEATED_DAY_IN_WEEK);
-						WeeklySchedule.NumOfWeekRepeat repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.ZERO;
-						if(rdiw != null && !rdiw.equals(""))
-							repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.genNumOfWeekRepeat(Integer.parseInt(rdiw));
-						
-						int repeatedMinute = 0;
-						String rm = pi.get(Constant.PI.REPEATED_MINUTE);
-						if(rm != null && !rm.equals(""))
-							repeatedMinute = Integer.parseInt(rm);
-						
-						int numOfWeekRepeat = 0;
-						String nowr = pi.get(Constant.PI.NUM_OF_WEEK_REPEAT);
-						if(nowr != null && !nowr.equals(""))
-							numOfWeekRepeat = Integer.parseInt(nowr);
-						
-						String createDate = pi.get(Constant.PI.CREATE_DATE);
-						String postDate = pi.get(Constant.PI.POST_DATE);
-						
-						double latitude = -91;
-						String lat = pi.get(Constant.PI.LATITUDE);
-						if(lat != null && !lat.equals(""))
-							latitude = Double.parseDouble(lat);
-						double longitude = -181;
-						String lng = pi.get(Constant.PI.LONGITUDE);
-						if(lng != null && !lng.equals(""))
-							longitude = Double.parseDouble(lng);
-						
-						int s = Integer.parseInt(pi.get(Constant.PI.STATUS));
-						AbstractPlaceIt.Status status = AbstractPlaceIt.Status.genStatus(s);
-						
-						String categoryOne = pi.get(Constant.PI.CATEGORY_ONE);
-						String categoryTwo = pi.get(Constant.PI.CATEGORY_TWO);
-						String categoryThree = pi.get(Constant.PI.CATEGORY_THREE);
-						String[] categories = null;
-						if((categoryOne != null && !categoryOne.equals("")) &&
-								(categoryTwo != null && !categoryTwo.equals("")) && 
-								(categoryThree != null && !categoryThree.equals(""))){
-							categories = new String[3];
-							categories[0] = categoryOne;
-							categories[1] = categoryTwo;
-							categories[2] = categoryThree;
-						}else if ((categoryOne != null && !categoryOne.equals("")) &&
-								(categoryTwo != null && !categoryTwo.equals("")) && 
-								(categoryThree == null || categoryThree.equals(""))){
-							categories = new String[2];
-							categories[0] = categoryOne;
-							categories[1] = categoryTwo;
-						}else if((categoryOne != null && !categoryOne.equals("")) &&
-								(categoryTwo == null || categoryTwo.equals("")) && 
-								(categoryThree == null || categoryThree.equals(""))){
-							categories = new String[1];
-							categories[0] = categoryOne;
-						}
-						
-						if(database.insertPlaceIt(id, title, description, repeatedMinute, numOfWeekRepeat, repeatedDayInWeek,
-								createDate, postDate, latitude, longitude, status, categories)){
-							AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedMinute, 
-									numOfWeekRepeat, repeatedDayInWeek, createDate, postDate, latitude, longitude, status, categories);
-							switch(placeIt.getStatus()){
-							case ON_MAP:
-								onMap.put(placeIt.getId(), placeIt);
-								break;
-							case ACTIVE:
-								prePost.put(placeIt.getId(), placeIt);
-								break;
-							case PULL_DOWN:
-								pulldown.put(placeIt.getId(), placeIt);
-								break;
-							}
-						}
-						
-					}
+					createPlaceIt(create);
 					
 					// TODO
 					List<JSONParser.StatusObject> status = JSONParser.getPlaceItIdStatusList();
@@ -341,6 +263,88 @@ public class MyService extends Service {
 			AbstractPlaceIt.Status status, String[] categories){
 		return createPlaceIt(title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat, createDate,
 				postDate, coordinate.latitude, coordinate.longitude, status, categories);
+	}
+	
+	private void createPlaceIt(List<Map<String, String>> create){
+		for( Map<String, String> pi : create ) {
+			long id = Long.parseLong(pi.get(Constant.PI.ID));
+			String title = pi.get(Constant.PI.TITLE);
+			String description = pi.get(Constant.PI.DESCRIPTION);
+			if(description == null)
+				description = "";
+			
+			String rdiw = pi.get(Constant.PI.REPEATED_DAY_IN_WEEK);
+			WeeklySchedule.NumOfWeekRepeat repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.ZERO;
+			if(rdiw != null && !rdiw.equals(""))
+				repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.genNumOfWeekRepeat(Integer.parseInt(rdiw));
+			
+			int repeatedMinute = 0;
+			String rm = pi.get(Constant.PI.REPEATED_MINUTE);
+			if(rm != null && !rm.equals(""))
+				repeatedMinute = Integer.parseInt(rm);
+			
+			int numOfWeekRepeat = 0;
+			String nowr = pi.get(Constant.PI.NUM_OF_WEEK_REPEAT);
+			if(nowr != null && !nowr.equals(""))
+				numOfWeekRepeat = Integer.parseInt(nowr);
+			
+			String createDate = pi.get(Constant.PI.CREATE_DATE);
+			String postDate = pi.get(Constant.PI.POST_DATE);
+			
+			double latitude = -91;
+			String lat = pi.get(Constant.PI.LATITUDE);
+			if(lat != null && !lat.equals(""))
+				latitude = Double.parseDouble(lat);
+			double longitude = -181;
+			String lng = pi.get(Constant.PI.LONGITUDE);
+			if(lng != null && !lng.equals(""))
+				longitude = Double.parseDouble(lng);
+			
+			int s = Integer.parseInt(pi.get(Constant.PI.STATUS));
+			AbstractPlaceIt.Status status = AbstractPlaceIt.Status.genStatus(s);
+			
+			String categoryOne = pi.get(Constant.PI.CATEGORY_ONE);
+			String categoryTwo = pi.get(Constant.PI.CATEGORY_TWO);
+			String categoryThree = pi.get(Constant.PI.CATEGORY_THREE);
+			String[] categories = null;
+			if((categoryOne != null && !categoryOne.equals("")) &&
+					(categoryTwo != null && !categoryTwo.equals("")) && 
+					(categoryThree != null && !categoryThree.equals(""))){
+				categories = new String[3];
+				categories[0] = categoryOne;
+				categories[1] = categoryTwo;
+				categories[2] = categoryThree;
+			}else if ((categoryOne != null && !categoryOne.equals("")) &&
+					(categoryTwo != null && !categoryTwo.equals("")) && 
+					(categoryThree == null || categoryThree.equals(""))){
+				categories = new String[2];
+				categories[0] = categoryOne;
+				categories[1] = categoryTwo;
+			}else if((categoryOne != null && !categoryOne.equals("")) &&
+					(categoryTwo == null || categoryTwo.equals("")) && 
+					(categoryThree == null || categoryThree.equals(""))){
+				categories = new String[1];
+				categories[0] = categoryOne;
+			}
+			
+			if(database.insertPlaceIt(id, title, description, repeatedMinute, numOfWeekRepeat, repeatedDayInWeek,
+					createDate, postDate, latitude, longitude, status, categories)){
+				AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedMinute, 
+						numOfWeekRepeat, repeatedDayInWeek, createDate, postDate, latitude, longitude, status, categories);
+				switch(placeIt.getStatus()){
+				case ON_MAP:
+					onMap.put(placeIt.getId(), placeIt);
+					break;
+				case ACTIVE:
+					prePost.put(placeIt.getId(), placeIt);
+					break;
+				case PULL_DOWN:
+					pulldown.put(placeIt.getId(), placeIt);
+					break;
+				}
+			}
+			
+		}
 	}
 
 
@@ -619,13 +623,37 @@ public class MyService extends Service {
 		}
 	}
 	
-	public String init(){
-		try {
-			return ServerUtil.init();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	public void init(){
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... arg0) {
+				String s = null;
+				try {
+					s = ServerUtil.init();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return null ;
+				}
+				if(s == null || s.isEmpty())
+					return null;
+				JSONParser.parsePlaceItInit(s);
+				List<Map<String, String>> info = JSONParser.getPlaceItInitList();
+				createPlaceIt(info);
+				return null;
+			}
+		}.execute();
+	}
+	
+	public void deleteDatabase(){
+		database.dropTable();
+		onMap.clear();
+		prePost.clear();
+		pulldown.clear();
+	}
+	
+	public void createDatabase(){
+		database.createTable();
 	}
 }
