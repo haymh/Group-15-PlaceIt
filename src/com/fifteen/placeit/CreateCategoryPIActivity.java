@@ -1,5 +1,7 @@
 package com.fifteen.placeit;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Vector;
@@ -18,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +28,8 @@ import android.widget.Toast;
 
 public class CreateCategoryPIActivity extends Activity{
 
+	private String title;
+	private String description;
 	private Button cancel = null;
 	private Button create = null;
 	private Vector<String> vector=new Vector<String>();
@@ -47,7 +52,8 @@ public class CreateCategoryPIActivity extends Activity{
 
 	private Date createDate = new Date();
 	private Date postDate = new Date();
-	private NumOfWeekRepeat numOfWeekRepea;
+	private EditText editTitle;
+	private EditText editDescription;
 	// temp
 	static private String[] catArray = new String[3];
 
@@ -67,9 +73,8 @@ public class CreateCategoryPIActivity extends Activity{
 		listview.setAdapter(adapter);
 		listview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
-
-
-
+		editTitle = (EditText)findViewById(R.id.editTitle);
+		editDescription = (EditText)findViewById(R.id.editDescription);
 		// create button
 		create = (Button)findViewById(R.id.buttonCreate);
 		create.setOnClickListener(new createListener());
@@ -146,14 +151,38 @@ public class CreateCategoryPIActivity extends Activity{
 				}
 				Collections.sort(vector);
 				vector.copyInto(catArray);			
-
-				create(v);
+				
+				if(validate())
+				{
+					create(v);
+				}
 			}
 
 		}	
 
 	}
 
+	public boolean validate()
+	{
+		title = editTitle.getText().toString();
+		description = editDescription.getText().toString();
+		if(title.equals("") && description.equals("")){
+			Toast.makeText(this, "Title and Description can not both be empty", Toast.LENGTH_SHORT).show();
+			editTitle.requestFocus();
+			return false;
+		}
+		if(title.equals("") && !description.equals("")){
+			String s[] = description.split(" |\n");
+			if(s.length <= 3)
+				title = description;
+			else{
+				for(int i = 0; i < 3; i++)
+					title += (s[i] + " ");
+			}
+			Log.wtf("heng decription","<" + description + ">");
+		}
+		return true;
+	}
 	// FIXME Working on this
 	public void create(View view){
 		
@@ -178,7 +207,7 @@ public class CreateCategoryPIActivity extends Activity{
 			@Override
 			protected Boolean doInBackground(Void... params) {
 				// TODO Auto-generated method stub
-				return service.createPlaceIt(cat[index], "Testing Categories", 0, 0, 
+				return service.createPlaceIt(title, description, 0, 0, 
 				WeeklySchedule.NumOfWeekRepeat.ZERO, createDate, postDate, new LatLng(0,0), AbstractPlaceIt.Status.ON_MAP, catArray );
 			}
 			
