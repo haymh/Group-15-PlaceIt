@@ -404,6 +404,7 @@ public class LoginFragment extends DialogFragment {
 				}
 
 				if(access) {
+					((MainActivity)getActivity()).allowAccess();
 					dismiss();
 				}
 			}

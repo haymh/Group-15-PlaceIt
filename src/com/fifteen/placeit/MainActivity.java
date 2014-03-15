@@ -82,6 +82,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		
 	// Login 
 	private DialogFragment loginDialog;
+	private boolean access = false;
 	
 	private MenuItem menuSearch;
 	
@@ -91,14 +92,12 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
 
 		// Receives broadcast from service
+		// Redraw map
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Bundle bundle = intent.getParcelableExtra("bundle");
-			long placeItId = bundle.getLong("id");
-			LatLng placeItLocation = bundle.getParcelable("position");
-
-			fillMapWithPlaceIts();
-			//putMarkerOnMap(placeItId, placeItLocation);
+			if(service != null) {
+				fillMapWithPlaceIts();
+			}
 		}
 	};
 
@@ -346,6 +345,10 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	// Fill the map with placeits
 	// Only gets called when service is successfully bound
 	private void fillMapWithPlaceIts() {
+		if(!access) {
+			return;
+		}
+		
 		ArrayList<AbstractPlaceIt> list = new ArrayList<AbstractPlaceIt>( service.getOnMapList() );
 
 		// Refreshes the map with new data
@@ -533,7 +536,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		Toast.makeText(this, mapClickMessage, Toast.LENGTH_SHORT).show();
 	}
 	
-	
 //LOGIN ALERT FRAGMENT DEFINITION
 	 void showDialog() {
 	    loginDialog = LoginFragment.newInstance(regId);
@@ -568,5 +570,11 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		View view = findViewById(android.R.id.content);
 		InputMethodManager input = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
 		input.hideSoftInputFromWindow(view.getWindowToken(),0);
+	}
+	
+	// Allow access to the user
+	public void allowAccess() {
+		access = true;
+		fillMapWithPlaceIts();
 	}
 }
