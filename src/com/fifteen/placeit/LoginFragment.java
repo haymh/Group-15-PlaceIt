@@ -325,6 +325,7 @@ public class LoginFragment extends DialogFragment {
 			Log.wtf("SET access to be ", " true");
 			access = true;
 		}else
+			access = false;
 			Log.wtf("SET access to be ", " false");
 
 		// Saved to connect to server
