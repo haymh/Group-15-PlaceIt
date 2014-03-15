@@ -56,9 +56,7 @@ public class JSONParser {
 			JSONObject object = new JSONObject(data);
 			JSONArray array = new JSONArray(object.getString("results"));
 			setupPlacesAPIMap(array);
-		} catch (Exception e) {
-			Log.wtf(tag, "parsePlacesAPI()\n" + e.toString());
-		}
+		} catch (Exception e) {}
 	}
 
 	// Set ups places access map
@@ -75,9 +73,7 @@ public class JSONParser {
 				for(int t = 0; t < types.length(); ++t) {
 					placesAPIMap.put(types.getString(t), address);
 				}
-			} catch (JSONException e) {
-				Log.wtf(tag, "setupPlacesAPIMap()\n" + e.toString());
-			}
+			} catch (JSONException e) {}
 		}
 	}
 
@@ -108,9 +104,7 @@ public class JSONParser {
 			setupPlaceItIdStatusMap(object.optString("change"));
 			setupPlaceItIdList(object.optString("delete"));
 
-		}catch (Exception e) {
-			Log.wtf("parsePlaceItServer()", e.toString());
-		} 
+		}catch (JSONException e) {}
 	}
 
 	// Parses place it list
@@ -148,9 +142,7 @@ public class JSONParser {
 				
 				placeItIdStatusList.add(status);
 			}
-		} catch(Exception e) {
-			Log.wtf("setupPlaceItIdStatusMap() ", e.toString());
-		}
+		} catch(Exception e) {}
 	}
 
 	// Parses id list
@@ -162,9 +154,7 @@ public class JSONParser {
 				JSONObject single = ids.getJSONObject(i);	
 				placeItIdList.add(single.getLong(Constant.PI.ID));
 			}
-		} catch(Exception e) {
-			Log.wtf("setupPlaceItIdList()", e.toString());
-		}
+		} catch(Exception e) {}
 	}
 
 	// Pass place it info map (list of place its)
@@ -205,9 +195,8 @@ public class JSONParser {
 			}
 
 			setupPlaceItInitList(object.getString("data"));
-		} catch (Exception e) {
-			Log.wtf("parsePlaceItInit()", e.toString());
-		}
+		} catch (JSONException e) {}
+
 	}
 
 	// Parses place it init list
@@ -217,7 +206,6 @@ public class JSONParser {
 		try {
 			array = new JSONArray(data);
 		}catch(JSONException e) {
-			Log.wtf("setupPlaceItInitList()", "Bad O string " + e.toString());
 			return;
 		}
 
@@ -228,9 +216,7 @@ public class JSONParser {
 				if(temp != null) {
 					placeItInitList.add(temp);
 				}
-			}catch(JSONException e) {
-				Log.wtf("setupPlaceItInitList()", "Bad data " + e.toString());
-			}
+			}catch(JSONException e) {}
 		}
 	}
 	
