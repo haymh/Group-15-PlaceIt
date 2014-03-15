@@ -8,10 +8,15 @@ import com.google.android.gms.maps.model.LatLng;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -66,7 +71,6 @@ public class PlaceItDetailActivity extends ListActivity {
 			protected void onPostExecute(Integer result) {
 				if( !listIsFilled ) {
 					fillDetailPage();
-					setUpOmniButton();
 					listIsFilled = true;
 				}
 			}
@@ -86,19 +90,47 @@ public class PlaceItDetailActivity extends ListActivity {
 		super.onDestroy();
 	}
 	
-//UI SETTERS AND SUPPORT
-	
+//UI SETTERS AND SUPPORT	
 	// Fills detail page, use DetailContent to format
 	// Calls service to obtain Place It referenced by ID from MainActivity
 	private void fillDetailPage() {
 		placeIt = service.findPlaceIt(placeItId);
-
 		
-		list = new ArrayList<DetailContent>(new DetailContentFormatter(placeIt).getDetailsArray());
-		
-		setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
+		if( placeIt == null ) {
+			popup("TOO LATE!", "Place-It exists no more!");
+		}
+		else {
+			list = new ArrayList<DetailContent>(new DetailContentFormatter(placeIt).getDetailsArray());
+			setListAdapter(new Adapter(PlaceItDetailActivity.this, R.layout.detail_list_object, list));
+			setUpOmniButton();
+		}
 	}
 	
+	// Sets up error popup whenever the notification is too old for access
+	private void popup(String title, String message) {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		alert.setTitle(title);
+		
+		TextView text = new TextView(this);
+		
+		SpannableString span =  new SpannableString(message);
+        span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  	
+		
+		text.setGravity(Gravity.CENTER_VERTICAL);
+		text.setText(span);
+		//text.setTextSize(new RelativeSizeSpan(Constant.F.POPUP_SIZE));
+		
+		alert.setView(text);
+		
+		//alert.setMessage(message);
+		alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+		alert.show();
+	}
 
 //BUTTON HANDLERS 
 	

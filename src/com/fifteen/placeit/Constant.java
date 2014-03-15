@@ -19,6 +19,12 @@ public final class Constant {
 		}
 	}
 	
+	// String format 
+	public static class F {
+		public static final float POPUP_SIZE = (float) 1.3;
+	}
+	
+	// Login systems
 	public static class LOGIN {
 		public static final String TITLE = "Fifteen Place-It";
 		public static final boolean LOGIN = true;

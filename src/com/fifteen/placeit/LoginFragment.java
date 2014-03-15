@@ -394,6 +394,7 @@ public class LoginFragment extends DialogFragment {
 					break;
 				case Constant.LOGIN.CONFLICT:
 					popup("USERNAME EXISTS", "I'd get a better name if I were you.");
+					access = false;
 					break;
 				case Constant.LOGIN.NOT_FOUND:
 					popup("JUST KIDDING", "Can't find you!");

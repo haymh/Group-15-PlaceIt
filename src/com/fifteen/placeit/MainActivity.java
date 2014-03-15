@@ -2,7 +2,6 @@ package com.fifteen.placeit;
 
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,9 +33,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -44,14 +41,11 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
@@ -88,7 +82,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		
 	// Login 
 	private DialogFragment loginDialog;
-	private boolean loginType;
 	
 	private MenuItem menuSearch;
 	
@@ -104,7 +97,8 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 			long placeItId = bundle.getLong("id");
 			LatLng placeItLocation = bundle.getParcelable("position");
 
-			putMarkerOnMap(placeItId, placeItLocation);
+			fillMapWithPlaceIts();
+			//putMarkerOnMap(placeItId, placeItLocation);
 		}
 	};
 
@@ -207,9 +201,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
             // Automatically registers application on startup.
             GCMRegistrar.register(this, Constant.GCM.SENDER_ID);
         }
-		
-		loginType = Constant.LOGIN.LOGIN;
-		
 		showDialog();
 	}
 
