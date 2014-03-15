@@ -334,12 +334,12 @@ public class LoginFragment extends DialogFragment {
 		
 		String title, message;
 		if(loginOrRegister == Constant.LOGIN.LOGIN) {
-			title = "LOGIN IN";
-			message = "Hooking you up!";
+			title = "LOGGING IN";
+			message = "I got you, buddy!";
 		}
 		else {
 			title = "REGISTERING";
-			message = "I got you, buddy!";
+			message = "Hooking you up!";
 		}
 		
 		SpannableString span =  new SpannableString(message);
@@ -400,6 +400,8 @@ public class LoginFragment extends DialogFragment {
 					popup("JUST KIDDING", "Can't find you!");
 					break;
 				case Constant.LOGIN.FAIL:
+					popup("JUST KIDDING", "Must be a type in there!");
+					break;
 				default:
 					popup("JUST KIDDING", "Server down, sorry!");
 				}
@@ -417,19 +419,18 @@ public class LoginFragment extends DialogFragment {
 		AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
 		alert.setTitle(title);
 		
-		TextView text = new TextView(getActivity());
-		
 		SpannableString span =  new SpannableString(message);
-        span.setSpan(new RelativeSizeSpan(FONT_SIZE), 0, span.length(), 0);  	
+		span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  	
 		
-		text.setGravity(Gravity.CENTER_VERTICAL);
-		text.setText(span);
-		
-		alert.setView(text);
+		alert.setMessage(span);
 		
 		//alert.setMessage(message);
 		alert.setPositiveButton("OK", null);
-		alert.show();
+		
+		AlertDialog dialog = alert.show();
+		TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+		messageText.setGravity(Gravity.CENTER_VERTICAL);
+		dialog.show();
 	}
 	
 	// LOGIN OR REGISTER? 

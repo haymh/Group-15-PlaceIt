@@ -111,16 +111,9 @@ public class PlaceItDetailActivity extends ListActivity {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 		alert.setTitle(title);
 		
-		TextView text = new TextView(this);
-		
 		SpannableString span =  new SpannableString(message);
         span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  	
-		
-		text.setGravity(Gravity.CENTER_VERTICAL);
-		text.setText(span);
-		//text.setTextSize(new RelativeSizeSpan(Constant.F.POPUP_SIZE));
-		
-		alert.setView(text);
+		alert.setMessage(message);
 		
 		//alert.setMessage(message);
 		alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -129,7 +122,11 @@ public class PlaceItDetailActivity extends ListActivity {
 				finish();
 			}
 		});
-		alert.show();
+		
+		AlertDialog dialog = alert.show();
+		TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+		messageText.setGravity(Gravity.CENTER_VERTICAL);
+		dialog.show();
 	}
 
 //BUTTON HANDLERS 
