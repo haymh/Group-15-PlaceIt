@@ -126,15 +126,11 @@ public class MyService extends Service {
 	private class NotifyPostThread extends Thread{
 		public void run(){
 			while(!stop){
+				Log.wtf("is this running ", "yes");
 				Iterator<AbstractPlaceIt> i = prePost.values().iterator();
 				Log.wtf("checking which should be posted","here");
 				while(i.hasNext()){
 					AbstractPlaceIt pi = i.next();
-					Log.wtf("prepost list is not empty","here");
-					if(stop)
-						Log.wtf("did thread stop?", " yes !");
-					else
-						Log.wtf("did thread stop?", " no !");
 					try {
 						if(pi.getSchedule().postNowOrNot()){
 							Log.wtf("Post","yes");
@@ -161,20 +157,12 @@ public class MyService extends Service {
 							sendBroadcast(in);
 						}
 					} catch (ContradictoryScheduleException e) {
-						Log.wtf("Notify Thread", " I catch something");
-						e.printStackTrace();
+						Log.wtf("Exception", e.getMessage());
+						//e.printStackTrace();
 					}
 				}
 				try {
-					if(stop)
-						Log.wtf("did thread stop?", " yes !");
-					else
-						Log.wtf("did thread stop?", " no !");
 					sleep(POST_TIME_LAG);
-					if(stop)
-						Log.wtf("did thread stop?", " yes !");
-					else
-						Log.wtf("did thread stop?", " no !");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -298,19 +286,19 @@ public class MyService extends Service {
 				description = "";
 			
 			String rdiw = pi.get(Constant.PI.REPEATED_DAY_IN_WEEK);
-			WeeklySchedule.NumOfWeekRepeat repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.ZERO;
+			int repeatedDayInWeek = 0;
 			if(rdiw != null && !rdiw.equals(""))
-				repeatedDayInWeek = WeeklySchedule.NumOfWeekRepeat.genNumOfWeekRepeat(Integer.parseInt(rdiw));
+				repeatedDayInWeek = Integer.parseInt(rdiw);	
 			
 			int repeatedMinute = 0;
 			String rm = pi.get(Constant.PI.REPEATED_MINUTE);
 			if(rm != null && !rm.equals(""))
 				repeatedMinute = Integer.parseInt(rm);
 			
-			int numOfWeekRepeat = 0;
+			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.ZERO;
 			String nowr = pi.get(Constant.PI.NUM_OF_WEEK_REPEAT);
 			if(nowr != null && !nowr.equals(""))
-				numOfWeekRepeat = Integer.parseInt(nowr);
+				numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.genNumOfWeekRepeat(Integer.parseInt(nowr));
 			
 			String createDate = pi.get(Constant.PI.CREATE_DATE);
 			String postDate = pi.get(Constant.PI.POST_DATE);
@@ -351,10 +339,10 @@ public class MyService extends Service {
 				categories[0] = categoryOne;
 			}
 			
-			if(database.insertPlaceIt(id, title, description, repeatedMinute, numOfWeekRepeat, repeatedDayInWeek,
+			if(database.insertPlaceIt(id, title, description, repeatedMinute, repeatedDayInWeek, numOfWeekRepeat,
 					createDate, postDate, latitude, longitude, status, categories)){
-				AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedMinute, 
-						numOfWeekRepeat, repeatedDayInWeek, createDate, postDate, latitude, longitude, status, categories);
+				AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedMinute, repeatedDayInWeek, 
+						numOfWeekRepeat, createDate, postDate, latitude, longitude, status, categories);
 				switch(placeIt.getStatus()){
 				case ON_MAP:
 					onMap.put(placeIt.getId(), placeIt);

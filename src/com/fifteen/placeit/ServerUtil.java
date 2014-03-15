@@ -100,15 +100,9 @@ public final class ServerUtil {
 		for(int i = 0; i < MAX_ATTEMPTS; i++){
 			code = login(username, password, regId);
 			if(code != OK){ // did not succeed
-				try {
-					Thread.sleep(backoff);
-				} catch (InterruptedException e1) {
-					Thread.currentThread().interrupt();
-					return code;
-				}
+				continue;
 			}else
 				return code;
-			backoff *= 2;
 		}
 		return code;
 	}
@@ -140,15 +134,9 @@ public final class ServerUtil {
 			if(code == CONFLICT) // conflict, username exists
 				return code;
 			if(code != OK){ // did not succeed
-				try {
-					Thread.sleep(backoff);
-				} catch (InterruptedException e1) {
-					Thread.currentThread().interrupt();
-					return code;
-				}
+				continue;
 			}else
 				return code;
-			backoff *= 2;
 		}
 		return code;
 	}
