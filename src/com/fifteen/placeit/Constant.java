@@ -97,5 +97,9 @@ public final class Constant {
 	     * Google API project id registered to use GCM.
 	     */
 	    public static final String SENDER_ID = "592230020068";
+	    public static final String PROPERTY_REG_ID = "PROPERTY_REG_ID";
+	    
 	}
+	
+	public static final String PROPERTY_APP_VERSION = "PROPERTY_APP_VERSION";
 }

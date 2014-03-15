@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DatabaseAccessor {
 
@@ -54,7 +55,7 @@ public class DatabaseAccessor {
 				allColumns, where, null, null, null, null);
 		int count = cursor.getCount();
 		cursor.moveToFirst();
-		Map<Long, AbstractPlaceIt> map = new HashMap<Long, AbstractPlaceIt>();
+		Map<Long, AbstractPlaceIt> map = new ConcurrentHashMap<Long, AbstractPlaceIt>();
 		for(int i = 0; i < count; i++){
 			AbstractPlaceIt pi = cursorToPlaceIt(cursor);
 			map.put(pi.getId(), pi);

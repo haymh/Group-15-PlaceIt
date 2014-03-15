@@ -38,7 +38,7 @@ import java.util.*;
 // Handlers everything, every activity has to go through this
 public class MyService extends Service {
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
-	
+
 	private final static double RANGE = 0.8;
 	private final static long POST_TIME_LAG = 20000;
 	private final IBinder mBinder = new LocalBinder();
@@ -48,13 +48,13 @@ public class MyService extends Service {
 	private Map<Long, AbstractPlaceIt> pulldown;
 	private Map<Long, AbstractPlaceIt> onMap;
 	private Map<Long, AbstractPlaceIt> prePost;
-	private NotifyPostThread nThread;
 	private int counter = 0; // id for notification
+	private Timer timer;
 
 	// TODO ZOO Location variables
 	private SharedPreferences preference;
 	private RequestPlacesAPI requestPlacesAPI;
-	
+
 	private BroadcastReceiver receiver = new BroadcastReceiver(){
 
 		// Receives broadcast from intent service
@@ -63,56 +63,61 @@ public class MyService extends Service {
 
 			//TODO: get data from database
 			Log.wtf("Service", "I got something from gcm");
-			new AsyncTask<Void, Void, String>() {
+			if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+				new AsyncTask<Void, Void, String>() {
 
-				@Override
-				protected String doInBackground(Void... arg0) {
-					String data;
-					
-					data = pull(preference.getLong(Constant.SP.TIME, 0));
-					return data;
-				}
-				
-				@Override
-				protected void onPostExecute(String results) {
-					
-					JSONParser.parsePlaceItServer(results);
-					
-					Log.wtf("TIME", JSONParser.getTime().toString());
-					
-					// Validity test
-					List<Map<String, String>> create= JSONParser.getPlaceItInfoList();
-					createPlaceIt(create);
-					
-					// TODO
-					List<JSONParser.StatusObject> status = JSONParser.getPlaceItIdStatusList();
-					for(JSONParser.StatusObject e : status) {
-						
-						if(database.updatePlaceItStatus(e.id, AbstractPlaceIt.Status.genStatus(e.status))){
-							Log.wtf("ID: " + e.id + "change status to ", "" + e.status);
-							changeStatus(e.id,AbstractPlaceIt.Status.genStatus(e.status));
-						}
+					@Override
+					protected String doInBackground(Void... arg0) {
+						String data;
+
+						data = pull(preference.getLong(Constant.SP.TIME, 0));
+						return data;
 					}
-					
-					List<Long> delete = JSONParser.getPlaceItIdList();
-					for(long id : delete){
-						Log.wtf("deleting id : ", "" + id);
-						if(database.discard(id)){
-							AbstractPlaceIt pi = onMap.get(id);
-							if(pi == null){
-								pi = prePost.get(id);
-								if(pi == null)
-									pulldown.remove(id);
-								else
-									prePost.remove(id);
-							}else
-								onMap.remove(id);
+
+					@Override
+					protected void onPostExecute(String results) {
+
+						JSONParser.parsePlaceItServer(results);
+
+						Log.wtf("TIME", JSONParser.getTime().toString());
+
+						// Validity test
+						List<Map<String, String>> create= JSONParser.getPlaceItInfoList();
+						createPlaceIt(create);
+
+						// TODO
+						List<JSONParser.StatusObject> status = JSONParser.getPlaceItIdStatusList();
+						for(JSONParser.StatusObject e : status) {
+
+							if(database.updatePlaceItStatus(e.id, AbstractPlaceIt.Status.genStatus(e.status))){
+								Log.wtf("ID: " + e.id + "change status to ", "" + e.status);
+								changeStatus(e.id,AbstractPlaceIt.Status.genStatus(e.status));
+							}
 						}
+
+						List<Long> delete = JSONParser.getPlaceItIdList();
+						for(long id : delete){
+							Log.wtf("deleting id : ", "" + id);
+							if(database.discard(id)){
+								AbstractPlaceIt pi = onMap.get(id);
+								if(pi == null){
+									pi = prePost.get(id);
+									if(pi == null)
+										pulldown.remove(id);
+									else
+										prePost.remove(id);
+								}else
+									onMap.remove(id);
+							}
+						}
+
+						preference.edit().putLong(Constant.SP.TIME, JSONParser.getTime()).commit();
+						//inform Main to redraw
+						Intent in = new Intent(NOTIFICATION);
+						sendBroadcast(in);
 					}
-					
-					preference.edit().putLong(Constant.SP.TIME, JSONParser.getTime()).commit();
-				}
-			}.execute();
+				}.execute();
+			}
 		}
 	};
 
@@ -123,53 +128,41 @@ public class MyService extends Service {
 	}
 
 	// a thread to check Place-it schedule and put them up, also check if there is any nearby place-it and notify user 
-	private class NotifyPostThread extends Thread{
+	private class PostTimer extends TimerTask{
 		public void run(){
-			while(!stop){
-				Log.wtf("is this running ", "yes");
-				Iterator<AbstractPlaceIt> i = prePost.values().iterator();
-				Log.wtf("checking which should be posted","here");
-				while(i.hasNext()){
-					Log.wtf("inside Thread", "checking prePost list");
-					AbstractPlaceIt pi = i.next();
-					try {
-						if(pi.getSchedule().postNowOrNot()){
-							Log.wtf("Post","yes");
-							if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-								TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP);
-								if(ts == null)
-									continue ;
-								if(ts.status != ServerUtil.OK)
-									continue ;
-								preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
-							}
-							i.remove();
-							database.onMap(pi.getId());
-							pi.status = AbstractPlaceIt.Status.ON_MAP;
-							onMap.put(pi.getId(), pi);
-							LatLng coordinate = pi.getCoordinate();
-							if(coordinate == null)
-								continue;
-							Bundle send = new Bundle();
-							send.putParcelable("position", coordinate);
-							send.putLong("id", pi.getId());
-							Intent in = new Intent(NOTIFICATION);
-							in.putExtra("bundle", send);
-							sendBroadcast(in);
-						}
-					} catch (ContradictoryScheduleException e) {
-						Log.wtf("Exception " + pi.getTitle(), e.getMessage());
-						//e.printStackTrace();
-					}
-				}
+			Log.wtf("is this running ", "yes");
+			Iterator<AbstractPlaceIt> i = prePost.values().iterator();
+			Log.wtf("checking which should be posted","here");
+			while(i.hasNext()){
+				Log.wtf("inside Thread", "checking prePost list");
+				AbstractPlaceIt pi = i.next();
 				try {
-					sleep(POST_TIME_LAG);
-				} catch (InterruptedException e) {
-					Log.wtf("Thread", e.toString());
-					e.printStackTrace();
+					if(pi.getSchedule().postNowOrNot()){
+						Log.wtf("Post","yes");
+						if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+							TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP);
+							if(ts == null)
+								continue ;
+							if(ts.status != ServerUtil.OK)
+								continue ;
+							preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
+						}
+						i.remove();
+						database.onMap(pi.getId());
+						pi.status = AbstractPlaceIt.Status.ON_MAP;
+						onMap.put(pi.getId(), pi);
+						LatLng coordinate = pi.getCoordinate();
+						if(coordinate == null)
+							continue;
+						
+						//inform Main to redraw
+						Intent in = new Intent(NOTIFICATION);
+						sendBroadcast(in);
+					}
+				} catch (ContradictoryScheduleException e) {
+					Log.wtf("Exception " + pi.getTitle(), e.getMessage());
+					//e.printStackTrace();
 				}
-				
-
 			}
 		}
 	}
@@ -186,8 +179,10 @@ public class MyService extends Service {
 		pulldown = database.pulldownPlaceIt();
 		onMap = database.onMapPlaceIt();
 		prePost = database.prepostPlaceIt();
+		
+		timer = new Timer();
 		// launch the thread
-		new NotifyPostThread().start(); 
+		timer.scheduleAtFixedRate(new PostTimer(), 0, POST_TIME_LAG);
 		// XXX Get universal data
 		preference = getSharedPreferences(Constant.SP.SAVE, Context.MODE_PRIVATE);
 
@@ -225,7 +220,7 @@ public class MyService extends Service {
 	public IBinder onBind(Intent intent) {
 		return mBinder;
 	}
-	
+
 
 	//create a place-it, return a boolean value indicates if it's successful
 	public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
@@ -241,7 +236,7 @@ public class MyService extends Service {
 			if(ts == null)
 				return false;
 			if(ts.status != ServerUtil.OK){
-				
+
 				Log.wtf("create status", "" + ts.status);
 				database.discard(pi.getId());
 				return false;
@@ -254,15 +249,9 @@ public class MyService extends Service {
 		//active.put(pi.getId(), pi);
 		if(pi.getStatus() == AbstractPlaceIt.Status.ON_MAP){
 			onMap.put(pi.getId(),pi);
-			LatLng coordinate = pi.getCoordinate();
-			if(coordinate != null){
-				Bundle send = new Bundle();
-				send.putParcelable("position", coordinate);
-				send.putLong("id", pi.getId());
-				Intent in = new Intent(NOTIFICATION);
-				in.putExtra("bundle", send);
-				sendBroadcast(in);
-			}
+			//inform Main to redraw
+			Intent in = new Intent(NOTIFICATION);
+			sendBroadcast(in);
 		}else if(pi.getStatus() == AbstractPlaceIt.Status.ACTIVE){
 			prePost.put(pi.getId(), pi);
 		}else if(pi.getStatus() == AbstractPlaceIt.Status.PULL_DOWN){
@@ -278,7 +267,7 @@ public class MyService extends Service {
 		return createPlaceIt(title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat, createDate,
 				postDate, coordinate.latitude, coordinate.longitude, status, categories);
 	}
-	
+
 	private void createPlaceIt(List<Map<String, String>> create){
 		for( Map<String, String> pi : create ) {
 			long id = Long.parseLong(pi.get(Constant.PI.ID));
@@ -286,25 +275,25 @@ public class MyService extends Service {
 			String description = pi.get(Constant.PI.DESCRIPTION);
 			if(description == null)
 				description = "";
-			
+
 			String rdiw = pi.get(Constant.PI.REPEATED_DAY_IN_WEEK);
 			int repeatedDayInWeek = 0;
 			if(rdiw != null && !rdiw.equals(""))
 				repeatedDayInWeek = Integer.parseInt(rdiw);	
-			
+
 			int repeatedMinute = 0;
 			String rm = pi.get(Constant.PI.REPEATED_MINUTE);
 			if(rm != null && !rm.equals(""))
 				repeatedMinute = Integer.parseInt(rm);
-			
+
 			WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.ZERO;
 			String nowr = pi.get(Constant.PI.NUM_OF_WEEK_REPEAT);
 			if(nowr != null && !nowr.equals(""))
 				numOfWeekRepeat = WeeklySchedule.NumOfWeekRepeat.genNumOfWeekRepeat(Integer.parseInt(nowr));
-			
+
 			String createDate = pi.get(Constant.PI.CREATE_DATE);
 			String postDate = pi.get(Constant.PI.POST_DATE);
-			
+
 			double latitude = -91;
 			String lat = pi.get(Constant.PI.LATITUDE);
 			if(lat != null && !lat.equals(""))
@@ -313,10 +302,10 @@ public class MyService extends Service {
 			String lng = pi.get(Constant.PI.LONGITUDE);
 			if(lng != null && !lng.equals(""))
 				longitude = Double.parseDouble(lng);
-			
+
 			int s = Integer.parseInt(pi.get(Constant.PI.STATUS));
 			AbstractPlaceIt.Status status = AbstractPlaceIt.Status.genStatus(s);
-			
+
 			String categoryOne = pi.get(Constant.PI.CATEGORY_ONE);
 			String categoryTwo = pi.get(Constant.PI.CATEGORY_TWO);
 			String categoryThree = pi.get(Constant.PI.CATEGORY_THREE);
@@ -340,14 +329,14 @@ public class MyService extends Service {
 				categories = new String[1];
 				categories[0] = categoryOne;
 			}
-			
+
 			if(database.insertPlaceIt(id, title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat,
 					createDate, postDate, latitude, longitude, status, categories)){
-				
-				
+
+
 				AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedDayInWeek, repeatedMinute, 
 						numOfWeekRepeat, createDate, postDate, latitude, longitude, status, categories);
-				
+
 				switch(placeIt.getStatus()){
 				case ON_MAP:
 					onMap.put(placeIt.getId(), placeIt);
@@ -360,7 +349,7 @@ public class MyService extends Service {
 					break;
 				}
 			}
-			
+
 		}
 	}
 
@@ -413,6 +402,9 @@ public class MyService extends Service {
 				pi = prePost.remove(id);
 			}else{
 				onMap.remove(id);	
+				//inform Main to redraw
+				Intent in = new Intent(NOTIFICATION);
+				sendBroadcast(in);
 			}		
 			pi.setStatus(AbstractPlaceIt.Status.PULL_DOWN);
 			pulldown.put(id, pi);
@@ -442,8 +434,12 @@ public class MyService extends Service {
 					pulldown.remove(id);
 				else
 					prePost.remove(id);
-			}else
+			}else{
 				onMap.remove(id);
+				//inform Main to redraw
+				Intent in = new Intent(NOTIFICATION);
+				sendBroadcast(in);
+			}
 		}
 		return success;
 	}
@@ -483,7 +479,7 @@ public class MyService extends Service {
 		prePost.put(id, pi);
 		return true;
 	}
-	
+
 	private boolean changeStatus(long id, AbstractPlaceIt.Status status){
 		AbstractPlaceIt pi = onMap.get(id);
 		if(pi != null){
@@ -519,7 +515,7 @@ public class MyService extends Service {
 				return false;
 			}
 		}
-		
+
 		pi = pulldown.get(id);
 		if(pi != null){
 			switch(status){
@@ -568,7 +564,7 @@ public class MyService extends Service {
 						}
 						preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 					}
-					
+
 					onMapIterator.remove();
 					database.active(pi.getId());
 					prePost.put(pi.getId(), pi);
@@ -583,7 +579,7 @@ public class MyService extends Service {
 						}
 						preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
 					}
-					
+
 
 					onMapIterator.remove();
 					database.pullDown(pi.getId());
@@ -593,6 +589,9 @@ public class MyService extends Service {
 				// category and location placeit have different notification
 				// when category gets triggered, pull down all category place it has the same category
 				// so, pull down by category in database, database accessor return me list of pulled down categories ids
+				//inform Main to redraw
+				Intent in = new Intent(NOTIFICATION);
+				sendBroadcast(in);
 			}			
 		}
 	}
@@ -627,9 +626,9 @@ public class MyService extends Service {
 	public int register(String username, String password, String regId){
 		return ServerUtil.registerWithMultipleAttempt(username, password, regId);
 	}
-	
+
 	// pull latest data from server
-	
+
 	public String pull(long lastUpdate){
 		try {
 			return ServerUtil.pull(lastUpdate);
@@ -639,7 +638,7 @@ public class MyService extends Service {
 			return null;
 		}
 	}
-	
+
 	public void init(){
 		new AsyncTask<Void, Void, Void>() {
 
@@ -661,16 +660,16 @@ public class MyService extends Service {
 				return null;
 			}
 		}.execute();
-		
+
 	}
-	
+
 	public void deleteDatabase(){
 		database.dropTable();
 		onMap.clear();
 		prePost.clear();
 		pulldown.clear();
 	}
-	
+
 	public void createDatabase(){
 		database.createTable();
 	}
