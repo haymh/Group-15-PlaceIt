@@ -263,13 +263,17 @@ public class LoginFragment extends DialogFragment {
 		flipLoginOrRegister();
 	}
 
+	// TODO Working on this
 	// Validates user input
 	private boolean validate() {
-
-		if(getTextUsername().isEmpty() || getTextPassword().isEmpty()) {
-			Toast.makeText(getActivity(), "Username & password cannot be empty!", Toast.LENGTH_LONG).show();
+		if(getTextUsername().isEmpty()) {
+			popup("USERNAME EMPTY!", "You deserve a popup with a button");
 			return false;
 		}
+		else if(getTextPassword().isEmpty()) {
+			popup("PASSWORD EMPTY!", "You deserve a popup with a button");
+			return false;
+		} 
 		else {
 			return true;
 		}
