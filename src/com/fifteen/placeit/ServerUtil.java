@@ -35,8 +35,8 @@ import org.apache.http.message.BasicNameValuePair;
  * Helper class used to communicate with the PlaceItserver.
  */
 public final class ServerUtil {
-	private static final String SERVER_URL = "http://1-dot-airy-dialect-514.appspot.com";
-	//private static final String SERVER_URL = "http://192.168.1.112:8888";
+	//private static final String SERVER_URL = "http://1-dot-airy-dialect-514.appspot.com";
+	private static final String SERVER_URL = "http://192.168.1.112:8888";
 	private static final int MAX_ATTEMPTS = 5;
 	private static final int BACKOFF_MILLI_SECONDS = 2000;
 	private static final Random random = new Random();

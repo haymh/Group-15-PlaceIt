@@ -24,16 +24,20 @@ public class MinutelySchedule extends AbstractSchedule{
 		postDate = c.getTime();
 		return postDate;
 	}
-	@Override
-	public String toString() {
-		
-		return null;
-	}
+	
 	@Override
 	public void fillUpScheduleInfo(Map<String, String> map) {
 		super.fillUpScheduleInfo(map);
 		map.put(Constant.PI.REPEATED_MINUTE, "" + repeatedMinute);
 		
+	}
+	@Override
+	public boolean postNowOrNot() throws ContradictoryScheduleException {
+		if(postDate.before(new Date())){
+			nextPostDate(); // update postDate
+			return true;
+		}
+		return false;
 	}
 	
 }

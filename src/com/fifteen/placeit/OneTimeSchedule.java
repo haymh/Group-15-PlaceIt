@@ -14,15 +14,16 @@ public class OneTimeSchedule extends AbstractSchedule {
 		return postDate;
 	}
 
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void fillUpScheduleInfo(Map<String, String> map) {
 		super.fillUpScheduleInfo(map);
+	}
+
+	@Override
+	public boolean postNowOrNot() throws ContradictoryScheduleException {
+
+		return postDate.compareTo(new Date()) <= 0;
 	}
 
 }

@@ -50,6 +50,7 @@ public class WeeklySchedule extends AbstractSchedule {
 		repeatedDay = new boolean[7];
 		setRepeatedDayInWeek(repeatedDayInWeek);
 		this.numOfWeekRepeat = numOfWeekRepeat;
+		postDate = new Date();
 	}
 
 	
@@ -112,6 +113,7 @@ public class WeeklySchedule extends AbstractSchedule {
 			throw new ContradictoryScheduleException("set repeat by days in a week, but no weekly schedule found!");
 
 		Calendar c = Calendar.getInstance();
+		c.setTime(postDate);
 		int day = c.get(Calendar.DAY_OF_WEEK);
 		int d = 0;
 		switch(day){
@@ -141,7 +143,7 @@ public class WeeklySchedule extends AbstractSchedule {
 		c.setTime(createDate);
 		int createWeek = c.get(Calendar.WEEK_OF_YEAR);
 		int weekDiff = Math.abs(currentWeek - createWeek) % numOfWeekRepeat.getValue();
-		c.setTime(new Date());
+		c.setTime(postDate);
 
 		found = false;
 		int i = d;
@@ -167,13 +169,6 @@ public class WeeklySchedule extends AbstractSchedule {
 
 
 
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 
 	@Override
 	public void fillUpScheduleInfo(Map<String, String> map) {
@@ -181,6 +176,17 @@ public class WeeklySchedule extends AbstractSchedule {
 		map.put(Constant.PI.REPEATED_DAY_IN_WEEK, "" + repeatedDayInWeek);
 		map.put(Constant.PI.NUM_OF_WEEK_REPEAT, "" + numOfWeekRepeat.getValue());
 		
+	}
+
+
+
+	@Override
+	public boolean postNowOrNot() throws ContradictoryScheduleException {
+		if(nextPostDate().before(new Date())){
+			postDate = nextPostDate();
+			return true;
+		}else
+			return false;
 	}
 
 

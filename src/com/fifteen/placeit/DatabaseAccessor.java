@@ -225,7 +225,11 @@ public class DatabaseAccessor {
 	
 	// create the placeIt table
 	public void createTable(){
-		database.execSQL(MySQLiteHelper.DATABASE_CREATE);
+		Cursor cursor = database.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '" + MySQLiteHelper.TABLE_PLACE_IT + "'", null);
+		if(cursor == null || cursor.getCount() == 0) {
+			database.execSQL(MySQLiteHelper.DATABASE_CREATE);
+		}
+		
 	}
 	
 	

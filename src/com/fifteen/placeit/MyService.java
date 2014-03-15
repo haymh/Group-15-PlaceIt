@@ -130,6 +130,7 @@ public class MyService extends Service {
 				Iterator<AbstractPlaceIt> i = prePost.values().iterator();
 				Log.wtf("checking which should be posted","here");
 				while(i.hasNext()){
+					Log.wtf("inside Thread", "checking prePost list");
 					AbstractPlaceIt pi = i.next();
 					try {
 						if(pi.getSchedule().postNowOrNot()){
@@ -164,6 +165,7 @@ public class MyService extends Service {
 				try {
 					sleep(POST_TIME_LAG);
 				} catch (InterruptedException e) {
+					Log.wtf("Thread", e.toString());
 					e.printStackTrace();
 				}
 				
@@ -179,7 +181,7 @@ public class MyService extends Service {
 		super.onCreate();
 		database = new DatabaseAccessor(this);
 		database.open();
-
+		database.createTable();
 		// get list of place-it from Data base
 		pulldown = database.pulldownPlaceIt();
 		onMap = database.onMapPlaceIt();

@@ -13,8 +13,8 @@ public abstract class AbstractSchedule {
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public abstract Date nextPostDate() throws ContradictoryScheduleException ;
-	public abstract String toString();
-	
+	// return if we should post it right now
+	public abstract boolean postNowOrNot() throws ContradictoryScheduleException;
 	
 	public AbstractSchedule(String type, Date createDate, Date postDate){
 		this.type = type;
@@ -49,12 +49,7 @@ public abstract class AbstractSchedule {
 	}
 	
 	
-	// return if we should post it right now
-	public boolean postNowOrNot() throws ContradictoryScheduleException{
-		Date postDate = nextPostDate();
-		Date today = new Date();
-		return postDate.compareTo(today) <= 0;
-	}
+	
 	
 	public void fillUpScheduleInfo(Map<String, String> map){
 		map.put(Constant.PI.CREATE_DATE, dateFormat.format(createDate));
