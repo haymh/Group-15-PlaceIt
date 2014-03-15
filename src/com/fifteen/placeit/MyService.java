@@ -157,7 +157,7 @@ public class MyService extends Service {
 							sendBroadcast(in);
 						}
 					} catch (ContradictoryScheduleException e) {
-						Log.wtf("Exception", e.getMessage());
+						Log.wtf("Exception " + pi.getTitle(), e.getMessage());
 						//e.printStackTrace();
 					}
 				}
@@ -339,10 +339,13 @@ public class MyService extends Service {
 				categories[0] = categoryOne;
 			}
 			
-			if(database.insertPlaceIt(id, title, description, repeatedMinute, repeatedDayInWeek, numOfWeekRepeat,
+			if(database.insertPlaceIt(id, title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat,
 					createDate, postDate, latitude, longitude, status, categories)){
-				AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedMinute, repeatedDayInWeek, 
+				
+				
+				AbstractPlaceIt placeIt = PlaceItFactory.createPlaceIt(id, title, description,  repeatedDayInWeek, repeatedMinute, 
 						numOfWeekRepeat, createDate, postDate, latitude, longitude, status, categories);
+				
 				switch(placeIt.getStatus()){
 				case ON_MAP:
 					onMap.put(placeIt.getId(), placeIt);
