@@ -401,7 +401,7 @@ public class LoginFragment extends DialogFragment {
 					popup("JUST KIDDING", "Can't find you!");
 					break;
 				case Constant.LOGIN.FAIL:
-					popup("JUST KIDDING", "Must be a type in there!");
+					popup("JUST KIDDING", "Must be a typo in there!");
 					break;
 				default:
 					popup("JUST KIDDING", "Server down, sorry!");
