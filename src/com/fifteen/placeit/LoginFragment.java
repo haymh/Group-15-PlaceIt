@@ -1,7 +1,5 @@
 package com.fifteen.placeit;
 
-import java.util.Date;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -11,9 +9,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.Layout.Alignment;
 import android.text.SpannableString;
-import android.text.style.AlignmentSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -81,13 +77,6 @@ public class LoginFragment extends DialogFragment {
 	@Override 
 	public void onStart() {
 		super.onStart();
-
-		if(access) {
-			Log.wtf("ACCESS", "TRUE");
-		}
-		else {
-			Log.wtf("ACCESS", "FALSE");
-		}
 
 		initializePositive();
 		initializeNegative();
@@ -322,11 +311,12 @@ public class LoginFragment extends DialogFragment {
 
 		if(hasCredentials()) {
 			// Has localized credentials, access set to true
-			Log.wtf("SET access to be ", " true");
+			Log.wtf("hasCredentials()", "YES ACCESS");
 			access = true;
-		}else
+		}else {
+			Log.wtf("hasCredentials()", "NO ACCESS");
 			access = false;
-			Log.wtf("SET access to be ", " false");
+		}
 
 		// Saved to connect to server
 		username = getTextUsername();
@@ -368,6 +358,11 @@ public class LoginFragment extends DialogFragment {
 			protected void onPostExecute(Integer results) {
 				dialog.dismiss();
 
+				if(access) {
+					((MainActivity)getActivity()).allowAccess();
+					dismiss();
+				}
+
 				Log.wtf("LOGGED", "SERVER RESULTS " + results.toString());
 
 				switch(results) {
@@ -382,11 +377,15 @@ public class LoginFragment extends DialogFragment {
 						// for user login on a new device, request all the information from server
 						if(loginOrRegister == Constant.LOGIN.LOGIN)
 								service.init();
+						
+						dismiss();
 					}				
 					
 					preference.edit().putString(Constant.SP.U.USERNAME, username).commit();
 					preference.edit().putString(Constant.SP.U.PASSWORD, password).commit();
 					preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
+					
+					((MainActivity)getActivity()).allowAccess();
 					access = true;
 					break;
 				case Constant.LOGIN.CONFLICT:
@@ -394,19 +393,24 @@ public class LoginFragment extends DialogFragment {
 					access = false;
 					break;
 				case Constant.LOGIN.NOT_FOUND:
-					popup("JUST KIDDING", "Can't find you!");
+					if(access) {
+						popup("HUH?", "Offline mode");
+					}else {
+						popup("JUST KIDDING", "Can't find you!");
+					}
 					break;
 				case Constant.LOGIN.FAIL:
-					popup("JUST KIDDING", "Must be a typo in there!");
+					if(access) {
+						popup("HUH?", "Offline mode");
+					}else {
+						popup("JUST KIDDING", "Must be a typo in there!");
+					}
 					break;
 				default:
-					popup("JUST KIDDING", "Server down, sorry!");
+					popup("JUST KIDDING", "Server down, probably.");
 				}
-
-				if(access) {
-					((MainActivity)getActivity()).allowAccess();
-					dismiss();
-				}
+				
+				Log.wtf("LoginFragment", "END");
 			}
 		}.execute(username, password, regId);
 	}
