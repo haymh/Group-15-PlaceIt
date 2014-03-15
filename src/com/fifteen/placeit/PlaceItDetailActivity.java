@@ -133,6 +133,8 @@ public class PlaceItDetailActivity extends ListActivity {
 	
 	// Handle omni button depending on place it type
 	public void omniPlaceItHandler(View view) {	
+		view.setEnabled(false);
+		
 		// Type 1 and 2: On Map Place It, To Be Posted Place It
 		// Type 3: Pulled Down Place It
 		switch(status) {
@@ -214,6 +216,7 @@ public class PlaceItDetailActivity extends ListActivity {
 	}
 	
 	public void discardPlaceIt(View view) {
+		view.setEnabled(false);
 		if(service != null) {
 			final ProgressDialog dialog = ProgressDialog.show(this,
 					"discarding...", "Please wait...", false);

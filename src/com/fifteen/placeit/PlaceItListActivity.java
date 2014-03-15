@@ -91,6 +91,7 @@ public class PlaceItListActivity extends Activity {
     // Repost button clicked, repost placeit
     public void repostPlaceIt(View view) {
     	View parent = (View) view.getParent();
+    	view.setEnabled(false);
     	
     	getPlaceItId(parent);
     	if(service != null) {
@@ -125,6 +126,7 @@ public class PlaceItListActivity extends Activity {
     // Pull down button clicked, pull down placeit
     public void pullDownPlaceIt(View view) {
     	View parent = (View) view.getParent();
+    	view.setEnabled(false);
     	
     	getPlaceItId(parent);
     	
@@ -159,6 +161,7 @@ public class PlaceItListActivity extends Activity {
     // Same behavior for both active and pull down lists
     public void discardPlaceIt(View view) {
     	View parent = (View) view.getParent();
+    	view.setEnabled(false);
     	
     	getPlaceItId(parent);
     	if(service != null) {

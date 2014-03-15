@@ -185,6 +185,7 @@ public class CreateCategoryPIActivity extends Activity{
 	}
 	// FIXME Working on this
 	public void create(View view){
+		view.setEnabled(false);
 		
 		/*
 		boolean s = service.createPlaceIt(cat[index], null, 0, 0, null, createDate,
