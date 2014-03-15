@@ -15,6 +15,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -95,8 +97,10 @@ public class PlaceItListActivity extends Activity {
     	
     	getPlaceItId(parent);
     	if(service != null) {
-			final ProgressDialog dialog = ProgressDialog.show(this,
-					"reposting...", "Please wait...", false);
+    		SpannableString span =  new SpannableString(Constant.F.REPOST_MSG);
+            span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  
+    		final ProgressDialog dialog = ProgressDialog.show(this, Constant.F.REPOST_TITLE, span);
+    		
 			new AsyncTask<Void,Void,Boolean>(){
 
 				@Override
@@ -115,7 +119,6 @@ public class PlaceItListActivity extends Activity {
 				}
 				
 			}.execute();
-			dialog.show();		
 		}else{
 			Toast.makeText(PlaceItListActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
 		}
@@ -131,8 +134,10 @@ public class PlaceItListActivity extends Activity {
     	getPlaceItId(parent);
     	
     	if(service != null) {
-			final ProgressDialog dialog = ProgressDialog.show(this,
-					"Pulling Down...", "Please wait...", false);
+    		SpannableString span =  new SpannableString(Constant.F.PULLDOWN_MSG);
+            span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  
+    		final ProgressDialog dialog = ProgressDialog.show(this, Constant.F.PULLDOWN_TITLE, span);
+    		
 			new AsyncTask<Void,Void,Boolean>(){
 
 				@Override
@@ -150,8 +155,7 @@ public class PlaceItListActivity extends Activity {
 						Toast.makeText(PlaceItListActivity.this, "cannot access server, place-it was not pulled down", Toast.LENGTH_SHORT).show();
 				}
 				
-			}.execute();
-			dialog.show();		
+			}.execute();	
 		}else{
 			Toast.makeText(PlaceItListActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
 		}
@@ -165,8 +169,10 @@ public class PlaceItListActivity extends Activity {
     	
     	getPlaceItId(parent);
     	if(service != null) {
-			final ProgressDialog dialog = ProgressDialog.show(this,
-					"discarding...", "Please wait...", false);
+    		SpannableString span =  new SpannableString(Constant.F.DISCARD_MSG);
+            span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  
+    		final ProgressDialog dialog = ProgressDialog.show(this, Constant.F.DISCARD_TITLE, span);
+
 			new AsyncTask<Void,Void,Boolean>(){
 
 				@Override
@@ -183,9 +189,7 @@ public class PlaceItListActivity extends Activity {
 					}else
 						Toast.makeText(PlaceItListActivity.this, "cannot access server, place-it was not discarded", Toast.LENGTH_SHORT).show();
 				}
-				
 			}.execute();
-			dialog.show();		
 		}else{
 			Toast.makeText(PlaceItListActivity.this, "Unable to perform your request at this moment", Toast.LENGTH_SHORT).show();
 		}

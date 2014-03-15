@@ -16,7 +16,9 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.text.SpannableString;
 import android.text.format.DateFormat;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -162,8 +164,10 @@ public class CreatePlaceItActivity extends Activity {
 	public void create(View view){
 		view.setEnabled(false);
 		
-		final ProgressDialog dialog = ProgressDialog.show(this,
-				"Posting Data...", "Please wait...", false);
+		SpannableString span =  new SpannableString(Constant.F.POST_MSG);
+        span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  
+		final ProgressDialog dialog = ProgressDialog.show(this, Constant.F.POST_TITLE, span);
+		
 		if(validate()){
 			new AsyncTask<Void, Void, Boolean>(){
 
@@ -185,7 +189,6 @@ public class CreatePlaceItActivity extends Activity {
 				}
 				
 			}.execute();
-			dialog.show();
 		}
 	}
 	

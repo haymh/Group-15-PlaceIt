@@ -10,8 +10,11 @@ import com.fifteen.placeit.WeeklySchedule.NumOfWeekRepeat;
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -186,35 +189,22 @@ public class CreateCategoryPIActivity extends Activity{
 	// FIXME Working on this
 	public void create(View view){
 		view.setEnabled(false);
-		
-		/*
-		boolean s = service.createPlaceIt(cat[index], null, 0, 0, null, createDate,
-				postDate, 0, 0, AbstractPlaceIt.Status.ON_MAP, tempArray);
-		*/
-
-		
-		//		null, createDate, postDate, new LatLng(0, 0), AbstractPlaceIt.Status.ON_MAP, tempArray );
-		// TODO REPLACE THIS TOP
-		/* 
-		public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
-				WeeklySchedule.NumOfWeekRepeat numOfWeekRepeat, Date createDate, Date postDate, LatLng coordinate,
-				AbstractPlaceIt.Status status, String[] categories){
-		*/
-		//final ProgressDialog dialog = ProgressDialog.show(this,
-		//		"Posting Data...", "Please wait...", false);
+	
+		SpannableString span =  new SpannableString(Constant.F.POST_MSG);
+        span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  
+		final ProgressDialog dialog = ProgressDialog.show(this, Constant.F.POST_TITLE, span);
 		
 		new AsyncTask<Void, Void, Boolean>(){
 
 			@Override
 			protected Boolean doInBackground(Void... params) {
-				// TODO Auto-generated method stub
 				return service.createPlaceIt(title, description, 0, 0, 
 				WeeklySchedule.NumOfWeekRepeat.ZERO, createDate, postDate, new LatLng(0,0), AbstractPlaceIt.Status.ON_MAP, catArray );
 			}
 			
 			@Override
 			protected void onPostExecute(Boolean params) {
-				//dialog.dismiss();
+				dialog.dismiss();
 				if(params){
 					Toast.makeText(CreateCategoryPIActivity.this, "New Category Place-it Created", Toast.LENGTH_SHORT).show();
 					CreateCategoryPIActivity.this.finish();
@@ -223,6 +213,5 @@ public class CreateCategoryPIActivity extends Activity{
 			}
 			
 		}.execute();
-		//dialog.show();
 	}
 }

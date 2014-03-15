@@ -344,15 +344,10 @@ public class LoginFragment extends DialogFragment {
 		}
 		
 		SpannableString span =  new SpannableString(message);
-        span.setSpan(new RelativeSizeSpan(FONT_SIZE), 0, span.length(), 0);  
-		final ProgressDialog dialog = ProgressDialog.show(getActivity(), title, span, false);
+        span.setSpan(new RelativeSizeSpan(Constant.F.POPUP_SIZE), 0, span.length(), 0);  
+		final ProgressDialog dialog = ProgressDialog.show(getActivity(), title, span);
 
 		new AsyncTask<String, Void, Integer>() {
-			long time;
-
-			protected void onPreExecute() {
-				time = new Date().getTime();
-			}
 
 			@Override
 			protected Integer doInBackground(String... argv) {
@@ -371,12 +366,13 @@ public class LoginFragment extends DialogFragment {
 			}
 
 			protected void onPostExecute(Integer results) {
-				long temp = new Date().getTime() - time;
+				dialog.dismiss();
 
-				Log.wtf("LOGGED", results.toString() + " in " + String.valueOf(temp) + " ms");
+				Log.wtf("LOGGED", "SERVER RESULTS " + results.toString());
 
 				switch(results) {
 				case Constant.LOGIN.OK:
+
 					if(!access){
 						// new user, so delete old data
 						Log.wtf("new user login or register", "here");
@@ -410,10 +406,8 @@ public class LoginFragment extends DialogFragment {
 				if(access) {
 					dismiss();
 				}
-				dialog.dismiss();
 			}
 		}.execute(username, password, regId);
-		dialog.show();
 	}
 	
 	private void popup(String title, String message) {
