@@ -401,7 +401,6 @@ public class LoginFragment extends DialogFragment {
 				case Constant.LOGIN.FAIL:
 				default:
 					popup("JUST KIDDING", "Server down, sorry!");
-
 				}
 
 				if(access) {

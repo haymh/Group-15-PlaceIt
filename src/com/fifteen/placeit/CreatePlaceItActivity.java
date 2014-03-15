@@ -169,7 +169,7 @@ public class CreatePlaceItActivity extends Activity {
 				protected Boolean doInBackground(Void... params) {
 					// TODO Auto-generated method stub
 					return service.createPlaceIt(title, description, repeatedDayInWeek, repeatedMinute, numOfWeekRepeat, createDate,
-							postDate, coordinate.latitude, coordinate.longitude, AbstractPlaceIt.Status.ON_MAP, null);
+							postDate, coordinate.latitude, coordinate.longitude, AbstractPlaceIt.Status.ACTIVE, null);
 				}
 				
 				@Override

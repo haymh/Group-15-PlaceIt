@@ -53,11 +53,7 @@ public abstract class AbstractSchedule {
 	public boolean postNowOrNot() throws ContradictoryScheduleException{
 		Date postDate = nextPostDate();
 		Date today = new Date();
-		if(today.getYear() == postDate.getYear() && today.getMonth() == postDate.getMonth()
-				&& today.getDate() == postDate.getDate())
-			return true;
-		else
-			return false;
+		return postDate.compareTo(today) <= 0;
 	}
 	
 	public void fillUpScheduleInfo(Map<String, String> map){

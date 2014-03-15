@@ -99,6 +99,8 @@ public class WeeklySchedule extends AbstractSchedule {
 	
 	@Override
 	public Date nextPostDate() throws ContradictoryScheduleException {
+		if(numOfWeekRepeat == NumOfWeekRepeat.ZERO)
+			throw new ContradictoryScheduleException("Number of weeks repeat cannot be 0");
 		boolean found = false;
 		int earliest = 0;
 		// find earliest post day in a week

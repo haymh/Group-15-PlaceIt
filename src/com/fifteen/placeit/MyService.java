@@ -127,10 +127,17 @@ public class MyService extends Service {
 		public void run(){
 			while(!stop){
 				Iterator<AbstractPlaceIt> i = prePost.values().iterator();
+				Log.wtf("checking which should be posted","here");
 				while(i.hasNext()){
 					AbstractPlaceIt pi = i.next();
+					Log.wtf("prepost list is not empty","here");
+					if(stop)
+						Log.wtf("did thread stop?", " yes !");
+					else
+						Log.wtf("did thread stop?", " no !");
 					try {
 						if(pi.getSchedule().postNowOrNot()){
+							Log.wtf("Post","yes");
 							if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
 								TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP);
 								if(ts == null)
@@ -154,14 +161,24 @@ public class MyService extends Service {
 							sendBroadcast(in);
 						}
 					} catch (ContradictoryScheduleException e) {
+						Log.wtf("Notify Thread", " I catch something");
 						e.printStackTrace();
 					}
 				}
 				try {
+					if(stop)
+						Log.wtf("did thread stop?", " yes !");
+					else
+						Log.wtf("did thread stop?", " no !");
 					sleep(POST_TIME_LAG);
+					if(stop)
+						Log.wtf("did thread stop?", " yes !");
+					else
+						Log.wtf("did thread stop?", " no !");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+				
 
 			}
 		}
@@ -174,13 +191,13 @@ public class MyService extends Service {
 		super.onCreate();
 		database = new DatabaseAccessor(this);
 		database.open();
+
 		// get list of place-it from Data base
 		pulldown = database.pulldownPlaceIt();
 		onMap = database.onMapPlaceIt();
 		prePost = database.prepostPlaceIt();
 		// launch the thread
-		(nThread = new NotifyPostThread()).start(); 
-
+		new NotifyPostThread().start(); 
 		// XXX Get universal data
 		preference = getSharedPreferences(Constant.SP.SAVE, Context.MODE_PRIVATE);
 
@@ -218,6 +235,7 @@ public class MyService extends Service {
 	public IBinder onBind(Intent intent) {
 		return mBinder;
 	}
+	
 
 	//create a place-it, return a boolean value indicates if it's successful
 	public boolean createPlaceIt(String title, String description, int repeatedDayInWeek, int repeatedMinute, 
@@ -244,15 +262,21 @@ public class MyService extends Service {
 		}
 
 		//active.put(pi.getId(), pi);
-		onMap.put(pi.getId(),pi);
-		LatLng coordinate = pi.getCoordinate();
-		if(coordinate != null){
-			Bundle send = new Bundle();
-			send.putParcelable("position", coordinate);
-			send.putLong("id", pi.getId());
-			Intent in = new Intent(NOTIFICATION);
-			in.putExtra("bundle", send);
-			sendBroadcast(in);
+		if(pi.getStatus() == AbstractPlaceIt.Status.ON_MAP){
+			onMap.put(pi.getId(),pi);
+			LatLng coordinate = pi.getCoordinate();
+			if(coordinate != null){
+				Bundle send = new Bundle();
+				send.putParcelable("position", coordinate);
+				send.putLong("id", pi.getId());
+				Intent in = new Intent(NOTIFICATION);
+				in.putExtra("bundle", send);
+				sendBroadcast(in);
+			}
+		}else if(pi.getStatus() == AbstractPlaceIt.Status.ACTIVE){
+			prePost.put(pi.getId(), pi);
+		}else if(pi.getStatus() == AbstractPlaceIt.Status.PULL_DOWN){
+			pulldown.put(pi.getId(), pi);
 		}
 		return true;
 	}
@@ -644,6 +668,7 @@ public class MyService extends Service {
 				return null;
 			}
 		}.execute();
+		
 	}
 	
 	public void deleteDatabase(){

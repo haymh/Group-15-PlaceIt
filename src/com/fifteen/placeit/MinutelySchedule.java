@@ -15,7 +15,7 @@ public class MinutelySchedule extends AbstractSchedule{
 	@Override
 	public Date nextPostDate() throws ContradictoryScheduleException {
 		Date now = new Date();
-		if(postDate.after(new Date()))
+		if(postDate.after(now))
 			return postDate;
 		Calendar c = Calendar.getInstance();
 		c.setTime(postDate);

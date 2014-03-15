@@ -207,12 +207,6 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
             // Automatically registers application on startup.
             GCMRegistrar.register(this, Constant.GCM.SENDER_ID);
         }
-        /* FIXME wtf is this!?
-		Log.wtf("GCM Reg Id", regId);
-		if(regId.equals("") || regId == null)
-			Log.wtf("GCM", "cannot get it fucker work");
-		Log.wtf("MAIN", "say something");
-		*/
 		
 		loginType = Constant.LOGIN.LOGIN;
 		
