@@ -160,6 +160,8 @@ public class CreatePlaceItActivity extends Activity {
 	
 	// when user click on create button, then call this method to create a Place-it
 	public void create(View view){
+		view.setEnabled(false);
+		
 		final ProgressDialog dialog = ProgressDialog.show(this,
 				"Posting Data...", "Please wait...", false);
 		if(validate()){
