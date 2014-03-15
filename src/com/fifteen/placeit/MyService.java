@@ -582,7 +582,7 @@ public class MyService extends Service {
 					notify(pi);
 				}else if(pi.status == AbstractPlaceIt.Status.PULL_DOWN){
 					if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
-						TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ACTIVE);
+						TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.PULL_DOWN);
 						if(ts == null)
 							continue;
 						if(ts.status != ServerUtil.OK) {
