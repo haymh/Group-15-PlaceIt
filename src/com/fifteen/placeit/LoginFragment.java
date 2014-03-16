@@ -250,6 +250,7 @@ public class LoginFragment extends DialogFragment {
 		clearText();
 		clearCredentials();
 		service.deleteDatabase();
+		((MainActivity)getActivity()).allowAccess(false);
 	}
 
 	// ON REGISTER. Register button press
@@ -363,7 +364,7 @@ public class LoginFragment extends DialogFragment {
 				dialog.dismiss();
 
 				if(access) {
-					((MainActivity)getActivity()).allowAccess();
+					((MainActivity)getActivity()).allowAccess(true);
 					dismiss();
 				}
 
@@ -389,7 +390,7 @@ public class LoginFragment extends DialogFragment {
 					preference.edit().putString(Constant.SP.U.PASSWORD, password).commit();
 					preference.edit().putBoolean(Constant.SP.U.LOGIN, true).commit();
 					
-					((MainActivity)getActivity()).allowAccess();
+					((MainActivity)getActivity()).allowAccess(true);
 					access = true;
 					break;
 				case Constant.LOGIN.CONFLICT:
