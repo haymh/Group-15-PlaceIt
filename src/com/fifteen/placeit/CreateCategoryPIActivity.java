@@ -63,6 +63,7 @@ public class CreateCategoryPIActivity extends Activity{
 	private ServiceManager serviceManager;
 	private MyService service;
 
+	// on create
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_create_category_pi);
@@ -76,6 +77,7 @@ public class CreateCategoryPIActivity extends Activity{
 		listview.setAdapter(adapter);
 		listview.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
+		// initialize edit text for both title and description
 		editTitle = (EditText)findViewById(R.id.editTitle);
 		editDescription = (EditText)findViewById(R.id.editDescription);
 		// create button
@@ -120,6 +122,7 @@ public class CreateCategoryPIActivity extends Activity{
 	}
 	class createListener implements OnClickListener{
 
+		
 		@Override
 		public void onClick(View v) {
 			// TODO Auto-generated method stub
@@ -130,6 +133,7 @@ public class CreateCategoryPIActivity extends Activity{
 				if(sba.valueAt(i))
 					counter++;
 			}
+			// check if user selected enough or too much categories
 			if(counter>3 || counter==0)
 			{
 				if(counter>3){
@@ -142,6 +146,7 @@ public class CreateCategoryPIActivity extends Activity{
 							Toast.LENGTH_SHORT).show();
 				}
 			}
+			// if the amount of selected cat is right then check title and discription
 			else
 			{
 				for(int i=0; i<sba.size();i++)
@@ -152,11 +157,14 @@ public class CreateCategoryPIActivity extends Activity{
 						vector.add(cat[sba.keyAt(i)]);
 					}
 				}
+				// sort the cat the user selected
 				Collections.sort(vector);
 				vector.copyInto(catArray);			
 				
+				// check title and discription
 				if(validate())
 				{
+					// create placeit
 					create(v);
 				}
 			}
@@ -165,6 +173,8 @@ public class CreateCategoryPIActivity extends Activity{
 
 	}
 
+	// check if the title and description is valid
+	// cannot be both empty
 	public boolean validate()
 	{
 		title = editTitle.getText().toString();
