@@ -36,7 +36,12 @@ public abstract class TabListFragment extends ListFragment {
 		super.onCreate(savedInstanceState);
 		setFields();
 		
-		manager = new ServiceManager(getActivity());
+		// TODO testing
+		try {
+			manager = new ServiceManager(getActivity());
+		}catch(Exception e) {
+			Log.wtf(tag, "manager " + e.toString());
+		}
 	}
 	
 	// Allows inherited classes to set fields
@@ -94,8 +99,13 @@ public abstract class TabListFragment extends ListFragment {
 			View row = convertView;
 
 			if(row == null) {
-				LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				row = inflater.inflate(imageResource, null);
+				// TODO testing
+				try {
+					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+					row = inflater.inflate(imageResource, null);
+				}catch(Exception e) {
+					Log.wtf(tag, "inflate " + e.toString());
+				}
 			}
 
 			AbstractPlaceIt item = getItem(position);
