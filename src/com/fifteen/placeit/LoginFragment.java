@@ -249,6 +249,7 @@ public class LoginFragment extends DialogFragment {
 	private void handleLogout() {
 		clearText();
 		clearCredentials();
+		//service.unregisterRegId();
 		service.deleteDatabase();
 		((MainActivity)getActivity()).allowAccess(false);
 	}
@@ -284,6 +285,7 @@ public class LoginFragment extends DialogFragment {
 	private void clearCredentials() {
 		preference.edit().remove(Constant.SP.U.USERNAME).commit();
 		preference.edit().remove(Constant.SP.U.PASSWORD).commit();
+		preference.edit().remove(Constant.SP.TIME).commit();
 	}
 
 	// Checks for local credentials
@@ -350,9 +352,11 @@ public class LoginFragment extends DialogFragment {
 				try {
 					if(loginOrRegister == Constant.LOGIN.LOGIN) {
 						request = service.login(argv[0], argv[1], argv[2]);
+						Log.wtf("LOGIN", argv[0]+"|||||"+argv[1]+"|||||"+argv[2]);
 					}
 					else {
 						request = service.register(argv[0], argv[1], argv[2]);
+						Log.wtf("REGISTER", argv[0]+"|||||"+argv[1]+"|||||"+argv[2]);
 					}
 				} catch(Exception e) {
 					Log.wtf(tag, "At login() " + e.toString());

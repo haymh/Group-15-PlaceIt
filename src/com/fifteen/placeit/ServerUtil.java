@@ -45,6 +45,7 @@ public final class ServerUtil {
 	public static final String REGISTER_URL = SERVER_URL + "/register";
 	public static final String PLACE_IT_URL = SERVER_URL + "/placeit";
 
+
 	public static final String USER_NAME = "username";
 	public static final String PASSWORD = "password";
 	public static final String ACTION = "action";
@@ -57,6 +58,7 @@ public final class ServerUtil {
 	public static final String PULL = "pull";
 	public static final String LAST_UPDATE = "lastUpdate";
 	public static final String GCM_ID_KEY = "RegId";
+	public static final String UNREGISTER_REG_ID = "UNREGISTER_REG_ID";
 	
 	private static HttpClient client = new DefaultHttpClient();
 	private static ServerUtil serverUtil = new ServerUtil();
@@ -139,6 +141,14 @@ public final class ServerUtil {
 				return code;
 		}
 		return code;
+	}
+	
+	//unregister Regid on server
+	public static void unregisterRegId(final String regId){
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
+		list.add(new BasicNameValuePair(ACTION,UNREGISTER_REG_ID));
+		list.add(new BasicNameValuePair(GCM_ID_KEY, regId));
+		postExpectString(PLACE_IT_URL,list);
 	}
 
 	// synchronize data with server

@@ -78,6 +78,9 @@ public class MyService extends Service {
 					protected void onPostExecute(String results) {
 
 						JSONParser.parsePlaceItServer(results);
+						long time = JSONParser.getTime();
+						if(time == preference.getLong(Constant.SP.TIME, 0))
+							return;
 
 						Log.wtf("TIME", JSONParser.getTime().toString());
 
@@ -703,6 +706,11 @@ public class MyService extends Service {
 		//inform Main to redraw
 		Intent in = new Intent(NOTIFICATION);
 		sendBroadcast(in);
+	}
+	
+	public void unregisterRegId(){
+		String regId = preference.getString(Constant.GCM.PROPERTY_REG_ID, "");
+		ServerUtil.unregisterRegId(regId);
 	}
 
 	public void deleteDatabase(){
