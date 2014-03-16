@@ -22,6 +22,7 @@ public final class Constant {
 	// String format 
 	public static class F {
 		public static final float POPUP_SIZE = (float) 1.3;
+		public static final float ALERT_SIZE = (float) 1.1;
 		public static final String POST_TITLE = "CREATING";
 		public static final String POST_MSG = "You just wait!";
 		public static final String PULLDOWN_TITLE = "PULL DOWN!";

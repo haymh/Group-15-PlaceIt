@@ -7,24 +7,5 @@
      android:name="com.google.android.gms.maps.MapFragment"
      map:uiZoomControls="false"
      map:uiCompass="false">
-     
-     <RelativeLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="bottom" >
-
-        <Button
-            android:id="@+id/mainTestBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginBottom="5dp"
-            android:onClick="debugHandler"
-            android:text="TEST" />
-        
-    </RelativeLayout>
-    
+         
 </fragment>

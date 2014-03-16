@@ -581,68 +581,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 		Toast.makeText(this, "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show(); 
 	} 
 
-//EVENT HANDLERS
-	public void debugHandler(View view) {
-		// TODO TESTTEST
-		// To be removed, TEST ONLY!
-		
-		if(service != null) {
-			new AsyncTask<Void, Void, String>() {
-
-				@Override
-				protected String doInBackground(Void... arg0) {
-					//String data;
-					
-					//data = service.init();
-					//data = service.pull(preference.getLong(Constant.SP.TIME, 0));
-					//return data;
-					return "";
-				}
-				
-				@Override
-				protected void onPostExecute(String results) {
-					/*
-					JSONParser.parsePlaceItInit(results);
-					
-					Log.wtf("TIME", JSONParser.getTime().toString());
-					
-					// Validity test
-					List<Map<String, String>> info = new ArrayList<Map<String, String>>(JSONParser.getPlaceItInitList());
-					for( int i = 0; i < info.size(); ++i ) {
-						Log.wtf("INFO", info.get(i).get(Constant.PI.ID) + " & " + 
-								info.get(i).get(Constant.PI.TITLE) + " & " + 
-								info.get(i).get(Constant.PI.NUM_OF_WEEK_REPEAT) + " & " +
-								info.get(i).get(Constant.PI.STATUS) +  " & " + 
-								info.get(i).get(Constant.PI.REPEATED_DAY_IN_WEEK) + " & " + 
-								info.get(i).get(Constant.PI.DESCRIPTION) + " & " + 
-								info.get(i).get(Constant.PI.LONGITUDE)
-								);
-					}
-					*/
-					
-					/*
-					JSONParser.parsePlaceItServer(results);
-					
-					Log.wtf("TIME", JSONParser.getTime().toString());
-					
-					// Validity test
-					List<Map<String, String>> info = new ArrayList<Map<String, String>>(JSONParser.getPlaceItInfoList());
-					for( int i = 0; i < info.size(); ++i ) {
-						Log.wtf("INFO", info.get(i).get(Constant.PI.ID) + " & " + info.get(i).get(Constant.PI.TITLE));
-					}
-					
-					List<Long> id = new ArrayList<Long>(JSONParser.getPlaceItIdList());
-					Map<Long, Integer> status = new HashMap<Long, Integer>(JSONParser.getPlaceItIdStatusMap());
-					for( int i = 0; i < id.size(); ++i ) {
-						Log.wtf("ID", "ID: " + id.get(i).toString() + " STATUS " + status.get(id.get(i)));
-					}
-					*/
-				}
-			}.execute();
-		}
-		// To be removed, TEST ONLY!
-	}
-	
+//EVENT HANDLERS	
 	public void gotoListPage() {
 		Intent i = new Intent(this, PlaceItListActivity.class);
 		startActivity(i);
@@ -718,8 +657,11 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 	}
 	
 	// Allow access to the user
-	public void allowAccess() {
-		access = true;
-		fillMapWithPlaceIts();
+	public void allowAccess(boolean choice) {
+		access = choice;
+		
+		if(access) {
+			fillMapWithPlaceIts();
+		}
 	}
 }
