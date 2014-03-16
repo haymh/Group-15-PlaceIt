@@ -184,6 +184,7 @@ public class WeeklySchedule extends AbstractSchedule {
 	public boolean postNowOrNot() throws ContradictoryScheduleException {
 		if(nextPostDate().before(new Date())){
 			postDate = nextPostDate();
+			
 			return true;
 		}else
 			return false;

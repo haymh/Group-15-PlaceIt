@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
+import android.util.Log;
+
 public class MinutelySchedule extends AbstractSchedule{
 
 	private int repeatedMinute;
@@ -15,14 +17,17 @@ public class MinutelySchedule extends AbstractSchedule{
 	}
 	@Override
 	public Date nextPostDate() throws ContradictoryScheduleException {
+		Log.wtf("Minute", "enter");
 		Date now = new Date();
 		if(postDate.after(now))
 			return postDate;
 		Calendar c = Calendar.getInstance();
 		c.setTime(postDate);
-		while(postDate.before(now))
+		while(postDate.before(now)){
 			c.add(Calendar.MINUTE, repeatedMinute);
-		postDate = c.getTime();
+			postDate = c.getTime();
+		}
+		Log.wtf("Minute","exit");
 		return postDate;
 	}
 	

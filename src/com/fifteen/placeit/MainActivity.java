@@ -556,6 +556,7 @@ public class MainActivity extends Activity implements OnMapClickListener, OnCame
 				// Calls service to check if Place Its are ready to trigger
 				@Override
 				protected Void doInBackground(Void... arg0) {
+					service.checkPost();
 					service.checkPlaceIts(new LatLng(latitude, longitude));
 					return null;
 				}

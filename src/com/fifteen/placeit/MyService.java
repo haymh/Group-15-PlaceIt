@@ -40,7 +40,7 @@ public class MyService extends Service {
 	public static final String NOTIFICATION = "com.example.placeit.service.receiver";
 
 	private final static double RANGE = 0.8;
-	private final static long POST_TIME_LAG = 20000;
+	private final static long POST_TIME_LAG = 5000;
 	private final IBinder mBinder = new LocalBinder();
 	private DistanceManager dManager = new DistanceManager(this);
 	private boolean stop = false;
@@ -180,9 +180,9 @@ public class MyService extends Service {
 		onMap = database.onMapPlaceIt();
 		prePost = database.prepostPlaceIt();
 		
-		timer = new Timer();
+		//timer = new Timer();
 		// launch the thread
-		timer.scheduleAtFixedRate(new PostTimer(), 0, POST_TIME_LAG);
+		//timer.scheduleAtFixedRate(new PostTimer(), 0, POST_TIME_LAG);
 		// XXX Get universal data
 		preference = getSharedPreferences(Constant.SP.SAVE, Context.MODE_PRIVATE);
 
@@ -595,17 +595,57 @@ public class MyService extends Service {
 			}			
 		}
 	}
+	
+	public void checkPost(){
+		Log.wtf("is this running ", "yes");
+		Iterator<AbstractPlaceIt> i = prePost.values().iterator();
+		Log.wtf("checking which should be posted","here");
+		while(i.hasNext()){
+			Log.wtf("inside Thread", "checking prePost list");
+			AbstractPlaceIt pi = i.next();
+			try {
+				if(pi.getSchedule().postNowOrNot()){
+					Log.wtf("Post","yes");
+					if(preference.getBoolean(Constant.SP.U.LOGIN, false)){
+						TimeAndStatus ts = ServerUtil.changeStatus(pi.id, AbstractPlaceIt.Status.ON_MAP);
+						if(ts == null)
+							continue ;
+						if(ts.status != ServerUtil.OK)
+							continue ;
+						preference.edit().putLong(Constant.SP.TIME, ts.time).commit();
+					}
+					i.remove();
+					database.onMap(pi.getId());
+					pi.status = AbstractPlaceIt.Status.ON_MAP;
+					onMap.put(pi.getId(), pi);
+					LatLng coordinate = pi.getCoordinate();
+					if(coordinate == null)
+						continue;
+					
+					//inform Main to redraw
+					Intent in = new Intent(NOTIFICATION);
+					sendBroadcast(in);
+				}
+			} catch (ContradictoryScheduleException e) {
+				Log.wtf("Exception " + pi.getTitle(), e.getMessage());
+				//e.printStackTrace();
+			}
+		}
+	}
 
 	private void notify(AbstractPlaceIt pi){
 		Intent intent = new Intent(MyService.this,PlaceItDetailActivity.class);
 		intent.putExtra("id", pi.getId());
+		String categoryAddress = pi.placeItInfoMap.get(Constant.PI.ADDRESS);
+		if(categoryAddress == null)
+			categoryAddress = "";
 		PendingIntent resultPendingIntent = 
 				PendingIntent.getActivity(MyService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(MyService.this)
 		.setSmallIcon(R.drawable.note)
 		.setContentTitle(pi.getTitle())
-		.setContentText(pi.getDescription())
+		.setContentText(pi.getDescription() + " " + categoryAddress)
 		.setContentIntent(resultPendingIntent)
 		.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
 		.setAutoCancel(true);
@@ -660,7 +700,9 @@ public class MyService extends Service {
 				return null;
 			}
 		}.execute();
-
+		//inform Main to redraw
+		Intent in = new Intent(NOTIFICATION);
+		sendBroadcast(in);
 	}
 
 	public void deleteDatabase(){
